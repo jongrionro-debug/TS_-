@@ -1,0 +1,3 @@
+Model,Request tokens_count,Request tokens_mean,Request tokens_median,Request tokens_max,Response tokens_count,Response tokens_mean,Response tokens_median,Response tokens_max
+ChatGPT,158117,784.6759361738459,439.0,14320,158117,198.0137809343714,144.0,2048
+GPT-4,75500,1304.396821192053,773.0,71197,75500,426.88953642384104,420.0,2049

@@ -1,0 +1,2 @@
+zero_elapsed_rows,zero_elapsed_pct,positive_output_with_zero_elapsed_rows,elapsed_ge_300_rows,elapsed_ge_300_zero_token_rows,max_elapsed_seconds,zero_output_rows,all_tokens_zero_rows,zero_output_positive_input_rows,completion_before_arrival_rows
+33779,14.459136107389444,32651,405,387,714.0,1856,1856,0,0

@@ -1,0 +1,9 @@
+column,original_dtype,missing_or_blank,non_numeric,infinite,negative,zero,fractional
+Timestamp,float64,0,0.0,0.0,0.0,0.0,0.0
+Session ID,string,5110404,,,,,
+Elapsed time,int64,0,0.0,0.0,0.0,3175935.0,0.0
+Model,category,0,,,,,
+Request tokens,int64,0,0.0,0.0,0.0,387962.0,0.0
+Response tokens,int64,0,0.0,0.0,0.0,387963.0,0.0
+Total tokens,int64,0,0.0,0.0,0.0,387962.0,0.0
+Log Type,category,0,,,,,

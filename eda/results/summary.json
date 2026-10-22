@@ -1,0 +1,105 @@
+{
+  "raw": {
+    "rows": 5344021,
+    "columns": 8,
+    "min_timestamp": 19440110.0,
+    "max_timestamp": 28943983.0,
+    "duplicate_extra_rows": 347285,
+    "token_mismatch_rows": 0
+  },
+  "conversation": {
+    "rows": 233617,
+    "share_all_rows_pct": 4.371558420148424,
+    "duplicate_extra_rows": 0,
+    "invalid_rows_for_token_timeseries": 0,
+    "median_input_tokens": 517.0,
+    "median_output_tokens": 187.0,
+    "mean_input_tokens": 952.638570823185,
+    "mean_output_tokens": 271.98151247554756,
+    "zero_token_rows": 1856,
+    "zero_token_pct": 0.7944627317361322,
+    "total_input_tokens": 222552565,
+    "total_final_output_tokens": 63539505
+  },
+  "coverage": {
+    "conversation_min_timestamp": 19440110.0,
+    "conversation_max_timestamp": 28943974.0,
+    "conversation_span_days": 109.99842592592593,
+    "minute_bins": 158399,
+    "fully_observed_minute_bins": 158397,
+    "partial_edge_minute_bins": 2,
+    "empty_full_minutes": 72943,
+    "empty_full_minutes_pct": 46.050745910591736,
+    "longest_empty_minutes": 340,
+    "longest_interarrival_seconds": 20513.0,
+    "full_relative_days": 108,
+    "empty_full_relative_days": 0,
+    "completion_after_last_arrival_rows": 1,
+    "completion_outside_minute_grid_rows": 0
+  },
+  "sessions": {
+    "valid_id_rows": 233617,
+    "invalid_id_rows": 0,
+    "id_whitespace_rows": 0,
+    "uuid_format_rows": 233617,
+    "unique_sessions": 55920,
+    "single_request_sessions": 19834,
+    "repeat_sessions": 36086,
+    "repeat_sessions_pct": 64.53147353361945,
+    "rows_in_repeat_sessions_pct": 91.5100356566517,
+    "max_requests_per_session": 436,
+    "largest_session_row_share_pct": 0.1866302537914621,
+    "mixed_model_sessions": 3950,
+    "mixed_model_sessions_pct": 7.063662374821172,
+    "observed_span_over_24h_sessions": 1087,
+    "same_session_same_timestamp_extra_rows": 0,
+    "model_switches": 5190
+  },
+  "response": {
+    "zero_elapsed_rows": 33779,
+    "zero_elapsed_pct": 14.459136107389444,
+    "positive_output_with_zero_elapsed_rows": 32651,
+    "elapsed_ge_300_rows": 405,
+    "elapsed_ge_300_zero_token_rows": 387,
+    "max_elapsed_seconds": 714.0,
+    "zero_output_rows": 1856,
+    "all_tokens_zero_rows": 1856,
+    "zero_output_positive_input_rows": 0,
+    "completion_before_arrival_rows": 0
+  },
+  "observed_followup_gap_median_seconds": 131.0,
+  "observed_followup_gap_le_5min_pct": 66.10297303837432,
+  "minute_boundaries_with_pending_requests_pct": 13.899253142420626,
+  "exploratory_next5_correlations": {
+    "past5_requests": {
+      "next5_input_tokens": 0.798207942966677,
+      "next5_final_output_tokens": 0.8057201291912282
+    },
+    "past5_input_tokens": {
+      "next5_input_tokens": 0.7845119489443536,
+      "next5_final_output_tokens": 0.767902626384686
+    },
+    "past5_completed_output_tokens": {
+      "next5_input_tokens": 0.7846150433659865,
+      "next5_final_output_tokens": 0.7907077523222744
+    },
+    "active_sessions_5min": {
+      "next5_input_tokens": 0.7993730849696196,
+      "next5_final_output_tokens": 0.8127375328347786
+    },
+    "active_sessions_15min": {
+      "next5_input_tokens": 0.8150853448350592,
+      "next5_final_output_tokens": 0.8315444723210188
+    },
+    "active_sessions_30min": {
+      "next5_input_tokens": 0.8109679382799718,
+      "next5_final_output_tokens": 0.828411893798603
+    }
+  },
+  "validation": {
+    "arrival_token_and_request_sums_match_raw": true,
+    "active_session_counts_match_direct_windows_at_9_times": true,
+    "next5_targets_match_direct_event_sums_at_9_times": true,
+    "raw_sha256_unchanged": true
+  }
+}

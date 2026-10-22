@@ -1,0 +1,3 @@
+Log Type,rows,duplicate_extra_rows,token_mismatch_rows,min_timestamp,max_timestamp
+API log,5110404,347285,0,19454781.0,28943983.0
+Conversation log,233617,0,0,19440110.0,28943974.0
