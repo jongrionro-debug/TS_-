@@ -1,8 +1,24 @@
 {
-  "started_at_kst": "2026-10-22T19:50:43.175385+09:00",
+  "started_at_kst": "2026-10-22T20:58:48.185450+09:00",
   "source": "data/BurstGPT_3.csv",
   "source_sha256": "2299986a07388aa303ec2c41d1131e756db650a39ed6ef9dfe7cc3d7f9a43b8f",
   "source_bytes": 231682327,
+  "forecast": {
+    "horizon_minutes": 10,
+    "horizon_seconds": 600,
+    "step_seconds": 60,
+    "history_minutes": 60,
+    "target_window": "[t, t + horizon_seconds)",
+    "grouped_by": "request_arrival",
+    "targets": [
+      "input_tokens",
+      "final_output_tokens"
+    ],
+    "comparison_horizons_minutes": [
+      5,
+      10
+    ]
+  },
   "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
   "platform": "macOS-26.3-arm64-arm-64bit-Mach-O",
   "packages": {
@@ -25,7 +41,7 @@
     "partial_edge_bins": "flag_and_exclude_from_rate_comparisons",
     "elapsed_zero": "retain; zero does not establish failure or missingness"
   },
-  "finished_at_kst": "2026-10-22T19:51:06.876472+09:00",
+  "finished_at_kst": "2026-10-22T20:59:12.042763+09:00",
   "output_tables": [
     "01_column_quality.csv",
     "01_quality_by_log_type.csv",
@@ -36,6 +52,7 @@
     "03_empty_runs.csv",
     "03_minute_timeseries.csv",
     "04_resolution_summary.csv",
+    "04_series_10min.csv",
     "04_series_1hour.csv",
     "04_series_1min.csv",
     "04_series_5min.csv",
@@ -59,6 +76,7 @@
     "08_active_sessions_and_demand.csv",
     "08_autocorrelation_all_lags.csv",
     "08_autocorrelation_selected_lags.csv",
+    "08_forecast_horizon_summary.csv",
     "08_hour_of_day_profile.csv",
     "08_peak_composition.csv",
     "08_spearman_correlations.csv"
@@ -74,6 +92,7 @@
     "07_elapsed_and_pending.png",
     "07_output_time_definitions.png",
     "08_demand_correlations.png",
+    "08_forecast_horizon_comparison.png",
     "08_time_patterns.png"
   ]
 }
