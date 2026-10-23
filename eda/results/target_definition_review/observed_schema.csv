@@ -1,0 +1,9 @@
+column
+Timestamp
+Session ID
+Elapsed time
+Model
+Request tokens
+Response tokens
+Total tokens
+Log Type

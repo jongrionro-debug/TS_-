@@ -1,0 +1,53 @@
+{
+  "requested_target": "actual_output_tokens_generated_in_[t,t+600)",
+  "status": "not_identifiable_from_current_csv",
+  "target_was_generated": false,
+  "source": "data/BurstGPT_3.csv",
+  "source_sha256": "2299986a07388aa303ec2c41d1131e756db650a39ed6ef9dfe7cc3d7f9a43b8f",
+  "source_unchanged": true,
+  "observed_columns": [
+    "Timestamp",
+    "Session ID",
+    "Elapsed time",
+    "Model",
+    "Request tokens",
+    "Response tokens",
+    "Total tokens",
+    "Log Type"
+  ],
+  "raw_rows": 5344021,
+  "conversation_rows": 233617,
+  "invalid_conversation_time_or_token_rows": 0,
+  "zero_elapsed_positive_output_rows": 32651,
+  "missing_observations": [
+    "token_generation_timestamps_or_time_binned_generation_counts",
+    "first_token_time_and_stream_chunk_counts_if_using_chunks",
+    "generation_telemetry_coverage_and_reporting_delay"
+  ],
+  "elapsed_time_semantics": "submission_to_complete_final_response_not_decode_duration",
+  "input_target": "arrival_input_tokens_unless_prefill_telemetry_is_obtained",
+  "unapproved_substitutions": [
+    "completion_assigned_final_output_is_a_different_target",
+    "uniform_allocation_over_elapsed_is_an_assumption_not_ground_truth",
+    "dropping_cross_boundary_responses_loses_in_window_tokens"
+  ],
+  "ambiguity_example": {
+    "kind": "synthetic_identifiability_example_not_observed_data",
+    "forecast_window": "[12:00:00, 12:10:00)",
+    "same_observed_row": {
+      "arrival": "12:09:30",
+      "completion": "12:11:00",
+      "elapsed_seconds": 90,
+      "final_output_tokens": 400
+    },
+    "possible_actual_tokens_inside_window": [
+      399,
+      0
+    ],
+    "arrival_assigned_output_tokens": 400,
+    "completion_assigned_output_tokens": 0,
+    "uniform_over_elapsed_estimated_tokens": 133.33333333333334,
+    "conclusion": "The logged fields cannot distinguish these histories."
+  },
+  "official_schema": "https://github.com/HPMLL/BurstGPT#schema"
+}
