@@ -38,3 +38,28 @@ python3 scripts/verify.py
 분할은 시각이 유효하고 유효 쌍이 있는 그룹을 최초 기록시각 순으로 정렬한 뒤 그룹 수의 70%/85% 위치를 경계로 삼는다. 경계에 걸친 그룹은 통째로 제외하고 같은 시각은 뒤 구간에 둔다. 따라서 제거 후 비율은 70%/15%/15%와 다를 수 있다. 기록시각 순 분할이며 실제 요청 도착시각 순서의 보장은 아니다. MAE·log 오차·pinball·커버리지는 후속 평가에서 산출한다.
 
 테스트는 합성 대화만 사용한다. 표준 라이브러리 Python에서는 순서·결측·불변성·그룹 분리 테스트를 실행하고 실제 tokenizer/Parquet CLI 통합 테스트 1개는 건너뛴다. 위 WildChat 가상환경에서는 통합 테스트까지 모두 실행한다.
+
+## 프롬프트 대 이력 분위수 실험 (#7)
+
+[train.py](train.py)는 LightGBM 분위수 회귀로 A(현재 프롬프트의 입력 토큰·문자·UTF-8 바이트 수)와 B(A + 이전 턴 수·1~3턴 입력/출력 길이 lag·결측 지표)를 비교한다. 원문은 사용하지 않는다. 결측 lag는 NaN으로 유지하고 첫 턴도 같은 평가 행에 포함한다. 간격 lag는 #5에서 user 제출시각 의미를 확인했고 train에 유효한 관측이 있는 슬롯만 사용한다. 이번 첫 샤드에는 해당 슬롯이 없다.
+
+기본 실행은 지정된 prepared 디렉터리의 train·validation 전체를 사용한다. 이 이슈에서는 운영자 자원·범위 결정에 따라 `/workspace/data/wildchat-1m/derived/issue5-shard0` 고정 표본을 사용하며 전체 14개 샤드를 추가로 읽지 않는다. manifest의 과거 `/tmp` 경로를 따라가지 않는다.
+
+```sh
+python3 wildchat/train.py --prepared /path/to/wildchat-prepared --output wildchat/results --seed 42
+python3 -m unittest discover -s wildchat/tests
+python3 scripts/verify.py
+```
+
+이 환경에서 실제 실험과 수치 통합 테스트를 실행하는 명령은 다음과 같다. 추가 설치는 필요하지 않다.
+
+```sh
+PATH=/workspace/venvs/wildchat/bin:$PATH python3 wildchat/train.py --prepared /workspace/data/wildchat-1m/derived/issue5-shard0 --output wildchat/results --seed 42
+/workspace/venvs/wildchat/bin/python -m unittest discover -s wildchat/tests
+```
+
+A·B에 동일한 3개 설정 × P10/P50/P90, seed, 최대 500회 boosting과 validation 손실 40회 무개선 조기 종료를 적용한다. `--max-rounds`, `--early-stopping-rounds`, `--threads`(기본 4)를 조정하면 두 모델에 공통 적용하며 결과에 기록한다. 음수 예측을 0으로 자르고 행별 정렬한 후, validation 평균 pinball로 각 모델의 설정을 선택한다. 단순 기준은 train 출력의 경험적 P10/P50/P90이며 #6의 동일 지표 함수를 사용한다. bin 경계는 train에서만 만들고 validation을 합쳐 재학습하지 않는다.
+
+사용자 지시로 **test.jsonl은 읽지 않으며 시험 평가는 보류**한다. test 접근 옵션은 없고 분할 표의 test 수·범위는 manifest 메타데이터만 인용한다. 최종 test 1회 평가 시점 승인이 필요하다. validation은 조기 종료·선택에 쓰인 자료이므로 이 결과는 독립 시험 성능이 아니다.
+
+[experiment.json](results/experiment.json)과 [report.md](results/report.md)에 기준·A·B 지표, B−A 차이, train/validation 분포와 상관, 특징, 후보별 선택·교차율, 패키지·시드·명령·시각·해시와 한계를 저장한다. 출력은 집계 두 파일뿐이며 표본·원문·모델 바이너리는 저장하지 않는다. 수치/LightGBM 환경이 없는 Python은 관련 테스트를 skip하고, 가상환경에서는 합성 학습과 test 접근 차단·재현성까지 검증한다.

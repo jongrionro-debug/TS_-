@@ -2,3 +2,7 @@
 datasets==5.1.0
 pyarrow==26.0.0
 tiktoken==0.14.0
+# #7 분위수 GBDT 실행 환경 (scipy는 LightGBM 수치 의존성)
+lightgbm==4.7.0
+numpy==2.5.4
+scipy==1.18.1
