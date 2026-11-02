@@ -10,6 +10,6 @@ adr 폴더는 우리 기획에 특성 수정사항이 생겼을 경우에 adr.md
 
 ## 재현 방법
 
-1. 원본 데이터 `data/BurstGPT_3.csv`를 저장소의 `data/` 경로에 둡니다. `data/`는 Git에서 제외되므로 데이터 파일은 저장소에 포함되지 않습니다.
+1. 원본 데이터 `data/BurstGPT_3.csv`를 저장소의 `data/` 경로에 둡니다. `.gitignore`가 `/data/BurstGPT_3.csv`를 제외하므로 이 데이터 파일은 저장소에 포함되지 않습니다.
 2. Jupyter 환경에서 `eda/eda.ipynb`를 위에서 아래 순서로 실행합니다.
 3. 분석 결과는 `eda/results/`에 저장됩니다. 요약은 `eda/results/summary.md`와 `eda/results/summary.json`에서 확인할 수 있습니다.
