@@ -1,0 +1,25 @@
+{
+  "prepared": "/workspace/data/wildchat-1m/derived/issue5-shard0",
+  "fit_split": "train",
+  "evaluation_split": "validation",
+  "quantile_method": "inverse empirical CDF, ceil(n*q)",
+  "crossing_rule": "reject",
+  "baseline_output_tokens": {
+    "p10": 45,
+    "p50": 229,
+    "p90": 603
+  },
+  "metrics": {
+    "n": 22968,
+    "mae_p50": 184.76179902473007,
+    "mean_absolute_log1p_error_p50": 0.8016741202832735,
+    "pinball_loss": {
+      "p10": 27.603774817137108,
+      "p50": 92.38089951236503,
+      "p90": 63.81430250783722
+    },
+    "mean_pinball_loss": 61.26632561244645,
+    "p10_p90_coverage": 0.789576802507837,
+    "mean_interval_width": 558.0
+  }
+}
