@@ -1,0 +1,61 @@
+name: Agent Task
+description: noxxcode/Codex가 처리할 작업
+title: "[agent] "
+labels: ["agent:triage"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: 무엇을, 왜 바꾸는가 (1~3문장)
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: 검증 가능한 체크리스트
+      value: |
+        - [ ] 
+        - [ ] python3 scripts/verify.py 통과
+    validations: { required: true }
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: 바꾸면 안 되는 것, 금지 사항
+      placeholder: docs/prd.md 정의 변경 금지, 새 의존성 금지
+  - type: textarea
+    id: context
+    attributes:
+      label: Context References
+      description: 라우터가 사전 조사로 채움 (문서/경로/관련 이슈·PR/ADR)
+      placeholder: |
+        docs: docs/prd.md
+        paths: eda/
+        related: #31, PR #35, ADR-0001
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Execution mode
+      options: [implement-and-verify, investigate-only, refactor, docs-only]
+    validations: { required: true }
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      description: "모델 선택 기준 — low: 가벼운 모델, medium: 기본, high: 최상위 모델"
+      options: [low, medium, high]
+      default: 1
+    validations: { required: true }
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options: [low, medium, high]
+  - type: checkboxes
+    id: flags
+    attributes:
+      label: Flags
+      options:
+        - label: Mac 필요 (box에서 실행 불가)
+        - label: 사람 결정 필요 (설계 선택)
