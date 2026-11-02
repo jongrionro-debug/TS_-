@@ -1,0 +1,12 @@
+provider,event_type,count
+claude,user_message,27182
+claude,text,81003
+claude,tool_call,142388
+claude,tool_result,141888
+claude,reasoning,42176
+codex,user_message,21114
+codex,reasoning,165131
+codex,text,78659
+codex,tool_call,290122
+codex,usage_report,216823
+codex,tool_result,289930

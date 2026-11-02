@@ -1,0 +1,170 @@
+{
+  "scope": "Exploratory CODEx usage-report clock; not original arrival-demand task, not actual per-minute generated tokens.",
+  "window_utc": [
+    "2026-05-01T00:00:00Z",
+    "2026-06-01T00:00:00Z"
+  ],
+  "horizon_minutes": 10,
+  "step_seconds": 60,
+  "train_cutoff_utc": "2026-05-19T14:24:00+00:00",
+  "test_start_utc": "2026-05-25T19:12:00+00:00",
+  "model": "sklearn HistGradientBoostingRegressor",
+  "params": {
+    "loss": "absolute_error",
+    "learning_rate": 0.06,
+    "max_iter": 100,
+    "max_leaf_nodes": 15,
+    "min_samples_leaf": 40,
+    "l2_regularization": 1.0,
+    "max_bins": 63,
+    "early_stopping": false,
+    "random_state": 42
+  },
+  "tuning_trials": 0,
+  "model_fit_count": 6,
+  "refit_on_validation": false,
+  "features": {
+    "A": [
+      "reports_lag_1",
+      "reports_lag_2",
+      "reports_lag_3",
+      "reports_sum_5",
+      "reports_sum_15",
+      "reports_sum_30",
+      "reports_sum_60",
+      "reports_std_15",
+      "input_lag_1",
+      "input_lag_2",
+      "input_lag_3",
+      "input_sum_5",
+      "input_sum_15",
+      "input_sum_30",
+      "input_sum_60",
+      "input_std_15",
+      "output_lag_1",
+      "output_lag_2",
+      "output_lag_3",
+      "output_sum_5",
+      "output_sum_15",
+      "output_sum_30",
+      "output_sum_60",
+      "output_std_15",
+      "prefix_sum_15",
+      "zero_input_sum_15",
+      "hour_sin",
+      "hour_cos",
+      "model_share_28",
+      "model_share_29",
+      "model_share_30",
+      "model_share_31",
+      "model_share_32",
+      "model_share_33",
+      "model_share_34",
+      "model_share_35",
+      "model_share_36",
+      "model_share_37",
+      "model_share_38",
+      "model_share_39",
+      "model_share_40",
+      "model_share_41",
+      "input_len_mean_15",
+      "input_len_std_15",
+      "input_len_median_15",
+      "input_len_p90_15"
+    ],
+    "B_extra": [
+      "recent_reporting_sessions_5",
+      "recent_reporting_sessions_15",
+      "recent_reporting_sessions_30"
+    ],
+    "C_extra": [
+      "session_recency_seconds_median",
+      "session_recency_seconds_p90",
+      "session_observed_age_seconds_median",
+      "session_observed_age_seconds_p90",
+      "session_observed_report_count_median",
+      "session_observed_report_count_p90",
+      "session_last_reported_input_median",
+      "session_last_reported_input_p90",
+      "session_reported_input_change_median",
+      "session_reported_input_change_p90"
+    ]
+  },
+  "model_share_mapping": {
+    "model_share_28": "codex-auto-review",
+    "model_share_29": "gpt-5",
+    "model_share_30": "gpt-5-codex",
+    "model_share_31": "gpt-5.1",
+    "model_share_32": "gpt-5.1-codex",
+    "model_share_33": "gpt-5.1-codex-max",
+    "model_share_34": "gpt-5.1-codex-mini",
+    "model_share_35": "gpt-5.2",
+    "model_share_36": "gpt-5.2-codex",
+    "model_share_37": "gpt-5.3-codex",
+    "model_share_38": "gpt-5.3-codex-spark",
+    "model_share_39": "gpt-5.4",
+    "model_share_40": "gpt-5.4-mini",
+    "model_share_41": "gpt-5.5"
+  },
+  "availability": "All feature usage reports strictly < origin; input length first used at report. Labels known after window end under timestamp-as-local-availability assumption. Ingestion delay unknown.",
+  "session_definition": "Recently reporting session: at least one report in trailing W min; not proof an agent is currently running. IDs are join keys only.",
+  "C_scope": "Observed per-session usage state only. No true tool-wait, turn-end, or running status features in this pilot.",
+  "split_counts": {
+    "train": 26775,
+    "validation": 8919,
+    "test": 8919,
+    "purged": 18
+  },
+  "features_count": {
+    "A": 46,
+    "B": 49,
+    "C": 59
+  },
+  "checks": {
+    "raw_target_and_history_and_session_spot_checks": 9,
+    "strict_feature_availability": true,
+    "training_labels_ready_by_fit": true,
+    "overlapping_train_validation_test_targets_purged": true
+  },
+  "environment": {
+    "python": "3.13.5",
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "sklearn": "1.6.1"
+  },
+  "limitations": [
+    "Full-period EDA seen before pilot; not pristine held-out confirmatory evaluation.",
+    "Missing logs versus no activity cannot be distinguished; zeros mean no recorded report, not verified zero demand.",
+    "Historical donations and participant/model composition shift limit external validity.",
+    "Six calendar days of test with overlapping 10-min targets; no independent-minute significance claim.",
+    "C tests session usage summaries, not observed execution/tool states; XGBoost not installed.",
+    "Two May sessions have earlier April cross-session round-ID repeats; historical C counts/age may be affected. No suspect repeat rows fall inside May targets."
+  ],
+  "horizon_density_on_pilot_window": [
+    {
+      "minutes": 1,
+      "origins": 44640,
+      "zero_report_target_pct": 63.13620071684588
+    },
+    {
+      "minutes": 5,
+      "origins": 44636,
+      "zero_report_target_pct": 52.06111658750784
+    },
+    {
+      "minutes": 10,
+      "origins": 44631,
+      "zero_report_target_pct": 47.628330084470434
+    }
+  ],
+  "selected_by_validation_mae": {
+    "input": "B",
+    "output": "B"
+  },
+  "cross_session_identity_caveat": {
+    "cross_session_round_id_extra_rows_full_codex": 2702,
+    "suspect_rows_reported_in_pilot_window": 0,
+    "pilot_sessions_with_earlier_suspect_reports": 2,
+    "pilot_rows_in_these_sessions": 1099
+  }
+}
