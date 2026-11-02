@@ -41,7 +41,7 @@ python3 scripts/verify.py
 
 ## 프롬프트 대 이력 분위수 실험 (#7)
 
-[train.py](train.py)는 LightGBM 분위수 회귀로 A(현재 프롬프트의 입력 토큰·문자·UTF-8 바이트 수)와 B(A + 이전 턴 수·1~3턴 입력/출력 길이 lag·결측 지표)를 비교한다. 원문은 사용하지 않는다. 결측 lag는 NaN으로 유지하고 첫 턴도 같은 평가 행에 포함한다. 간격 lag는 #5에서 user 제출시각 의미를 확인했고 train에 유효한 관측이 있는 슬롯만 사용한다. 이번 첫 샤드에는 해당 슬롯이 없다.
+[train.py](train.py)는 “길이+대화이력 B가 길이만 A보다 출력 토큰을 더 잘 예측하는가”만 검증한다. 비교 대상은 고정 분위수 기준선·LightGBM A·LightGBM B 세 개다. A는 현재 프롬프트의 입력 토큰·문자·UTF-8 바이트 수 3개, B는 A + 이전 턴 수·1~3턴 입력/출력 길이 lag·결측 지표 31개를 사용한다. 원문·프롬프트 유형·주제·언어·임베딩 등 의미 특징은 사용하지 않는다. 결측 lag는 NaN으로 유지하고 첫 턴도 같은 평가 행에 포함한다. 간격 lag는 #5에서 user 제출시각 의미를 확인했고 train에 유효한 관측이 있는 슬롯만 사용한다. 이번 첫 샤드에는 해당 슬롯이 없다.
 
 기본 실행은 지정된 prepared 디렉터리의 train·validation 전체를 사용한다. 이 이슈에서는 운영자 자원·범위 결정에 따라 `/workspace/data/wildchat-1m/derived/issue5-shard0` 고정 표본을 사용하며 전체 14개 샤드를 추가로 읽지 않는다. manifest의 과거 `/tmp` 경로를 따라가지 않는다.
 
@@ -60,6 +60,10 @@ PATH=/workspace/venvs/wildchat/bin:$PATH python3 wildchat/train.py --prepared /w
 
 A·B에 동일한 3개 설정 × P10/P50/P90, seed, 최대 500회 boosting과 validation 손실 40회 무개선 조기 종료를 적용한다. `--max-rounds`, `--early-stopping-rounds`, `--threads`(기본 4)를 조정하면 두 모델에 공통 적용하며 결과에 기록한다. 음수 예측을 0으로 자르고 행별 정렬한 후, validation 평균 pinball로 각 모델의 설정을 선택한다. 단순 기준은 train 출력의 경험적 P10/P50/P90이며 #6의 동일 지표 함수를 사용한다. bin 경계는 train에서만 만들고 validation을 합쳐 재학습하지 않는다.
 
+2026-11-03 사용자 결정에 따라 전체·첫 턴(`turn_index==0`)·후속 턴(`>0`)별 평균 pinball(주 지표), P50 MAE, P10~P90 커버리지, 평균 구간 폭을 보고한다. 각 지표와 B−A 차이에 #5 대화 그룹 부트스트랩 95% CI를 붙인다. `--bootstrap-replicates` 기본 1,000회, `--seed` 기본 42이며 NumPy PCG64를 사용한다. validation 전체의 G개 그룹에서 G개를 복원 추출하고 각 그룹의 모든 행을 유지한다. 같은 추출을 세 모델·세 턴 구분에 공통 적용하며, 각 반복의 표본별 평균과 대응 B−A 차이에서 2.5%/97.5% percentile(선형 보간)을 구한다. 턴 표본이 0인 반복은 제외하고 유효 반복 수를 기록한다. 부트스트랩 중 재학습·재선택은 하지 않는다.
+
+하이퍼파라미터 선택·조기 종료·보고가 모두 같은 validation이라 절대 수치는 낙관적일 수 있음(A·B 동일 조건). CI는 고정된 선택 모델과 검증 표본에 조건부이며 이 선택 편향이나 모델 학습 불확실성을 보정하지 않는다. SciPy 1.18.1은 LightGBM 4.7.0의 필수 런타임 의존성이므로 버전 고정을 유지한다. 부트스트랩 자체는 NumPy만 사용한다.
+
 사용자 지시로 **test.jsonl은 읽지 않으며 시험 평가는 보류**한다. test 접근 옵션은 없고 분할 표의 test 수·범위는 manifest 메타데이터만 인용한다. 최종 test 1회 평가 시점 승인이 필요하다. validation은 조기 종료·선택에 쓰인 자료이므로 이 결과는 독립 시험 성능이 아니다.
 
-[experiment.json](results/experiment.json)과 [report.md](results/report.md)에 기준·A·B 지표, B−A 차이, train/validation 분포와 상관, 특징, 후보별 선택·교차율, 패키지·시드·명령·시각·해시와 한계를 저장한다. 출력은 집계 두 파일뿐이며 표본·원문·모델 바이너리는 저장하지 않는다. 수치/LightGBM 환경이 없는 Python은 관련 테스트를 skip하고, 가상환경에서는 합성 학습과 test 접근 차단·재현성까지 검증한다.
+[experiment.json](results/experiment.json)과 [report.md](results/report.md)에 턴 구분별 기준·A·B 지표와 B−A·95% CI, train/validation 분포와 상관, 특징, 후보별 선택·교차율, 패키지·시드·명령·시각·해시와 한계를 저장한다. JSON의 `validation_by_cohort`가 분리 결과이며 기존 전체 지표 필드도 유지한다. 출력은 집계 두 파일뿐이며 표본·원문·모델 바이너리는 저장하지 않는다. 수치/LightGBM 환경이 없는 Python은 관련 테스트를 skip하고, 가상환경에서는 합성 학습과 그룹 부트스트랩·턴 분리·test 접근 차단·재현성까지 검증한다.

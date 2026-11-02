@@ -92,6 +92,8 @@ class FeatureAndContractTests(unittest.TestCase):
         changed["target"]["output_tokens"] = 999999
         changed["metadata"] = {"future": "must not be a feature"}
         changed["prompt_features"]["future_output"] = 999999
+        changed["prompt_features"]["language"] = "ko"
+        changed["prompt_features"]["prompt_type"] = "semantic feature must be ignored"
         changed["history_features"]["whole_conversation_total"] = 999999
         for names in train.feature_names(3).values():
             self.assertEqual(train.feature_vector(original, names), train.feature_vector(changed, names))
@@ -143,6 +145,74 @@ class FeatureAndContractTests(unittest.TestCase):
 
 @unittest.skipUnless(HAS_NUMPY, "numerical checks require the issue-authorized NumPy environment")
 class NumericalTests(unittest.TestCase):
+    def test_paired_group_bootstrap_matches_explicit_group_row_resampling(self):
+        import numpy as np
+        targets = np.array([0, 5, 9, 10, 30])
+        groups = np.array([10, 10, 20, 30, 30])  # deliberately unequal cluster sizes
+        turns = np.array([0, 2, 0, 0, 1])
+        a = np.array([[1, 2, 4], [3, 6, 8], [4, 8, 12], [5, 9, 13], [10, 20, 35]])
+        predictions = {"baseline": np.tile([1, 7, 20], (5, 1)), "A": a, "B": a + 1}
+        seed, repeats = 17, 128
+        metadata, result = train.cluster_bootstrap(targets, predictions, groups, turns, seed, repeats)
+        self.assertEqual(metadata["groups_per_draw"], 3)
+        self.assertEqual(metadata["replicates"], repeats)
+        self.assertFalse(metadata["refit_or_reselect"])
+        rng = np.random.Generator(np.random.PCG64(seed))
+        explicit = {name: [] for name in ("all", "first_turn", "followup_turn")}
+        for _ in range(repeats):
+            # Independent reference: materialize every selected group's full rows,
+            # including repeated groups; call #6 evaluate instead of aggregated sums.
+            draw = rng.integers(0, 3, size=3)
+            indices = np.concatenate([np.flatnonzero(groups == [10, 20, 30][g]) for g in draw])
+            subsets = {"all": indices, "first_turn": indices[turns[indices] == 0],
+                       "followup_turn": indices[turns[indices] > 0]}
+            for cohort, rows in subsets.items():
+                if not len(rows):
+                    continue
+                metrics = {name: evaluate(targets[rows].tolist(), pred[rows].tolist())
+                           for name, pred in predictions.items()}
+                metrics["B-A"] = train.metric_difference(metrics["A"], metrics["B"])
+                explicit[cohort].append(metrics)
+        for cohort, mask in train.cohort_masks(turns).items():
+            actual = result[cohort]
+            self.assertEqual(actual["n_samples"], int(mask.sum()))
+            self.assertEqual(actual["n_groups"], len(set(groups[mask])))
+            self.assertEqual(actual["bootstrap_effective_replicates"], len(explicit[cohort]))
+            self.assertEqual(actual["bootstrap_empty_replicates"], repeats - len(explicit[cohort]))
+            for name, pred in predictions.items():
+                self.assertEqual(actual["models"][name]["metrics"], evaluate(targets[mask].tolist(), pred[mask].tolist()))
+            for name in (*train.COMPARISONS, "B-A"):
+                entry = actual["difference_b_minus_a"] if name == "B-A" else actual["models"][name]
+                for metric in train.BOOTSTRAP_METRICS:
+                    expected = np.quantile([m[name][metric] for m in explicit[cohort]], [.025, .975], method="linear")
+                    np.testing.assert_allclose(entry["ci95"][metric], expected, atol=1e-12)
+        self.assertGreater(result["followup_turn"]["bootstrap_empty_replicates"], 0)
+        self.assertEqual((metadata, result), train.cluster_bootstrap(targets, predictions, groups, turns, seed, repeats))
+
+    def test_bootstrap_degenerate_paired_difference_and_empty_cohort(self):
+        import numpy as np
+        y = np.array([0, 1, 2])
+        a = np.tile([3, 4, 5], (3, 1))
+        predictions = {"baseline": a, "A": a, "B": a + 1}
+        _, result = train.cluster_bootstrap(y, predictions, [7, 7, 7], [0, 1, 2], 42, 25)
+        for cohort in result.values():
+            np.testing.assert_allclose(cohort["difference_b_minus_a"]["ci95"]["mae_p50"], [1, 1])
+            np.testing.assert_allclose(cohort["difference_b_minus_a"]["ci95"]["mean_pinball_loss"], [.5, .5])
+        _, no_later = train.cluster_bootstrap(y, predictions, [7, 8, 9], [0, 0, 0], 42, 25)
+        empty = no_later["followup_turn"]
+        self.assertEqual(empty["n_samples"], 0)
+        self.assertEqual(empty["bootstrap_effective_replicates"], 0)
+        self.assertEqual(empty["bootstrap_empty_replicates"], 25)
+        self.assertIsNone(empty["difference_b_minus_a"]["metrics"])
+        for entry in empty["models"].values():
+            self.assertIsNone(entry["metrics"])
+            self.assertTrue(all(value is None for value in entry["ci95"].values()))
+        for seed, repeats in ((42, 0), (-1, 10)):
+            with self.assertRaises(ValueError):
+                train.cluster_bootstrap(y, predictions, [7, 7, 7], [0, 1, 2], seed, repeats)
+        with self.assertRaises(ValueError):
+            train.cluster_bootstrap(y, {"A": a, "B": a}, [7, 7, 7], [0, 1, 2], 42, 10)
+
     def test_crossing_repair_clipping_and_metrics(self):
         import numpy as np
         raw = [[5, 1, 3], [-2, 0, 4], [1, 1, 2]]
@@ -193,6 +263,8 @@ class NumericalTests(unittest.TestCase):
             self.assertEqual(a.summary["first_turn_samples"], 80)
             self.assertEqual(b.summary["first_turn_samples"], 20)
             self.assertEqual(len(b.y), 100)
+            self.assertEqual(list(b.row_groups[:5]), [100] * 5)
+            self.assertEqual(list(b.turn_indices[:5]), [0, 1, 2, 3, 4])
             with self.assertRaisesRegex(ValueError, "test is forbidden"):
                 train.load_partition(path, "test", manifest, names)
             invalid_manifest = copy.deepcopy(manifest)
@@ -240,7 +312,7 @@ class LightGBMIntegrationTests(unittest.TestCase):
             prepared = tmp / "prepared"
             prepared_fixture(prepared)
             args = argparse.Namespace(prepared=prepared, output=tmp / "results", seed=42,
-                                      max_rounds=6, early_stopping_rounds=2, threads=1)
+                                      max_rounds=6, early_stopping_rounds=2, threads=1, bootstrap_replicates=64)
             original_open = Path.open
             opened = []
             def guarded_open(path, *args, **kwargs):
@@ -268,6 +340,21 @@ class LightGBMIntegrationTests(unittest.TestCase):
                 self.assertEqual(valid_a.num_data(), 100)
                 np.testing.assert_equal(valid_a.get_label(), valid_b.get_label())
             self.assertEqual(result["partitions"]["validation"]["first_turn_samples"], 20)
+            self.assertEqual(result["comparison_models"], ["baseline", "A", "B"])
+            self.assertEqual(result["bootstrap"]["replicates"], 64)
+            self.assertEqual(result["bootstrap"]["seed"], 42)
+            self.assertFalse(result["semantic_features"])
+            for cohort, n in (("all", 100), ("first_turn", 20), ("followup_turn", 80)):
+                grouped = result["validation_by_cohort"][cohort]
+                self.assertEqual(grouped["n_samples"], n)
+                self.assertEqual(grouped["n_groups"], 20)
+                self.assertEqual(grouped["bootstrap_effective_replicates"], 64)
+                self.assertEqual(set(grouped["models"]), {"baseline", "A", "B"})
+                for entry in grouped["models"].values():
+                    self.assertEqual(entry["metrics"]["n"], n)
+                    self.assertEqual(set(entry["ci95"]), set(train.BOOTSTRAP_METRICS))
+                    for bounds in entry["ci95"].values():
+                        self.assertLessEqual(bounds[0], bounds[1])
             self.assertEqual(result["baseline"]["quantiles"], dict(zip(("p10", "p50", "p90"), baseline([
                 sample(g, t)["target"]["output_tokens"] for g in range(80) for t in range(5)]))))
             for name, model in result["models"].items():
@@ -277,12 +364,14 @@ class LightGBMIntegrationTests(unittest.TestCase):
             saved = json.loads((args.output / "experiment.json").read_text())
             self.assertEqual(saved, result)
             self.assertIn("test 미평가", (args.output / "report.md").read_text())
+            self.assertIn("절대 수치는 낙관적일 수 있음(A·B 동일 조건)", (args.output / "report.md").read_text())
             self.assertEqual({p.name for p in args.output.iterdir()}, {"experiment.json", "report.md"})
             # Same seed and inputs reproduce every model/trial metric and selection.
             args.output = tmp / "repeat"
             with mock.patch.object(Path, "open", guarded_open), mock.patch("sys.stdout", new_callable=io.StringIO):
                 repeated = train.run(args)
             self.assertEqual(result["models"], repeated["models"])
+            self.assertEqual(result["validation_by_cohort"], repeated["validation_by_cohort"])
 
 
 if __name__ == "__main__":
