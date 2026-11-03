@@ -22,11 +22,11 @@ Closes #<issue>
 - 없음 / 항목
 
 ## Agent metadata
-- worker: noxxcode (codex exec)
+- worker: <실행 주체 / 로컬 채팅 또는 box worker>
 - difficulty / model: <low|medium|high> / <model>
-- codex_session: <session-id>
+- codex_session: <session-id / 해당 없음>
 - base_commit: <sha>
-- attempts: <n>/3
-- handoff: agent-ops/state/issues/<repo>-<n>.json
+- attempts: <실제 검증·수정 횟수>
+- handoff: <box worker 인계 경로 / 해당 없음>
 
-<!-- 에이전트는 머지하지 않는다. 머지는 종현 승인 후. -->
+<!-- Git 요청의 병합은 WORKFLOW.md §0의 사용자 위임과 이번 요청의 보류 여부를 따른다. -->
