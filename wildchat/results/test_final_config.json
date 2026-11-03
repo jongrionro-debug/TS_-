@@ -1,0 +1,200 @@
+{
+  "issue": 15,
+  "frozen_at_utc": "2026-11-03T01:59:31.367330+00:00",
+  "approval": "repo owner, 2026-11-03, issue15 operator context",
+  "issue13_ref": "origin/agent/issue-13-7-train",
+  "issue13_commit": "922370cea7abc36e85379db4cee3f99cf3e8e4d6",
+  "issue13_result_sha256": "5cf6ad575c6320f0ddfafe409d2d541f475755da1bf60ee8ed985348f2b11c36",
+  "source": {
+    "prepared": "/workspace/data/wildchat-1m/derived/issue5-shard0",
+    "metadata_source": "/workspace/data/wildchat-1m/data/train-00000-of-00014.parquet",
+    "preparation_provenance": [
+      {
+        "name": "train-00000-of-00014.parquet",
+        "sha256": "abec2a13129db8c0e6a2d3a51ff12644873c748205a6fdf6551fbcb34430e51c",
+        "rows": 59857
+      }
+    ],
+    "metadata_checks": [
+      "filename",
+      "row count",
+      "all selected row timestamps"
+    ],
+    "prepared_sha256": {
+      "train": "1a0268417c47dc19d838de7472c3876d2b4cce944e964be3c105f69183f91388",
+      "validation": "e619f27483ed5986add62f2c0e57e3c29c8162c3924b1053e12c2820090d156a"
+    },
+    "manifest_sha256": "d9c5a4040ea2abd3173825fc34fe03812ba668b011d9c051f6fb92d82a18a8b2"
+  },
+  "versions": {
+    "python": "3.13.5",
+    "numpy": "2.5.4",
+    "lightgbm": "4.7.0",
+    "scipy": "1.18.1",
+    "pyarrow": "26.0.0"
+  },
+  "features": {
+    "A": [
+      "input_tokens",
+      "input_chars",
+      "input_utf8_bytes"
+    ],
+    "B": [
+      "input_tokens",
+      "input_chars",
+      "input_utf8_bytes",
+      "previous_user_turns",
+      "lag_1_input_tokens",
+      "lag_1_input_chars",
+      "lag_1_input_utf8_bytes",
+      "lag_1_output_tokens",
+      "lag_1_output_chars",
+      "lag_1_output_utf8_bytes",
+      "lag_1_turn_missing",
+      "lag_1_input_missing",
+      "lag_1_output_missing",
+      "lag_2_input_tokens",
+      "lag_2_input_chars",
+      "lag_2_input_utf8_bytes",
+      "lag_2_output_tokens",
+      "lag_2_output_chars",
+      "lag_2_output_utf8_bytes",
+      "lag_2_turn_missing",
+      "lag_2_input_missing",
+      "lag_2_output_missing",
+      "lag_3_input_tokens",
+      "lag_3_input_chars",
+      "lag_3_input_utf8_bytes",
+      "lag_3_output_tokens",
+      "lag_3_output_chars",
+      "lag_3_output_utf8_bytes",
+      "lag_3_turn_missing",
+      "lag_3_input_missing",
+      "lag_3_output_missing"
+    ]
+  },
+  "seed": 42,
+  "threads": 4,
+  "bootstrap_replicates": 1000,
+  "common_parameters": {
+    "objective": "quantile",
+    "metric": "quantile",
+    "learning_rate": 0.05,
+    "max_bin": 255,
+    "feature_fraction": 1.0,
+    "bagging_fraction": 1.0,
+    "bagging_freq": 0,
+    "lambda_l1": 0.0,
+    "lambda_l2": 0.0,
+    "seed": 42,
+    "data_random_seed": 42,
+    "feature_fraction_seed": 42,
+    "bagging_seed": 42,
+    "deterministic": true,
+    "force_col_wise": true,
+    "num_threads": 4,
+    "verbosity": -1,
+    "feature_pre_filter": false
+  },
+  "models": {
+    "A": {
+      "selected_parameters": {
+        "num_leaves": 15,
+        "min_data_in_leaf": 100
+      },
+      "selected_quantile_fits": [
+        {
+          "quantile": 0.1,
+          "best_iteration": 231,
+          "rounds_evaluated": 271,
+          "inner_raw_pinball": 25.334544791664115
+        },
+        {
+          "quantile": 0.5,
+          "best_iteration": 175,
+          "rounds_evaluated": 215,
+          "inner_raw_pinball": 80.67298439785564
+        },
+        {
+          "quantile": 0.9,
+          "best_iteration": 175,
+          "rounds_evaluated": 215,
+          "inner_raw_pinball": 50.05925035744309
+        }
+      ]
+    },
+    "B": {
+      "selected_parameters": {
+        "num_leaves": 31,
+        "min_data_in_leaf": 300
+      },
+      "selected_quantile_fits": [
+        {
+          "quantile": 0.1,
+          "best_iteration": 403,
+          "rounds_evaluated": 443,
+          "inner_raw_pinball": 23.05194010733413
+        },
+        {
+          "quantile": 0.5,
+          "best_iteration": 244,
+          "rounds_evaluated": 284,
+          "inner_raw_pinball": 67.2458931652499
+        },
+        {
+          "quantile": 0.9,
+          "best_iteration": 279,
+          "rounds_evaluated": 319,
+          "inner_raw_pinball": 40.449902765732375
+        }
+      ]
+    }
+  },
+  "baseline_fit": {
+    "fixed": [
+      45.0,
+      232.0,
+      613.0
+    ],
+    "previous_ratio": [
+      0.3,
+      0.9423868312757202,
+      1.641025641025641
+    ],
+    "cumulative_mean_offsets": [
+      -151.0,
+      0.0,
+      200.66666666666666
+    ],
+    "positive_previous_fit_rows": 53420,
+    "cumulative_fit_rows": 53266
+  },
+  "best_baselines": {
+    "first_turn": {
+      "row": "fixed",
+      "user": "fixed"
+    },
+    "followup_turn": {
+      "row": "cumulative_mean",
+      "user": "cumulative_mean"
+    },
+    "all": {
+      "row": "cumulative_mean",
+      "user": "cumulative_mean"
+    }
+  },
+  "policy": {
+    "training": "issue13 full purged train only; validation never added; no retuning or early stopping",
+    "exclusions": "test-only whole groups: missing user, user/group/source in original train OR validation, or recorded_at before fixed test boundary; never change training",
+    "quantiles": "original P10/P50/P90; clip negatives to zero; never sort",
+    "bootstrap": "paired user bootstrap; seed 42; 1000 replicates; same draws across models/cohorts/weights",
+    "selection": "issue13 train-internal best baseline per cohort/weight; no test selection"
+  },
+  "code_sha256": {
+    "wildchat/finalize.py": "96ec03f440bc36b03a76712a6503fc9094c1a9103d22783672ca4022fdad5e7a",
+    "wildchat/revalidate.py": "1bc920f94eab045e43ce541de9ec385bf817428a4e6719edb93f86b7c3c04cd2",
+    "wildchat/train.py": "c0faf0003f6071cc817a7b78d3f2e5ad8d8f80818b358dcc8b500c4d625ae9af",
+    "wildchat/prepare.py": "8d4dc94fff10379a220f5dc3d5ae2135642b53d3245c951121c35a6319841759",
+    "wildchat/metrics.py": "37828985f55b349fd09407c78138980335149991ab08c33fa533077c95c1db2d"
+  }
+}
