@@ -38,7 +38,7 @@ agent:triage → agent:ready → agent:in-progress → agent:review → merge �
 - 기존 실패가 남으면 새 실패와 구분하고 원인·개수를 보고한다. 전체 DoD 통과로 표시하지 않는다.
 - 범위 밖 변경 없음 또는 risks에 명시
 - 문서 영향 있으면 docs/ 갱신
-- `git diff --check`, 변경 범위·기존 작업 보존·이번 임시 파일 정리를 확인한다.
+- `git diff --check`, 변경 범위·기존 작업 보존·이번 임시 파일 정리를 확인한다. 대체된 파일의 삭제와 관련 참조·진입점 수정·검증도 완료 조건이다.
 
 ## 5. Handoff JSON (box worker 기계 인계)
 
@@ -57,7 +57,9 @@ box worker의 최종 출력 형식이다. 일반 채팅 작업은 결과·핵심
 ## 6. 자료·실험·외부 작업 경계
 - 시크릿·자격증명 접근, 요청 범위 밖 삭제·배포·외부 메시지 전송·새 의존성 추가를 하지 않는다. Git 요청의 push·PR·병합은 §0의 위임을 따른다.
 - force-push는 자기 작업 브랜치 rebase 외에는 하지 않는다. Git 위임을 기존 작업이나 공유 브랜치 이력 삭제 권한으로 해석하지 않는다.
-- `eda/results/`·`wildchat/results/`는 생성 산출물이므로 수작업으로 변경하지 않는다. 원본 데이터·PDF·대용량 파일·출처 사본도 보존한다.
+- 생성 산출물의 수치를 수작업으로 바꾸지 않는다. 현재 재현·검증·라이선스에 필요한 파일만 유지하며, 원본·PDF·출처 사본이라는 이유만으로 일괄 보존하지 않는다. #13/#15의 현재 근거인 고정 코드·설정·결과·로그는 유지한다.
+- 대체된 제안·옛 설계·중복 보고서·미사용 코드와 산출물은 사용처와 Git 복구 가능 여부를 확인하고 작업 범위에서 삭제한다. archive/backup 폴더나 과거 설계 부록으로 옮겨 쌓지 않는다. 파일 내용은 Git, 중요한 결정은 ADR, 작업·검증 근거는 이슈·PR에 남긴다.
+- 허용된 범위의 불필요한 커밋된 파일 삭제는 재승인받지 않는다. 미커밋 변경·미추적 파일·gitignore 데이터·유일한 원본은 복구 가능하다고 가정하지 않으며 별도 권한과 보존 수단을 확인한다. 삭제한 경로의 문서 링크·진입점도 함께 수정한다.
 - #15 최종 test 평가는 완료됐다. `wildchat/finalize.py freeze/evaluate` 재실행·test 재접근·결과를 본 뒤 재튜닝하지 않는다. 고정 코드·해시·설정·로그는 보존한다.
 
 ## 7. 난이도 → 모델
@@ -72,4 +74,4 @@ box 자동화의 모델 이름은 저장소 밖 설정에서 관리하며 이 �
 - `python3 scripts/verify.py`: 표준 라이브러리만 사용. JSON/ipynb 파싱과 Markdown 상대 링크의 존재를 검사하며 모델 성능·외부 URL·노트북 재현을 검증하지는 않는다.
 - `python3 -m unittest discover -s wildchat/tests`: 합성 자료 기반 기존 테스트. NumPy·LightGBM·PyArrow·tiktoken 부재 시 관련 테스트는 skip된다. 실제 실험을 검증했다고 대신 보고하지 않는다.
 - WildChat 의존성이 준비된 환경의 명령·선택 테스트는 [wildchat/README.md](wildchat/README.md)를 따른다. 문서 갱신을 위해 의존성을 새로 설치하거나 학습·최종 평가를 재실행할 필요는 없다.
-- 2026-11-03 문서 점검 기준, 외부에서 보관한 `eda/agent_transition/tracelab/source/LICENSE-DATASET.md`와 `release_README.md`에는 upstream 저장소 기준 상대 링크 8건이 로컬에 없다. 사본은 `provenance.json`의 SHA256 보존 대상이므로 수정하지 않는다. 전체 verify에는 이 기존 오류가 남으며 실패로 보고한다. 자체 문서의 새 링크 오류를 이 사유에 섞지 않는다.
+- 2026-11-03 문서 점검 기준, 외부에서 보관한 `eda/agent_transition/tracelab/source/LICENSE-DATASET.md`와 `release_README.md`에는 upstream 저장소 기준 상대 링크 8건이 로컬에 없다. 계속 사용하는 사본은 `provenance.json`의 SHA256과 출처 의미를 지켜야 하지만, 해시 기록 자체가 미사용 사본의 영구 보존 이유는 아니다. 해당 사본이 남아 있는 현재 전체 verify는 기존 오류 8건으로 실패하며, 자체 문서의 새 오류와 구분한다.
