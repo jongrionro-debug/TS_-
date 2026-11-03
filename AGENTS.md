@@ -1,59 +1,54 @@
 # AGENTS.md — 에이전트용 지도 (100줄 이내 유지)
 
-## 0. 팀 기획 규칙 (기존 agents.md 원문 유지)
-- 우리 기획의 source of truth는 docs/prd.md이다.
-- docs에는 prd.md, adr 폴더가 있다. (adr 폴더 = `docs/decisions/`)
-- adr 폴더는 우리 기획에 특성 수정사항이 생겼을 경우에 adr.md(작성 전 질문)를 작성한다.
-  큰 변경이 아니면 prd.md에 관련 내용이 있으면 해당 내용만 수정한다.
+## 0. 정본과 현재 상태 (2026-11-03)
+- 연구 정의의 정본은 [docs/prd.md](docs/prd.md), 작업 절차는 [WORKFLOW.md](WORKFLOW.md)다.
+- 현재 작업은 WildChat의 **현재 프롬프트에 대한 응답 토큰 수 예측**이다. 길이만 쓰는 A와 대화 이력을 더한 B를 비교한다.
+- #13 사용자 분리·train 내부 튜닝 재검증과 #15 최종 test 1회 평가가 완료됐다. 다음 할 일을 모델 구현이나 test 승인 대기로 안내하지 않는다.
+- BurstGPT의 다음 10분 집계 입력·출력 수요 설계와 EDA는 별도 보존 트랙이다. WildChat 결과로 그 가설을 검증했다고 해석하지 않는다.
+- 큰 연구 정의 변경은 먼저 기존 사용자 결정과 PRD를 확인하고, 미결정 사항만 질문한 뒤 `docs/decisions/`에 ADR을 기록한다. 작은 보완은 기존 문서를 갱신한다.
 
-## 1. 이 저장소는
-- 한 줄 설명: BurstGPT 대화형 로그로 다음 10분 입력·출력 토큰 수요를 단기 예측하는 시계열 연구 (과목 프로젝트)
-- 스택: Python 3 + Jupyter 노트북 (eda/eda.ipynb), Markdown 문서. 빌드/테스트 프레임워크 없음
-- 작업 절차는 WORKFLOW.md, 기획 원본은 docs/prd.md
-
-## 2. 먼저 읽을 곳 (필요한 것만)
+## 1. 필요한 진입점
 | 알고 싶은 것 | 위치 |
 |---|---|
-| 연구 질문·목표 정의·실험 범위 | docs/prd.md |
-| 이슈→PR 절차, 완료 기준, handoff 스키마 | WORKFLOW.md |
-| 과거 설계 결정 (ADR) | docs/decisions/ (NNNN-*.md, 템플릿 0000) |
-| EDA 코드 | eda/eda.ipynb |
-| EDA 산출물 요약 | eda/results/summary.md, summary.json, manifest.json |
-| 발표/제안 자료 | output/ |
-| 참고 논문 (PDF, 수정 금지) | ref/ |
+| 연구 질문·현재 범위·BurstGPT 보존 설계 | [docs/prd.md](docs/prd.md) |
+| 실행 환경·명령·단계별 산출물 | [wildchat/README.md](wildchat/README.md) |
+| 최종 test 결과·설정·실행 증거 | `wildchat/results/test_final.md`, `.json`, `_config.json`, `_config.sha256`, `.log` |
+| 사용자 분리·내부 튜닝·validation 결과 | `wildchat/revalidate.py`, `wildchat/results/revalidation.md`, `.json` |
+| 전처리·과거 탐색 실험 | `wildchat/prepare.py`, `analyze.py`, `train.py`, `wildchat/results/` |
+| 테스트 | `wildchat/tests/test_*.py` (unittest·합성 자료) |
+| 설계 결정 | `docs/decisions/` (NNNN-*.md, 템플릿 0000) |
+| BurstGPT EDA·요약·실행 환경 | `eda/eda.ipynb`, `eda/results/summary.md`, `summary.json`, `manifest.json` |
+| 과거 전환 검토·발표 자료 | `docs/adr/가설1.md`, `제안1.md`, `eda/agent_transition/`, `output/` |
 
-## 3. 명령어
-- 설치: 없음 (검증 스크립트는 표준 라이브러리만 사용)
-- 검증(전체, 필수): `python3 scripts/verify.py`
-  - 모든 *.json / *.ipynb 가 JSON으로 파싱되는지, *.md 의 상대 링크가 실제 파일을 가리키는지 확인
-- 테스트/린트/타입체크: 아직 없음 — 추가하려면 이슈로 제안
-- 노트북 실행: 원본 데이터 `data/BurstGPT_3.csv`(gitignore, box에 없음)가 필요 → 재실행이 필요하면 decisions_needed
+## 2. 명령과 환경
+- 전체 형식·상대 링크 검증(필수): `python3 scripts/verify.py` (표준 라이브러리만 사용).
+- 기존 테스트: `python3 -m unittest discover -s wildchat/tests`. 수치·Parquet 의존성이 없으면 관련 테스트가 skip되므로 통과/skip 수를 함께 보고한다.
+- WildChat 의존성은 `wildchat/requirements.txt`에 고정돼 있다. box의 `/workspace/venvs/wildchat/bin/python`은 과거 실행 환경이며 로컬에 있다고 가정하지 않는다.
+- 빌드·별도 린트·타입체크 설정은 없다. 새 의존성·테스트 프레임워크를 임의로 추가하지 않는다.
+- BurstGPT 노트북은 `data/BurstGPT_3.csv`와 노트북 의존성이 필요하다. CSV는 gitignore 대상이며 환경별 존재 여부를 확인한다.
+- 전체 검증에는 보존된 TraceLab 외부 문서 사본의 기존 링크 오류가 있다. [WORKFLOW.md §8](WORKFLOW.md#8-검증-명령과-기존-한계)를 따르고 실패를 통과로 보고하지 않는다.
 
-## 4. 작업 규칙
-- 새 의존성 추가 금지 (이슈에 허용 명시된 경우만)
-- 기획/정의 변경은 docs/prd.md 해당 부분만 수정, 큰 변경은 docs/decisions/에 ADR
-- eda/results/* 산출물은 노트북 재실행 결과물 — 손으로 수정 금지
-- ref/*.pdf, output/*.pdf, data/ 등 대용량·바이너리 파일 수정·삭제 금지
-- 문서는 한국어 기본, 수치는 eda/results 근거와 일치시킬 것
+## 3. 실험·자료 보존
+- WildChat은 첫 Parquet 샤드의 고정 표본 결과다. 전체 14개 샤드나 실제 API 사용량·GPU 효과로 일반화하지 않는다.
+- 현재 비교는 고정 분위수·직전 응답 비율·대화 누적 평균·A·B의 5개다. #7의 3모델·validation 튜닝·분위수 정렬은 과거 규칙이다.
+- 현재 규칙은 사용자/대화 그룹 분리, train 내부 튜닝, 분위수 무정렬, 사용자 bootstrap이다. 세부 사항은 PRD와 #13/#15 산출물을 따른다.
+- **`wildchat/finalize.py freeze/evaluate`는 이미 완료된 실행 이력이다. 재실행·재튜닝·실제 test 자료 재접근을 하지 않는다.** 합성 fixture 기반 테스트는 가능하다.
+- `test_final_config.json`에 고정된 5개 코드 파일과 설정·결과·로그를 문서 수정 중 변경하지 않는다. 새 실험은 별도 범위 결정이 필요하다.
+- `eda/results/*`, `wildchat/results/*`는 실행 산출물이다. 수치·생성 보고서를 손으로 바꾸지 않는다.
+- 원문·생성 표본·모델 바이너리는 커밋하지 않는다. `ref/`, PDF, 데이터·대용량 파일, 출처 해시가 있는 `source/` 사본은 보존한다.
+- 시크릿/.env/자격증명 파일 읽기·수정 금지. 사용자 ID·대화 원문을 채팅이나 보고서에 노출하지 않는다.
 
-## 5. 작업 경계 (반드시)
-- 이슈의 Acceptance Criteria 범위 밖 변경 금지 (발견 시 risks에 기록)
-- 기본 브랜치(현재 `가설1`) 직접 push/merge 금지, 브랜치: agent/issue-<n>-<slug>
-- 시크릿/.env/자격증명 파일 읽기·수정 금지
-- 파일 삭제·대용량 파일 변경·CI 설정 변경은 decisions_needed로 보고
-- 모호하면: 문서·코드 조사로 불확실성 줄이기 → 그래도 남으면 질문 1~3개
+## 4. 작업과 Git
+- 요청/이슈 AC 범위에서 최소 변경한다. 의미 있는 변경은 바꿀 동작·지킬 동작·확인 방법을 3줄 이내로 알린다.
+- 한 메인 에이전트가 기본이다. 원본 프로젝트에서 작업하고 기존 변경을 보존하며, 새 worktree는 사용자 명시 요청 때만 만든다.
+- 착수 시 `git status --short`, 현재 브랜치·HEAD를 확인한다. 기본 작업 브랜치는 `가설1`; 이슈 작업은 `agent/issue-<n>-<slug>`, 이슈 없는 작업은 `agent/<slug>`를 사용한다.
+- Git 요청에는 필요한 브랜치·커밋·push·PR·병합·기본 브랜치 반영 권한이 포함된다(2026-10-30 사용자 위임). 단계별 재확인하지 않으며 이번 요청의 보류·범위 제한이 우선한다.
+- 이슈 없이 받은 로컬 작업에 GitHub 이슈·게시를 자동으로 요구하지 않는다. 삭제·대용량·CI 변경이 필요하면 요청 범위와 권한을 먼저 확인한다.
+- 막연한 불확실성은 `rg`, 관련 함수·산출물, `git log`, 관련 이슈/PR로 줄이고 결과를 크게 바꾸는 미결정 사항만 질문한다.
 
-## 6. 맥락 찾는 법
-- candidate_paths는 출발점일 뿐, rg로 자유롭게 탐색
-- 관련 이력: `gh issue view <n>`, `gh pr view <n>`, `git log -S <문자열>`
-- 과거 PR 내용은 이후 바뀌었을 수 있으니 현재 파일로 재확인
-
-## 7. 끝내기 전 자기점검
-1. AC 각 항목을 무엇으로 검증했는지
-2. `python3 scripts/verify.py` 실행 결과
-3. 범위 밖 변경 없음 확인 (`git diff --stat`)
-4. 영구 지식 정리: 설계 결정→docs/decisions, 재발 방지 규칙→본 파일 또는 verify 스크립트
-5. 마지막 출력은 handoff JSON (WORKFLOW.md §5 스키마)
-
-## 8. 하위 AGENTS.md
-- 하위 디렉터리에 AGENTS.md가 있으면 해당 디렉터리 작업 시 우선 적용
+## 5. 완료 전 확인
+1. 요청/AC별 근거, 필수 검증·관련 테스트 결과와 skip/기존 실패를 확인한다.
+2. `git diff --check`, `git diff --stat`으로 범위와 기존 작업 보존을 확인하고 이번 임시 파일을 처리한다.
+3. 영구 지식은 기존 PRD·ADR·지침에 반영한다. 별도 계획·요약 MD를 임의로 만들지 않는다.
+4. 채팅 작업은 결과·위치·검증·남은 점을 한국어로 간결히 보고한다. box worker의 기계 인계는 WORKFLOW.md §5 JSON을 사용한다.
+5. 하위 AGENTS.md가 있으면 해당 디렉터리 작업 시 우선 적용한다.
