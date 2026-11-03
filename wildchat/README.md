@@ -67,3 +67,19 @@ A·B에 동일한 3개 설정 × P10/P50/P90, seed, 최대 500회 boosting과 va
 사용자 지시로 **test.jsonl은 읽지 않으며 시험 평가는 보류**한다. test 접근 옵션은 없고 분할 표의 test 수·범위는 manifest 메타데이터만 인용한다. 최종 test 1회 평가 시점 승인이 필요하다. validation은 조기 종료·선택에 쓰인 자료이므로 이 결과는 독립 시험 성능이 아니다.
 
 [experiment.json](results/experiment.json)과 [report.md](results/report.md)에 턴 구분별 기준·A·B 지표와 B−A·95% CI, train/validation 분포와 상관, 특징, 후보별 선택·교차율, 패키지·시드·명령·시각·해시와 한계를 저장한다. JSON의 `validation_by_cohort`가 분리 결과이며 기존 전체 지표 필드도 유지한다. 출력은 집계 두 파일뿐이며 표본·원문·모델 바이너리는 저장하지 않는다. 수치/LightGBM 환경이 없는 Python은 관련 테스트를 skip하고, 가상환경에서는 합성 학습과 그룹 부트스트랩·턴 분리·test 접근 차단·재현성까지 검증한다.
+
+## 사용자 분리·train 내부 튜닝 재검증 (#13)
+
+[revalidate.py](revalidate.py)는 기존 #7 산출물을 보존하고 별도 결과를 만든다. 기존 train/validation 시간 경계에서 양쪽에 등장한 `hashed_ip`와 ID 결측이 있는 원래 대화 그룹 전체를 제외한다. train 내부에도 시간순 80/20 홀드아웃과 같은 사용자 분리를 적용한다. A/B 설정·조기 종료 횟수 및 비교 기준선은 내부에서 고정하고, 전체 정제 train으로 재학습한 뒤 validation을 보고에만 쓴다. 분위수를 정렬하지 않으며 교차를 그대로 평가한다.
+
+준비 표본에는 사용자 ID가 없어 원본 **단일 train Parquet 샤드의 `hashed_ip`·`timestamp` 열만** 연결한다. Python 객체로 변환하는 원본 행은 허용된 두 분할의 source_row_id뿐이며 대화 원문은 읽지 않는다. 소스 파일명·행 수·선택 행 시각을 준비 manifest와 대조한다. 원본 전체 바이트 해시는 재검증하지 않고 기존 manifest의 출처 해시를 기록한다. 의존성 추가·전처리 재실행·추가 추출이 없다.
+
+```sh
+/workspace/venvs/wildchat/bin/python wildchat/revalidate.py --prepared /workspace/data/wildchat-1m/derived/issue5-shard0 --source /workspace/data/wildchat-1m/data/train-00000-of-00014.parquet --output wildchat/results --seed 42 --inner-fraction 0.8 --max-rounds 500 --early-stopping-rounds 40 --threads 4 --bootstrap-replicates 1000
+/workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_revalidate wildchat.tests.test_metrics
+python3 scripts/verify.py
+```
+
+고정 분위수·직전 응답 비율·대화 누적 평균·A·B의 30개 조합(3턴 구분×2가중×5모델)에 평균/분위수별 pinball, P50 MAE, coverage, 평균 구간 폭과 교차율을 제공한다. 누적 평균은 같은 원본 대화의 현재 턴 이전 유효 쌍 전체로 계산한다. 사용자 bootstrap 1,000회는 같은 사용자 추출을 모든 모델·턴·가중 방식에 공유한다. 최선 기준선은 턴·가중 방식별 내부 홀드아웃 점수로 미리 정하며 모든 개별 기준선 대비 CI도 보존한다.
+
+결과는 [revalidation.md](results/revalidation.md), 전체 설정·수치는 [revalidation.json](results/revalidation.json), 실행·분할 검증은 [revalidation.log](results/revalidation.log)에 자동 저장된다. 이슈 PR용 요약은 [revalidation_pr.md](results/revalidation_pr.md), 실제 두 번 실행의 수치 대조 기록은 [revalidation_verification.json](results/revalidation_verification.json)에 있다. CI는 고정된 학습 결과에 조건부이며 IP 식별 오차·시간 블록 상관·학습 불확실성을 포함하지 않는다. 사용자 제거로 평가 모집단이 바뀌므로 기존 −9.55와의 차이를 보정 요인의 개별 효과로 해석하지 않는다.
