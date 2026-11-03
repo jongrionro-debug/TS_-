@@ -83,3 +83,28 @@ python3 scripts/verify.py
 고정 분위수·직전 응답 비율·대화 누적 평균·A·B의 30개 조합(3턴 구분×2가중×5모델)에 평균/분위수별 pinball, P50 MAE, coverage, 평균 구간 폭과 교차율을 제공한다. 누적 평균은 같은 원본 대화의 현재 턴 이전 유효 쌍 전체로 계산한다. 사용자 bootstrap 1,000회는 같은 사용자 추출을 모든 모델·턴·가중 방식에 공유한다. 최선 기준선은 턴·가중 방식별 내부 홀드아웃 점수로 미리 정하며 모든 개별 기준선 대비 CI도 보존한다.
 
 결과는 [revalidation.md](results/revalidation.md), 전체 설정·수치는 [revalidation.json](results/revalidation.json), 실행·분할 검증은 [revalidation.log](results/revalidation.log)에 자동 저장된다. 이슈 PR용 요약은 [revalidation_pr.md](results/revalidation_pr.md), 실제 두 번 실행의 수치 대조 기록은 [revalidation_verification.json](results/revalidation_verification.json)에 있다. CI는 고정된 학습 결과에 조건부이며 IP 식별 오차·시간 블록 상관·학습 불확실성을 포함하지 않는다. 사용자 제거로 평가 모집단이 바뀌므로 기존 −9.55와의 차이를 보정 요인의 개별 효과로 해석하지 않는다.
+
+## 승인된 최종 테스트 1회 평가 (#15)
+
+2026-11-03 종현 님의 승인으로 #15에 한해 test 접근을 허용했다. 위 #7/#13의 보류 설명은 당시 실험에 적용된다. [finalize.py](finalize.py)는 PR #14의 고정 코드·선택 설정을 사용한다. 현재 체크아웃의 #13 관련 네 코드 파일과 결과는 `origin/agent/issue-13-7-train`의 `922370cea7abc36e85379db4cee3f99cf3e8e4d6`과 같으며, 기존 파일을 수정하지 않는다. 의존성 추가가 없다.
+
+학습은 #13의 정제 train 81,307행만 쓴다. validation을 합치지 않아 같은 학습 표본·모델 설정·반복 수를 유지한다. A의 P10/P50/P90은 231/175/175회, B는 403/244/279회로 고정한다. 조기 종료나 재튜닝을 하지 않는다. 기준선 추정값과 턴·가중별 최선 기준선도 #13 그대로다.
+
+실행 이력은 다음과 같다. **이미 완료된 실행을 다시 실행하지 않는다.**
+
+```sh
+/workspace/venvs/wildchat/bin/python wildchat/finalize.py freeze
+/workspace/venvs/wildchat/bin/python wildchat/finalize.py evaluate
+```
+
+첫 명령은 [고정 설정](results/test_final_config.json)과 [SHA256](results/test_final_config.sha256)을 테스트 접근 전에 만든다. 두 번째 명령은 코드·설정·환경·준비 manifest·train/validation 해시를 확인하고 #13의 train 정제와 기준선 추정을 재현한다. A/B를 같은 횟수로 학습한 후, 기존 validation의 모든 지표가 1e−10 이내로 일치하는지 확인한다. 이어 학습 모델 해시를 기록한 뒤 test를 딱 한 번 읽으면서 파일 해시도 계산한다. 원래 train 또는 validation과 사용자·그룹·원본 행이 겹치거나 ID가 결측인 test 대화 그룹 전체를 제외한다. 이 규칙은 테스트 전에 고정하며 학습 표본은 바꾸지 않는다.
+
+출력 경로는 고정이다. [로그](results/test_final.log)를 독점 생성하며 로그 또는 결과가 존재하면 재실행을 거부한다. 실패한 시도도 로그를 남기므로 자동 재시도하지 않는다. 결과 확인 뒤 모델·설정·예측 코드 수정과 재평가는 금지한다. [최종 보고서](results/test_final.md), [기계 판독 결과](results/test_final.json), [PR 본문](results/test_final_pr.md)에 5모델×3턴 구분×2가중, 평균/분위수별 pinball·MAE·coverage·구간 폭·교차율과 B−A/기준선 대비 사용자 bootstrap 95% CI를 기록한다. 검증셋 대비 차이는 기간과 사용자 구성의 차이를 함께 포함한다.
+
+검증은 실제 test 파일을 읽지 않는 합성 fixture만 사용한다. 기존 전처리 CLI 통합 테스트 1개는 합성 `test.jsonl`을 읽으므로 수치 환경의 아래 검증에서 제외한다. 표준 Python의 전체 discover에서는 해당 선택 의존성 통합 테스트가 skip된다.
+
+```sh
+/workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_finalize wildchat.tests.test_revalidate wildchat.tests.test_experiment wildchat.tests.test_metrics wildchat.tests.test_prepare.FeatureTests wildchat.tests.test_prepare.GroupSplitTests
+python3 -m unittest discover -s wildchat/tests
+python3 scripts/verify.py
+```
