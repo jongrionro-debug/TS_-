@@ -6,6 +6,19 @@
 
 정제 train 81,307행, validation 12,920행, 최종 test 11,942행·1,770사용자다. 최종 test 전체 행 가중 평균 pinball은 A 55.849263, B 45.455475, B−A −10.393788(사용자 bootstrap 95% CI [−12.732540, −8.279974])이다. 첫 턴 행 가중 차이의 CI는 0을 포함한다. 첫 샤드의 가시 텍스트 길이 예측 결과이며 실제 API 사용량이나 전체 14개 샤드의 성능을 뜻하지 않는다.
 
+## 데이터 경로 설정
+
+데이터 위치는 컴퓨터마다 다르므로 명령에서는 `$WILDCHAT_DATA_DIR`를 쓴다. 저장소에는 경로를 고정하지 않고 각 컴퓨터의 셸 설정에만 둔다.
+
+```sh
+# box(VM)
+export WILDCHAT_DATA_DIR=/workspace/data/wildchat-1m
+# 로컬 Mac (~/.zshrc)
+export WILDCHAT_DATA_DIR=~/data/wildchat-1m
+```
+
+결과 파일(`results/*.json`, `results/*.md`)에 남은 `/workspace/...` 경로는 box에서 실행한 기록이므로 고치지 않는다.
+
 ## 데이터 조사 (#4)
 
 [AllenAI WildChat-1M](https://huggingface.co/datasets/allenai/WildChat-1M), Zhao 등 [WildChat 논문](https://arxiv.org/abs/2405.01470). 데이터 카드의 라이선스는 [ODC-BY 1.0](https://opendatacommons.org/licenses/by/1-0/)이다. 출처 리비전은 `7d6490e462285cf85d91eabea0f9a954fbddcd1f`이며 데이터는 이 저장소에 포함하지 않는다.
@@ -15,7 +28,7 @@
 의존성은 [requirements.txt](requirements.txt)에 기록한다. `o200k_base` 인코딩 파일이 로컬 캐시에 없으면 최초 사용 시 다운로드가 필요하다. 네트워크가 없는 환경에서는 미리 캐시가 준비되어야 한다. 승인된 환경에서 실행한 명령은 다음과 같다.
 
 ```sh
-/workspace/venvs/wildchat/bin/python wildchat/inspect.py --input /workspace/data/wildchat-1m/data/train-00000-of-00014.parquet --output wildchat/results/data_audit.md
+/workspace/venvs/wildchat/bin/python wildchat/inspect.py --input "$WILDCHAT_DATA_DIR"/data/train-00000-of-00014.parquet --output wildchat/results/data_audit.md
 python3 scripts/verify.py
 ```
 
@@ -62,7 +75,7 @@ python3 scripts/verify.py
 당시 의존성이 준비된 box에서 사용한 명령은 다음과 같다. 로컬의 의존성 설치 여부는 별도로 확인한다.
 
 ```sh
-PATH=/workspace/venvs/wildchat/bin:$PATH python3 wildchat/train.py --prepared /workspace/data/wildchat-1m/derived/issue5-shard0 --output wildchat/results --seed 42
+PATH=/workspace/venvs/wildchat/bin:$PATH python3 wildchat/train.py --prepared "$WILDCHAT_DATA_DIR"/derived/issue5-shard0 --output wildchat/results --seed 42
 /workspace/venvs/wildchat/bin/python -m unittest discover -s wildchat/tests
 ```
 
@@ -83,7 +96,7 @@ A·B에 동일한 3개 설정 × P10/P50/P90, seed, 최대 500회 boosting과 va
 준비 표본에는 사용자 ID가 없어 원본 **단일 train Parquet 샤드의 `hashed_ip`·`timestamp` 열만** 연결한다. Python 객체로 변환하는 원본 행은 허용된 두 분할의 source_row_id뿐이며 대화 원문은 읽지 않는다. 소스 파일명·행 수·선택 행 시각을 준비 manifest와 대조한다. 원본 전체 바이트 해시는 재검증하지 않고 기존 manifest의 출처 해시를 기록한다. 의존성 추가·전처리 재실행·추가 추출이 없다.
 
 ```sh
-/workspace/venvs/wildchat/bin/python wildchat/revalidate.py --prepared /workspace/data/wildchat-1m/derived/issue5-shard0 --source /workspace/data/wildchat-1m/data/train-00000-of-00014.parquet --output wildchat/results --seed 42 --inner-fraction 0.8 --max-rounds 500 --early-stopping-rounds 40 --threads 4 --bootstrap-replicates 1000
+/workspace/venvs/wildchat/bin/python wildchat/revalidate.py --prepared "$WILDCHAT_DATA_DIR"/derived/issue5-shard0 --source "$WILDCHAT_DATA_DIR"/data/train-00000-of-00014.parquet --output wildchat/results --seed 42 --inner-fraction 0.8 --max-rounds 500 --early-stopping-rounds 40 --threads 4 --bootstrap-replicates 1000
 /workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_revalidate wildchat.tests.test_metrics
 python3 scripts/verify.py
 ```
