@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NoTestAccessTests(unittest.TestCase):
     def test_sources_never_reference_test_split(self):
-        for name in ("classify.py", "category.py"):
+        for name in ("classify.py", "category.py", "classify_sims.py", "category_features.py"):
             self.assertNotIn("test.jsonl", (ROOT / name).read_text())
 
 
@@ -81,3 +81,44 @@ class CategoryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(HAS_NUMPY, "requires NumPy")
+class SimilarityTests(unittest.TestCase):
+    def test_per_category_argmax_matches_assign(self):
+        import numpy as np
+        from wildchat import classify as cl
+        from wildchat import classify_sims as cs
+        rng = np.random.default_rng(0)
+        proto_labels = [c for c in cl.CATEGORIES for _ in cl.TAXONOMY[c]]
+        proto, prompts = rng.normal(size=(len(proto_labels), 8)), rng.normal(size=(50, 8))
+        labels, best = cl.assign(prompts, proto, proto_labels)
+        sims = cs.per_category(prompts, proto, proto_labels)
+        self.assertEqual(sims.shape, (50, len(cl.CATEGORIES)))
+        self.assertEqual([cl.CATEGORIES[i] for i in sims.argmax(axis=1)], labels)
+        np.testing.assert_allclose(sims.max(axis=1), best)
+
+
+@unittest.skipUnless(HAS_TRAINING, "requires training dependencies")
+class FeatureVariantTests(unittest.TestCase):
+    def test_label_codes_follow_taxonomy_order(self):
+        from wildchat import category_features as cf
+        from wildchat.classify import CATEGORIES
+        self.assertEqual(cf.label_codes([CATEGORIES[3], CATEGORIES[0]]).tolist(), [3.0, 0.0])
+        with self.assertRaises(KeyError):
+            cf.label_codes(["unknown"])
+
+    def test_fixed_fit_uses_categorical_signal(self):
+        import numpy as np
+        from argparse import Namespace
+        from wildchat import category_features as cf
+        rng = np.random.default_rng(1)
+        n = 3000
+        cat = rng.integers(0, 7, n).astype(float)
+        x = np.column_stack([rng.normal(size=n), cat])
+        y = np.where(cat % 2 == 0, 10.0, 100.0) + rng.normal(size=n)
+        sel = {"parameters": {"num_leaves": 7, "min_data_in_leaf": 20}, "iterations": [100, 100, 100]}
+        pred = cf.fit_fixed(x, y, x, ["noise", "category"], sel, Namespace(seed=1, threads=1), categorical=[1])
+        self.assertEqual(pred.shape, (n, 3))
+        self.assertTrue((pred >= 0).all())
+        self.assertLess(np.abs(pred[:, 1] - y).mean(), 5)

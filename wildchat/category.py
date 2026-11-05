@@ -79,7 +79,7 @@ def score_table(rows, predictions, models):
     return result
 
 
-def bootstrap_diffs(rows, predictions, seed, replicates):
+def bootstrap_diffs(rows, predictions, seed, replicates, models=MODELS, comparisons=COMPARISONS):
     """Paired user bootstrap of model differences in mean pinball."""
     users, codes = np.unique(rows.users, return_inverse=True)
     g = len(users)
@@ -88,17 +88,17 @@ def bootstrap_diffs(rows, predictions, seed, replicates):
     for cohort, mask in masks.items():
         cnt = np.bincount(codes[mask], minlength=g).astype(float)
         sums = {m: np.bincount(codes[mask], rv.contributions(rows.y[mask], predictions[m][mask])[:, 0],
-                               minlength=g) for m in MODELS}
+                               minlength=g) for m in models}
         per[cohort] = (cnt, sums)
     rng = np.random.Generator(np.random.PCG64(seed))
-    draws = {(c, w, a, b): [] for c in masks for w in ("row", "user") for a, b in COMPARISONS}
+    draws = {(c, w, a, b): [] for c in masks for w in ("row", "user") for a, b in comparisons}
     for _ in range(replicates):
         weight = np.bincount(rng.integers(0, g, size=g), minlength=g).astype(float)
         for cohort, (cnt, sums) in per.items():
             present = cnt > 0
             if not (weight @ cnt) > 0:
                 continue
-            for a, b in COMPARISONS:
+            for a, b in comparisons:
                 row = (weight @ sums[a] - weight @ sums[b]) / (weight @ cnt)
                 ua = np.divide(sums[a], cnt, out=np.zeros(g), where=present)
                 ub = np.divide(sums[b], cnt, out=np.zeros(g), where=present)
