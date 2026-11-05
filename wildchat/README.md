@@ -1,5 +1,23 @@
 # WildChat 응답 토큰 예측 — 조사부터 최종 평가까지
 
+## #21 대화 간 이력 (validation 전용)
+
+[cross_history.py](cross_history.py)는 B, C_emb_PCA, B_cross_hist, C_emb_PCA_cross_hist 네 조건을 동일한 사용자 분리·train 내부 튜닝 규칙으로 비교한다. 완료된 원래 연구와 구분되는 승인 범위는 [ADR 0004](../docs/decisions/0004-wildchat-cross-conversation-history.md)를 따른다.
+
+사용자 키는 기존 `hashed_ip`를 유지한다. `header`, `country`/`state`, `model`은 결측 감사에만 사용한다. assistant UTC 시각은 응답 완료 시각이므로 현재 응답 시각을 예측 기준으로 삼지 않는다. 같은 대화의 **직전 assistant 완료 시각**을 현재 요청시각의 보수적 하한으로 사용하고, 첫 턴은 새 이력·시간 특성을 결측 처리한다. 그 하한보다 먼저 완료된 같은 split·같은 사용자의 다른 대화만 집계한다. 현재 대화/중복 그룹·동시각·미래·다른 split은 제외한다. 이력은 outer/inner purge 후 각 분할에서 독립적으로 다시 계산한다.
+
+```sh
+OPENBLAS_NUM_THREADS=4 OMP_NUM_THREADS=4 /workspace/venvs/wildchat/bin/python wildchat/cross_history.py --prepared "$WILDCHAT_DATA_DIR"/derived/issue5-shard0 --source "$WILDCHAT_DATA_DIR"/data/train-00000-of-00014.parquet --embeddings "$WILDCHAT_DATA_DIR"/derived/issue19-categories/embeddings.npz --output wildchat/results --seed 42 --inner-fraction 0.8 --max-rounds 500 --early-stopping-rounds 40 --threads 4 --bootstrap-replicates 1000
+OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 /workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_cross_history wildchat.tests.test_revalidate wildchat.tests.test_category wildchat.tests.test_metrics wildchat.tests.test_prepare.FeatureTests wildchat.tests.test_prepare.GroupSplitTests
+python3 scripts/verify.py
+```
+
+위 Python 경로와 자료는 이번 box 실행에서 확인했으며 다른 환경에는 없을 수 있다. 기존 MiniLM 임베딩 캐시(384차원)를 그대로 사용하므로 의존성 추가·재임베딩은 없다. 출력은 `wildchat/results/cross_history.json`, `.md`, `.log`이며 기존 출력이 있으면 덮어쓰기를 거부한다. 재현은 `--output`을 다른 디렉터리로 지정한다. 원문·식별자·모델 바이너리는 저장하지 않는다.
+
+JSON/Markdown에는 4조건 × 3턴 × 2가중의 평균/분위수별 pinball, P50 MAE, coverage, 부호 있는 구간 폭, 교차율을 기록한다. validation에서 이력이 있는 행을 한 개 이상 가진 사용자와 없는 사용자도 별도로 보고한다. 사용자 bootstrap 1,000회는 두 추가 효과의 95% CI를 모든 구분에 같은 추출로 계산한다. validation의 과거 완료 응답은 순차 이력으로만 관측하며 학습·선택에는 사용하지 않는다.
+
+네 조건의 하이퍼파라미터·조기 종료·PCA 차원은 train 내부에서만 선택한다. 기존 #19의 46.3373은 B의 설정/반복 수를 고정한 결과이므로 이번 재튜닝된 C_emb_PCA 기준 점수가 다를 수 있다. 첫 턴에서 이력을 직접 쓰는 효과는 제출시각 부재로 검증할 수 없다. 원래 실험·최종 평가 코드는 실행하거나 수정하지 않는다.
+
 2026-11-03 기준 #4~#7 조사·전처리·탐색 실험, #13 사용자 분리 재검증, #15 최종 test 1회 평가를 완료했다. 현재 정의는 [PRD](../docs/prd.md), 최종 결과는 [test_final.md](results/test_final.md)와 [test_final.json](results/test_final.json)이다. 아래 명령은 단계별 실행 방법과 과거 실행 이력을 구분해 읽는다.
 
 현재 비교는 고정 분위수·직전 응답 비율·대화 누적 평균·A·B의 5개이며, train 내부에서만 튜닝하고 사용자 분리·분위수 무정렬·사용자 bootstrap을 적용한다. #7의 validation 튜닝·3모델·분위수 정렬은 과거 탐색 규칙이다. **최종 test는 이미 한 번 사용했으므로 `finalize.py freeze/evaluate`를 재실행하지 않는다.**
