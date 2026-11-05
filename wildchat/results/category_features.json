@@ -1,0 +1,368 @@
+{
+  "issue": 19,
+  "recorded_at_utc": "2026-11-05T01:49:16.461278+00:00",
+  "evaluation_split": "validation only; test split never read",
+  "prepared_sha256": {
+    "train": "1a0268417c47dc19d838de7472c3876d2b4cce944e964be3c105f69183f91388",
+    "validation": "e619f27483ed5986add62f2c0e57e3c29c8162c3924b1053e12c2820090d156a"
+  },
+  "labels_sha256": "a79617e305381506f752c68b451049b5c0c2f1ca08f367946f9fd0e50bcaa217",
+  "sims_sha256": "b28d09904ba501d04007f797feaf370f9e110541169ca2ba2f6e607b8f6f5b37",
+  "fixed_hyperparameters": {
+    "A": {
+      "parameters": {
+        "num_leaves": 15,
+        "min_data_in_leaf": 100
+      },
+      "iterations": [
+        231,
+        175,
+        175
+      ]
+    },
+    "B": {
+      "parameters": {
+        "num_leaves": 31,
+        "min_data_in_leaf": 300
+      },
+      "iterations": [
+        403,
+        244,
+        279
+      ]
+    }
+  },
+  "settings": {
+    "prepared": "/workspace/data/wildchat-1m/derived/issue5-shard0",
+    "source": "/workspace/data/wildchat-1m/data/train-00000-of-00014.parquet",
+    "labels": "/workspace/data/wildchat-1m/derived/issue19-categories/labels.jsonl",
+    "sims": "/workspace/data/wildchat-1m/derived/issue19-categories/sims.jsonl",
+    "category_c": "wildchat/results/category_c.json",
+    "output": "wildchat/results",
+    "seed": 42,
+    "inner_fraction": 0.8,
+    "max_rounds": 500,
+    "early_stopping_rounds": 40,
+    "threads": 4,
+    "bootstrap_replicates": 1000,
+    "min_fit_rows": 500,
+    "min_holdout_rows": 100
+  },
+  "validation_metrics": {
+    "first_turn": {
+      "row": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.17607749200536
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.1246298260113
+        },
+        "C": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 70.24247971396161
+        },
+        "C_feat_label": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 70.19535681750672
+        },
+        "C_feat_sim": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 66.56988424395219
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.8032269159691
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.47031233494411
+        },
+        "C": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 61.4877211827613
+        },
+        "C_feat_label": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 61.3191584180889
+        },
+        "C_feat_sim": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 58.629161763757175
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 51.53091764972025
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.33156826359245
+        },
+        "C": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.30597218843042
+        },
+        "C_feat_label": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.97134699441418
+        },
+        "C_feat_sim": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.461012332110606
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 58.0625989299115
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.05178233068215
+        },
+        "C": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.234846995348484
+        },
+        "C_feat_label": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 41.59052820136572
+        },
+        "C_feat_sim": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.941698345904214
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 59.37352171364713
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.92849908002835
+        },
+        "C": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.19764238466162
+        },
+        "C_feat_label": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 48.97223245971901
+        },
+        "C_feat_sim": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 47.27853116673279
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 62.449830705644835
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.875767170812594
+        },
+        "C": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.45242359737959
+        },
+        "C_feat_label": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.08799353220927
+        },
+        "C_feat_sim": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 53.00720608790505
+        }
+      }
+    }
+  },
+  "bootstrap_ci95": {
+    "first_turn": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5492476211379165,
+            -0.22170373996066534
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.1250784697592806,
+            -0.7998020364921496
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -7.517404238617933,
+            -3.6315422107202924
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.759579173644004,
+            -0.17845526013213991
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.7558477037584983,
+            -0.5220804505301941
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.710551183721079,
+            -2.921504693780629
+          ]
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6355198856855818,
+            0.48530011495550746
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.67043751364762,
+            -0.1163192909804943
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.384537122329085,
+            -0.4797011214498321
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.3594596296050021,
+            0.8151588192393294
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.8031031645829743,
+            -0.1271682370804049
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.6102294894307572,
+            -0.5829595031584872
+          ]
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.5156459679013443,
+            -0.012596720631925311
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.4952700528528173,
+            -0.4834384003769878
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5620008174335154,
+            -1.8473503425902504
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.0567187072675204,
+            0.24128070367839088
+          ]
+        },
+        "C_feat_label-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.280048373678428,
+            -0.2867470507501621
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5317003315516775,
+            -2.1674509212580753
+          ]
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 33.30302335900342
+}

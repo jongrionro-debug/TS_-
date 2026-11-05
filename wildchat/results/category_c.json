@@ -1,0 +1,1795 @@
+{
+  "issue": 19,
+  "recorded_at_utc": "2026-11-04T17:42:57.948627+00:00",
+  "command": "/workspace/venvs/wildchat/bin/python wildchat/category.py --prepared /workspace/data/wildchat-1m/derived/issue5-shard0 --source /workspace/data/wildchat-1m/data/train-00000-of-00014.parquet --labels /workspace/data/wildchat-1m/derived/issue19-categories/labels.jsonl --output wildchat/results --seed 42 --inner-fraction 0.8 --max-rounds 500 --early-stopping-rounds 40 --threads 4 --bootstrap-replicates 1000 --min-fit-rows 500 --min-holdout-rows 100 --fallback-train-rows 5000",
+  "evaluation_split": "validation only; test split never read",
+  "versions": {
+    "python": "3.13.5",
+    "numpy": "2.5.4",
+    "lightgbm": "4.7.0",
+    "pyarrow": "26.0.0"
+  },
+  "prepared_sha256": {
+    "train": "1a0268417c47dc19d838de7472c3876d2b4cce944e964be3c105f69183f91388",
+    "validation": "e619f27483ed5986add62f2c0e57e3c29c8162c3924b1053e12c2820090d156a"
+  },
+  "labels_sha256": "a79617e305381506f752c68b451049b5c0c2f1ca08f367946f9fd0e50bcaa217",
+  "settings": {
+    "prepared": "/workspace/data/wildchat-1m/derived/issue5-shard0",
+    "source": "/workspace/data/wildchat-1m/data/train-00000-of-00014.parquet",
+    "labels": "/workspace/data/wildchat-1m/derived/issue19-categories/labels.jsonl",
+    "output": "wildchat/results",
+    "seed": 42,
+    "inner_fraction": 0.8,
+    "max_rounds": 500,
+    "early_stopping_rounds": 40,
+    "threads": 4,
+    "bootstrap_replicates": 1000,
+    "min_fit_rows": 500,
+    "min_holdout_rows": 100,
+    "fallback_train_rows": 5000
+  },
+  "split_sizes": {
+    "train": 81307,
+    "validation": 12920,
+    "fit": 52674,
+    "inner_holdout": 10524
+  },
+  "global_selection": {
+    "A": {
+      "parameters": {
+        "num_leaves": 15,
+        "min_data_in_leaf": 100
+      },
+      "iterations": [
+        231,
+        175,
+        175
+      ]
+    },
+    "B": {
+      "parameters": {
+        "num_leaves": 31,
+        "min_data_in_leaf": 300
+      },
+      "iterations": [
+        403,
+        244,
+        279
+      ]
+    }
+  },
+  "validation_metrics": {
+    "first_turn": {
+      "row": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.17607749200536
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.1246298260113
+        },
+        "C": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 70.24247971396161
+        },
+        "C_fallback": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 70.24247971396161
+        },
+        "C_inner_select": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 71.85905842697404
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.8032269159691
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.47031233494411
+        },
+        "C": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 61.4877211827613
+        },
+        "C_fallback": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 61.4877211827613
+        },
+        "C_inner_select": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.04324198586519
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 51.53091764972025
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.33156826359245
+        },
+        "C": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.30597218843042
+        },
+        "C_fallback": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.30597218843042
+        },
+        "C_inner_select": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.064036047627425
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 58.0625989299115
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.05178233068215
+        },
+        "C": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.234846995348484
+        },
+        "C_fallback": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.234846995348484
+        },
+        "C_inner_select": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 41.912838374144066
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 59.37352171364713
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.92849908002835
+        },
+        "C": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.19764238466162
+        },
+        "C_fallback": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.19764238466162
+        },
+        "C_inner_select": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.66171173167023
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 62.449830705644835
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.875767170812594
+        },
+        "C": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.45242359737959
+        },
+        "C_fallback": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.45242359737959
+        },
+        "C_inner_select": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.780723921571166
+        }
+      }
+    }
+  },
+  "bootstrap_ci95": {
+    "first_turn": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5492476211379165,
+            -0.22170373996066534
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5492476211379165,
+            -0.22170373996066534
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.8074211792961169,
+            0.298580125605389
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.9921347625887726,
+            0.3589345176280025
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.759579173644004,
+            -0.17845526013213991
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.759579173644004,
+            -0.17845526013213991
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9516478284227653,
+            0.19646168280381898
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.1460222585646873,
+            -0.4859256280220697
+          ]
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6355198856855818,
+            0.48530011495550746
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6355198856855818,
+            0.48530011495550746
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.89737463527763,
+            0.1426903689932422
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -16.83486796627309,
+            -13.727733852922693
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.3594596296050021,
+            0.8151588192393294
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.3594596296050021,
+            0.8151588192393294
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.5738775332762903,
+            0.27928687694137105
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -18.030579545157256,
+            -14.003615039568396
+          ]
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.5156459679013443,
+            -0.012596720631925311
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.5156459679013443,
+            -0.012596720631925311
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6940248836916248,
+            0.08722033415491345
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -11.563647379584445,
+            -8.675428828978102
+          ]
+        }
+      },
+      "user": {
+        "C-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.0567187072675204,
+            0.24128070367839088
+          ]
+        },
+        "C_fallback-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.0567187072675204,
+            0.24128070367839088
+          ]
+        },
+        "C_inner_select-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.5145839317723516,
+            0.3790465963307548
+          ]
+        },
+        "C-A": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -7.984409621312046,
+            -6.040396564562087
+          ]
+        }
+      }
+    }
+  },
+  "per_category": {
+    "chit_chat": {
+      "train_rows": 10021,
+      "fit_rows": 6721,
+      "inner_holdout_rows": 1185,
+      "validation_rows": 1401,
+      "validation_users": 531,
+      "validation_first_turn_rows": 471,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 33.899624885617975,
+        "global_B": 35.02733378906115
+      },
+      "inner_select_uses_category_model": true,
+      "selected": {
+        "parameters": {
+          "num_leaves": 31,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          255,
+          122,
+          100
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 51.33216717704115
+            },
+            "B": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 50.70400761116955
+            },
+            "C": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 50.1833020689841
+            },
+            "C_fallback": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 50.1833020689841
+            },
+            "C_inner_select": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 50.1833020689841
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 50.53571550672047
+            },
+            "B": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 48.7719249292256
+            },
+            "C": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 48.056971540668236
+            },
+            "C_fallback": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 48.056971540668236
+            },
+            "C_inner_select": {
+              "n_rows": 471,
+              "n_users": 332,
+              "mean_pinball_loss": 48.056971540668236
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 40.23993508158612
+            },
+            "B": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 31.308447376847806
+            },
+            "C": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 28.17880609957129
+            },
+            "C_fallback": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 28.17880609957129
+            },
+            "C_inner_select": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 28.17880609957129
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 41.69841019116043
+            },
+            "B": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 31.186095713476302
+            },
+            "C": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 30.555032545448416
+            },
+            "C_fallback": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 30.555032545448416
+            },
+            "C_inner_select": {
+              "n_rows": 930,
+              "n_users": 339,
+              "mean_pinball_loss": 30.555032545448416
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 43.96901525072197
+            },
+            "B": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 37.82901045348274
+            },
+            "C": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 35.57646320277859
+            },
+            "C_fallback": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 35.57646320277859
+            },
+            "C_inner_select": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 35.57646320277859
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 46.58432218590329
+            },
+            "B": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 40.33043020155328
+            },
+            "C": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 40.70278201907775
+            },
+            "C_fallback": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 40.70278201907775
+            },
+            "C_inner_select": {
+              "n_rows": 1401,
+              "n_users": 531,
+              "mean_pinball_loss": 40.70278201907775
+            }
+          }
+        }
+      }
+    },
+    "coding": {
+      "train_rows": 12843,
+      "fit_rows": 7992,
+      "inner_holdout_rows": 1461,
+      "validation_rows": 1383,
+      "validation_users": 400,
+      "validation_first_turn_rows": 459,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 51.05633245171756,
+        "global_B": 51.58345932869008
+      },
+      "inner_select_uses_category_model": true,
+      "selected": {
+        "parameters": {
+          "num_leaves": 15,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          52,
+          181,
+          206
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 73.60725164236956
+            },
+            "B": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 73.67842116752539
+            },
+            "C": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 73.71848690520075
+            },
+            "C_fallback": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 73.71848690520075
+            },
+            "C_inner_select": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 73.71848690520075
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 76.17143796682852
+            },
+            "B": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 75.47166225882047
+            },
+            "C": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 75.89864119357384
+            },
+            "C_fallback": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 75.89864119357384
+            },
+            "C_inner_select": {
+              "n_rows": 459,
+              "n_users": 282,
+              "mean_pinball_loss": 75.89864119357384
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 58.86267586783832
+            },
+            "B": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 45.003782133386615
+            },
+            "C": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 45.93015029150381
+            },
+            "C_fallback": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 45.93015029150381
+            },
+            "C_inner_select": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 45.93015029150381
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 68.23803973550307
+            },
+            "B": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 56.18171145349814
+            },
+            "C": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 56.75813048573534
+            },
+            "C_fallback": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 56.75813048573534
+            },
+            "C_inner_select": {
+              "n_rows": 924,
+              "n_users": 274,
+              "mean_pinball_loss": 56.75813048573534
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 63.756211862422425
+            },
+            "B": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 54.5205278431984
+            },
+            "C": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 55.15274357110388
+            },
+            "C_fallback": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 55.15274357110388
+            },
+            "C_inner_select": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 55.15274357110388
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 71.87286501181525
+            },
+            "B": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 66.11549800060577
+            },
+            "C": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 66.36202520898354
+            },
+            "C_fallback": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 66.36202520898354
+            },
+            "C_inner_select": {
+              "n_rows": 1383,
+              "n_users": 400,
+              "mean_pinball_loss": 66.36202520898354
+            }
+          }
+        }
+      }
+    },
+    "creative_writing": {
+      "train_rows": 9578,
+      "fit_rows": 6492,
+      "inner_holdout_rows": 1203,
+      "validation_rows": 1926,
+      "validation_users": 477,
+      "validation_first_turn_rows": 1109,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 59.988877141961595,
+        "global_B": 59.04110259229745
+      },
+      "inner_select_uses_category_model": false,
+      "selected": {
+        "parameters": {
+          "num_leaves": 15,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          63,
+          71,
+          149
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 95.40513911951572
+            },
+            "B": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 94.46260735814641
+            },
+            "C": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 87.5706402588868
+            },
+            "C_fallback": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 87.5706402588868
+            },
+            "C_inner_select": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 94.46260735814641
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 78.46750646791612
+            },
+            "B": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 76.56179506741081
+            },
+            "C": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 74.79298200888528
+            },
+            "C_fallback": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 74.79298200888528
+            },
+            "C_inner_select": {
+              "n_rows": 1109,
+              "n_users": 338,
+              "mean_pinball_loss": 76.56179506741081
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 64.39624453739849
+            },
+            "B": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 44.66107880804074
+            },
+            "C": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 44.55562912540508
+            },
+            "C_fallback": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 44.55562912540508
+            },
+            "C_inner_select": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 44.66107880804074
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 62.38802128953139
+            },
+            "B": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 47.402408935580006
+            },
+            "C": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 47.16008554368224
+            },
+            "C_fallback": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 47.16008554368224
+            },
+            "C_inner_select": {
+              "n_rows": 817,
+              "n_users": 269,
+              "mean_pinball_loss": 47.402408935580006
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 82.25131415918872
+            },
+            "B": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 73.33703683611301
+            },
+            "C": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 69.32387800756044
+            },
+            "C_fallback": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 69.32387800756044
+            },
+            "C_inner_select": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 73.33703683611301
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 72.46477828089388
+            },
+            "B": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 64.8135010339061
+            },
+            "C": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 63.00181000683662
+            },
+            "C_fallback": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 63.00181000683662
+            },
+            "C_inner_select": {
+              "n_rows": 1926,
+              "n_users": 477,
+              "mean_pinball_loss": 64.8135010339061
+            }
+          }
+        }
+      }
+    },
+    "editing_summarization": {
+      "train_rows": 17802,
+      "fit_rows": 11565,
+      "inner_holdout_rows": 2443,
+      "validation_rows": 3006,
+      "validation_users": 828,
+      "validation_first_turn_rows": 1050,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 48.70064706286252,
+        "global_B": 48.40910011645265
+      },
+      "inner_select_uses_category_model": false,
+      "selected": {
+        "parameters": {
+          "num_leaves": 31,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          57,
+          311,
+          87
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 74.72321061335649
+            },
+            "B": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 73.90869311087265
+            },
+            "C": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 73.61209930429392
+            },
+            "C_fallback": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 73.61209930429392
+            },
+            "C_inner_select": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 73.90869311087265
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 63.78529659575396
+            },
+            "B": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 63.002801040507855
+            },
+            "C": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 63.18192284898958
+            },
+            "C_fallback": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 63.18192284898958
+            },
+            "C_inner_select": {
+              "n_rows": 1050,
+              "n_users": 528,
+              "mean_pinball_loss": 63.002801040507855
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 57.45920424688447
+            },
+            "B": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 38.87157419062168
+            },
+            "C": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 39.229767265765226
+            },
+            "C_fallback": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 39.229767265765226
+            },
+            "C_inner_select": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 38.87157419062168
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 58.50777366499333
+            },
+            "B": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 41.0842321584001
+            },
+            "C": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 41.54854456026584
+            },
+            "C_fallback": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 41.54854456026584
+            },
+            "C_inner_select": {
+              "n_rows": 1956,
+              "n_users": 584,
+              "mean_pinball_loss": 41.0842321584001
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 63.48954579205932
+            },
+            "B": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 51.11008878352372
+            },
+            "C": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 51.239563886009776
+            },
+            "C_fallback": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 51.239563886009776
+            },
+            "C_inner_select": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 51.11008878352372
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 60.21542359001389
+            },
+            "B": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 49.80587063900532
+            },
+            "C": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 50.30241113931685
+            },
+            "C_fallback": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 50.30241113931685
+            },
+            "C_inner_select": {
+              "n_rows": 3006,
+              "n_users": 828,
+              "mean_pinball_loss": 49.80587063900532
+            }
+          }
+        }
+      }
+    },
+    "knowledge_qa": {
+      "train_rows": 13547,
+      "fit_rows": 8614,
+      "inner_holdout_rows": 1960,
+      "validation_rows": 2373,
+      "validation_users": 682,
+      "validation_first_turn_rows": 865,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 33.3564481423357,
+        "global_B": 33.53532830878578
+      },
+      "inner_select_uses_category_model": true,
+      "selected": {
+        "parameters": {
+          "num_leaves": 31,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          77,
+          131,
+          85
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 53.19096350752089
+            },
+            "B": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 54.85300192591042
+            },
+            "C": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 53.60842124417791
+            },
+            "C_fallback": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 53.60842124417791
+            },
+            "C_inner_select": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 53.60842124417791
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 51.48140053648346
+            },
+            "B": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 52.49937955488396
+            },
+            "C": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 51.67178534590776
+            },
+            "C_fallback": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 51.67178534590776
+            },
+            "C_inner_select": {
+              "n_rows": 865,
+              "n_users": 470,
+              "mean_pinball_loss": 51.67178534590776
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 42.857087025246756
+            },
+            "B": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 29.09698043005008
+            },
+            "C": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 29.038050785126423
+            },
+            "C_fallback": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 29.038050785126423
+            },
+            "C_inner_select": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 29.038050785126423
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 43.75453068356816
+            },
+            "B": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 30.49350591748099
+            },
+            "C": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 30.15880580172721
+            },
+            "C_fallback": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 30.15880580172721
+            },
+            "C_inner_select": {
+              "n_rows": 1508,
+              "n_users": 463,
+              "mean_pinball_loss": 30.15880580172721
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 46.62396572611786
+            },
+            "B": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 38.485500697188385
+            },
+            "C": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 37.994380514194916
+            },
+            "C_fallback": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 37.994380514194916
+            },
+            "C_inner_select": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 37.994380514194916
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 48.509998079448906
+            },
+            "B": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 42.22394339026014
+            },
+            "C": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 41.700363894328504
+            },
+            "C_fallback": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 41.700363894328504
+            },
+            "C_inner_select": {
+              "n_rows": 2373,
+              "n_users": 682,
+              "mean_pinball_loss": 41.700363894328504
+            }
+          }
+        }
+      }
+    },
+    "math_reasoning": {
+      "train_rows": 11350,
+      "fit_rows": 7151,
+      "inner_holdout_rows": 1471,
+      "validation_rows": 1886,
+      "validation_users": 506,
+      "validation_first_turn_rows": 566,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 37.71399664144075,
+        "global_B": 37.650381319014606
+      },
+      "inner_select_uses_category_model": false,
+      "selected": {
+        "parameters": {
+          "num_leaves": 15,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          169,
+          86,
+          104
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 56.41400255885327
+            },
+            "B": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 57.25360942244457
+            },
+            "C": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 55.802682106154116
+            },
+            "C_fallback": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 55.802682106154116
+            },
+            "C_inner_select": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 57.25360942244457
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 53.98878336319447
+            },
+            "B": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 55.026059658015946
+            },
+            "C": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 52.92172490065275
+            },
+            "C_fallback": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 52.92172490065275
+            },
+            "C_inner_select": {
+              "n_rows": 566,
+              "n_users": 310,
+              "mean_pinball_loss": 55.026059658015946
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 48.16815508841417
+            },
+            "B": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 33.57099002681751
+            },
+            "C": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 34.20146538426492
+            },
+            "C_fallback": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 34.20146538426492
+            },
+            "C_inner_select": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 33.57099002681751
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 50.410909374018495
+            },
+            "B": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 37.25431241153043
+            },
+            "C": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 37.91010828438006
+            },
+            "C_fallback": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 37.91010828438006
+            },
+            "C_inner_select": {
+              "n_rows": 1320,
+              "n_users": 362,
+              "mean_pinball_loss": 37.25431241153043
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 50.642783756637144
+            },
+            "B": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 40.67828725795479
+            },
+            "C": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 40.684121091894454
+            },
+            "C_fallback": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 40.684121091894454
+            },
+            "C_inner_select": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 40.67828725795479
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 52.668111453427564
+            },
+            "B": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 45.263448472018844
+            },
+            "C": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 44.916946189563454
+            },
+            "C_fallback": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 44.916946189563454
+            },
+            "C_inner_select": {
+              "n_rows": 1886,
+              "n_users": 506,
+              "mean_pinball_loss": 45.263448472018844
+            }
+          }
+        }
+      }
+    },
+    "translation": {
+      "train_rows": 6166,
+      "fit_rows": 4139,
+      "inner_holdout_rows": 801,
+      "validation_rows": 945,
+      "validation_users": 336,
+      "validation_first_turn_rows": 388,
+      "own_model": true,
+      "fallback_to_global_B": false,
+      "inner_holdout_pinball": {
+        "category_model": 40.381633760380105,
+        "global_B": 39.18676676120553
+      },
+      "inner_select_uses_category_model": false,
+      "selected": {
+        "parameters": {
+          "num_leaves": 15,
+          "min_data_in_leaf": 100
+        },
+        "iterations": [
+          187,
+          139,
+          74
+        ]
+      },
+      "validation": {
+        "first_turn": {
+          "row": {
+            "A": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 87.81657158929012
+            },
+            "B": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 87.81224577240133
+            },
+            "C": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 89.98150233823137
+            },
+            "C_fallback": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 89.98150233823137
+            },
+            "C_inner_select": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 87.81224577240133
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 70.04368619320265
+            },
+            "B": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 69.83953194857156
+            },
+            "C": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 69.46999254952965
+            },
+            "C_fallback": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 69.46999254952965
+            },
+            "C_inner_select": {
+              "n_rows": 388,
+              "n_users": 202,
+              "mean_pinball_loss": 69.83953194857156
+            }
+          }
+        },
+        "followup_turn": {
+          "row": {
+            "A": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 49.98397277748927
+            },
+            "B": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 35.323734917854686
+            },
+            "C": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 36.20648469167083
+            },
+            "C_fallback": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 36.20648469167083
+            },
+            "C_inner_select": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 35.323734917854686
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 49.28826296990274
+            },
+            "B": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 37.97121489320084
+            },
+            "C": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 38.94091594004516
+            },
+            "C_fallback": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 38.94091594004516
+            },
+            "C_inner_select": {
+              "n_rows": 557,
+              "n_users": 221,
+              "mean_pinball_loss": 37.97121489320084
+            }
+          }
+        },
+        "all": {
+          "row": {
+            "A": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 65.51735726318105
+            },
+            "B": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 56.87457323697013
+            },
+            "C": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 58.28553955607876
+            },
+            "C_fallback": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 58.28553955607876
+            },
+            "C_inner_select": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 56.87457323697013
+            }
+          },
+          "user": {
+            "A": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 58.617086079056975
+            },
+            "B": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 52.18806069492926
+            },
+            "C": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 52.1303230600745
+            },
+            "C_fallback": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 52.1303230600745
+            },
+            "C_inner_select": {
+              "n_rows": 945,
+              "n_users": 336,
+              "mean_pinball_loss": 52.18806069492926
+            }
+          }
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 36.3400405939974
+}
