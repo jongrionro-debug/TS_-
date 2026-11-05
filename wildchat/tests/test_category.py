@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class NoTestAccessTests(unittest.TestCase):
     def test_sources_never_reference_test_split(self):
-        for name in ("classify.py", "category.py", "classify_sims.py", "category_features.py"):
+        for name in ("classify.py", "category.py", "classify_sims.py", "category_features.py", "embed_save.py", "category_pca.py"):
             self.assertNotIn("test.jsonl", (ROOT / name).read_text())
 
 
@@ -122,3 +122,33 @@ class FeatureVariantTests(unittest.TestCase):
         self.assertEqual(pred.shape, (n, 3))
         self.assertTrue((pred >= 0).all())
         self.assertLess(np.abs(pred[:, 1] - y).mean(), 5)
+
+
+@unittest.skipUnless(HAS_TRAINING, "requires training dependencies")
+class PCATests(unittest.TestCase):
+    def test_pca_uses_only_fit_rows_and_orders_components(self):
+        import numpy as np
+        from wildchat.category_pca import PCA
+        rng = np.random.default_rng(2)
+        x = rng.normal(size=(500, 6)) * np.array([10, 5, 1, 1, 1, 1])
+        p = PCA().fit(x, 3)
+        self.assertEqual(p.components.shape, (3, 6))
+        self.assertTrue(p.explained[0] >= p.explained[1] >= p.explained[2])
+        np.testing.assert_allclose(p.transform(x).mean(axis=0), 0, atol=1e-9)
+        shifted = PCA().fit(x + 100, 3)
+        np.testing.assert_allclose(shifted.mean, p.mean + 100)
+        other = np.full((2, 6), 1e6)
+        before = p.mean.copy(); p.transform(other)
+        np.testing.assert_array_equal(p.mean, before)
+
+    def test_design_appends_first_k_components(self):
+        import numpy as np
+        from types import SimpleNamespace
+        from wildchat.category_pca import PCA, design
+        rng = np.random.default_rng(3)
+        emb = rng.normal(size=(40, 10))
+        rows = SimpleNamespace(x=rng.normal(size=(40, 5)))
+        p = PCA().fit(emb, 8)
+        d = design(rows, emb, [0, 2], p, 4)
+        self.assertEqual(d.shape, (40, 6))
+        np.testing.assert_allclose(d[:, 2:], p.transform(emb)[:, :4])

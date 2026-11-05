@@ -1,0 +1,1195 @@
+{
+  "issue": 19,
+  "recorded_at_utc": "2026-11-05T02:47:41.416559+00:00",
+  "evaluation_split": "validation only; test split never read",
+  "prepared_sha256": {
+    "train": "1a0268417c47dc19d838de7472c3876d2b4cce944e964be3c105f69183f91388",
+    "validation": "e619f27483ed5986add62f2c0e57e3c29c8162c3924b1053e12c2820090d156a"
+  },
+  "sims_sha256": "b28d09904ba501d04007f797feaf370f9e110541169ca2ba2f6e607b8f6f5b37",
+  "embeddings_sha256": "2a75bc62adc8146119a573165e318a8d67c08c30b990b4296144bea9291e161d",
+  "fixed_hyperparameters": {
+    "A": {
+      "parameters": {
+        "num_leaves": 15,
+        "min_data_in_leaf": 100
+      },
+      "iterations": [
+        231,
+        175,
+        175
+      ]
+    },
+    "B": {
+      "parameters": {
+        "num_leaves": 31,
+        "min_data_in_leaf": 300
+      },
+      "iterations": [
+        403,
+        244,
+        279
+      ]
+    }
+  },
+  "pca_explained_variance_full_train": [
+    0.05295782489456142,
+    0.031957655801456646,
+    0.030621906561186164,
+    0.027625735740080974,
+    0.024945413299734372,
+    0.02205595231629025,
+    0.02120508759391725,
+    0.01929506897670163,
+    0.01735337840948019,
+    0.016128163071557487,
+    0.014806998167824196,
+    0.014536362033017046,
+    0.013695228980174572,
+    0.013274520522941256,
+    0.012796861407983412,
+    0.012182531980540841,
+    0.011825022191789387,
+    0.011586445016344543,
+    0.011348483515660486,
+    0.01090964788171506,
+    0.010537221362258957,
+    0.010177267219994315,
+    0.01011186672763267,
+    0.009685888108978614,
+    0.009507351950384463,
+    0.009240990355891513,
+    0.008971296390084005,
+    0.008748641599960706,
+    0.008509384240555792,
+    0.008300658928242298,
+    0.008068441869590708,
+    0.007926301968450079
+  ],
+  "inner_holdout_pinball": {
+    "C_emb_PCA": {
+      "8": 41.58587258782119,
+      "16": 41.27042144257784,
+      "32": 40.962183117647484
+    },
+    "C_feat_sim_PCA": {
+      "8": 41.3486060636825,
+      "16": 41.06779002034238,
+      "32": 40.99601107462325
+    }
+  },
+  "chosen_k": {
+    "C_emb_PCA": 32,
+    "C_feat_sim_PCA": 32
+  },
+  "models": [
+    "A",
+    "B",
+    "C_feat_sim",
+    "C_emb_PCA",
+    "C_feat_sim_PCA",
+    "C_emb_PCA_k8",
+    "C_emb_PCA_k16",
+    "C_emb_PCA_k32",
+    "C_feat_sim_PCA_k8",
+    "C_feat_sim_PCA_k16",
+    "C_feat_sim_PCA_k32"
+  ],
+  "settings": {
+    "prepared": "/workspace/data/wildchat-1m/derived/issue5-shard0",
+    "source": "/workspace/data/wildchat-1m/data/train-00000-of-00014.parquet",
+    "sims": "/workspace/data/wildchat-1m/derived/issue19-categories/sims.jsonl",
+    "embeddings": "/workspace/data/wildchat-1m/derived/issue19-categories/embeddings.npz",
+    "category_c": "wildchat/results/category_c.json",
+    "output": "wildchat/results",
+    "seed": 42,
+    "inner_fraction": 0.8,
+    "threads": 4,
+    "bootstrap_replicates": 1000
+  },
+  "validation_metrics": {
+    "first_turn": {
+      "row": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.17607749200536
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 72.1246298260113
+        },
+        "C_feat_sim": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 66.56988424395219
+        },
+        "C_emb_PCA": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 64.88309743726835
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 64.67470119087157
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 67.4845783927713
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 65.10443512680244
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 64.88309743726835
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 65.84505232712932
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 64.53719426125923
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 64.67470119087157
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.8032269159691
+        },
+        "B": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 62.47031233494411
+        },
+        "C_feat_sim": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 58.629161763757175
+        },
+        "C_emb_PCA": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.61652935331146
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.80431529022033
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 58.27222037342648
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.9048207922272
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.61652935331146
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 57.54616935282903
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.88579407441781
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 4908,
+          "n_users": 1726,
+          "mean_pinball_loss": 56.80431529022033
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 51.53091764972025
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 36.33156826359245
+        },
+        "C_feat_sim": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.461012332110606
+        },
+        "C_emb_PCA": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 34.97645686683684
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 34.888957598453125
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.32099981870133
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.05667511075789
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 34.97645686683684
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 35.12467868340647
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 34.982389374946386
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 34.888957598453125
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 58.0625989299115
+        },
+        "B": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 42.05178233068215
+        },
+        "C_feat_sim": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.941698345904214
+        },
+        "C_emb_PCA": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.46454408621751
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.370826169893704
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.69102991914783
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.512801360909265
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.46454408621751
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.62775735977174
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.4561824898049
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 8012,
+          "n_users": 1093,
+          "mean_pinball_loss": 40.370826169893704
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 59.37352171364713
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 49.92849908002835
+        },
+        "C_feat_sim": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 47.27853116673279
+        },
+        "C_emb_PCA": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.33727667486144
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.20385152659476
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 47.53917657114214
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.471102832023114
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.33727667486144
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.79461628738416
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.20955519398844
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 46.20385152659476
+        }
+      },
+      "user": {
+        "A": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 62.449830705644835
+        },
+        "B": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 55.875767170812594
+        },
+        "C_feat_sim": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 53.00720608790505
+        },
+        "C_emb_PCA": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.51838139241984
+        },
+        "C_feat_sim_PCA": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.61032337882926
+        },
+        "C_emb_PCA_k8": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 52.714399089591595
+        },
+        "C_emb_PCA_k16": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.7364678602648
+        },
+        "C_emb_PCA_k32": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.51838139241984
+        },
+        "C_feat_sim_PCA_k8": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 52.12925781605571
+        },
+        "C_feat_sim_PCA_k16": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.66389613075423
+        },
+        "C_feat_sim_PCA_k32": {
+          "n_rows": 12920,
+          "n_users": 1736,
+          "mean_pinball_loss": 51.61032337882926
+        }
+      }
+    }
+  },
+  "bootstrap_ci95": {
+    "first_turn": {
+      "row": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -9.905707999942901,
+            -4.652595751353363
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.0747876271957146,
+            -0.23554647820576238
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -10.09431022577861,
+            -4.776189002024734
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.180961900172289,
+            -0.5789105835472573
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.718774094260892,
+            -2.653105544875338
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.33656332941465983,
+            2.172564692108938
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -9.686078999563119,
+            -4.392438457543609
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.7889143335155366,
+            -0.20630854563130907
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -9.905707999942901,
+            -4.652595751353363
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.0747876271957146,
+            -0.23554647820576238
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -8.718331743071213,
+            -3.9410319198375787
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.8152947616624437,
+            0.3520618064497826
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -10.286029507831019,
+            -4.970563388496502
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.2053970094858006,
+            -0.844484584592292
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -10.09431022577861,
+            -4.776189002024734
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.180961900172289,
+            -0.5789105835472573
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -7.517404238617933,
+            -3.6315422107202924
+          ]
+        }
+      },
+      "user": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.988969479207086,
+            -4.696022667554352
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.866437510991236,
+            -1.2258448488794444
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.797112477266755,
+            -4.487011849720235
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.590682846782947,
+            -1.108453334482741
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.306439917563572,
+            -3.170844744812376
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.2038609484734284,
+            0.428000736623254
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.649977242293507,
+            -4.4787063251842625
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.5084194051197803,
+            -0.9988822051657094
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.988969479207086,
+            -4.696022667554352
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.866437510991236,
+            -1.2258448488794444
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.9709167022219996,
+            -3.8428842195451085
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.6991273673813667,
+            -0.5262707544805572
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.622340365431539,
+            -4.435922866740118
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.3817601498819423,
+            -1.1236757733976817
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -6.797112477266755,
+            -4.487011849720235
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.590682846782947,
+            -1.108453334482741
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.710551183721079,
+            -2.921504693780629
+          ]
+        }
+      }
+    },
+    "followup_turn": {
+      "row": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.823894808889727,
+            -0.9304603383004456
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.7309955134894741,
+            -0.20902011657738218
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.0073457894915343,
+            -0.9616378488794849
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.7987766872430145,
+            -0.3345230077490638
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.4104555728897394,
+            -0.6523212282792599
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.3696080263466179,
+            0.13106933529186282
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.698702874386718,
+            -0.8544168311962202
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6256377077232398,
+            -0.1460103610896476
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.823894808889727,
+            -0.9304603383004456
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.7309955134894741,
+            -0.20902011657738218
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.6491013106221635,
+            -0.7628882291636845
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.5251615389115225,
+            -0.13191299614916424
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.8214354120921172,
+            -0.915246508501871
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.669647616748396,
+            -0.2534360319878979
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.0073457894915343,
+            -0.9616378488794849
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.7987766872430145,
+            -0.3345230077490638
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.384537122329085,
+            -0.4797011214498321
+          ]
+        }
+      },
+      "user": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.269001867217037,
+            -0.843446142877211
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9431906204246956,
+            -0.01188842536318434
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.3917036901124273,
+            -0.9007173778510255
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9875543825968994,
+            -0.09927668489297266
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.924219808559618,
+            -0.765124199357997
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.7014549403406691,
+            0.20113927022575287
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.152879490414838,
+            -0.8384535820628186
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.8603341322293275,
+            0.009291658424488265
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.269001867217037,
+            -0.843446142877211
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9431906204246956,
+            -0.01188842536318434
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.04538186363507,
+            -0.716276309949381
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.6657363262454281,
+            0.09345959837045133
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.257875700436979,
+            -0.9033856896170884
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.8628952414929295,
+            -0.10427009037378639
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.3917036901124273,
+            -0.9007173778510255
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9875543825968994,
+            -0.09927668489297266
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.6102294894307572,
+            -0.5829595031584872
+          ]
+        }
+      }
+    },
+    "all": {
+      "row": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.779649488779689,
+            -2.5005646736799805
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.543148185981627,
+            -0.3644062438633404
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.930589656156433,
+            -2.613083796696233
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.63822499697269,
+            -0.5332180909325575
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.2693337866085392,
+            -1.5735589468902629
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.2495997756007882,
+            0.7987277046775726
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.6747721260161565,
+            -2.4142148344992878
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.3713194266211823,
+            -0.3079039709476307
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.779649488779689,
+            -2.5005646736799805
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.543148185981627,
+            -0.3644062438633404
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.168981992931651,
+            -2.2072931338909836
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9449459510056142,
+            -0.07066417973606406
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.953130869826362,
+            -2.6280231776113077
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.6053360561228873,
+            -0.5997228758256461
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.930589656156433,
+            -2.613083796696233
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.63822499697269,
+            -0.5332180909325575
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5620008174335154,
+            -1.8473503425902504
+          ]
+        }
+      },
+      "user": {
+        "C_emb_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.272586238679173,
+            -3.5068338307069533
+          ]
+        },
+        "C_emb_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.1045722027634057,
+            -0.8926829366576418
+          ]
+        },
+        "C_feat_sim_PCA-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.273920986723169,
+            -3.334653398926075
+          ]
+        },
+        "C_feat_sim_PCA-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.9961300582340542,
+            -0.8280438263980799
+          ]
+        },
+        "C_emb_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.015777308160255,
+            -2.382405675176606
+          ]
+        },
+        "C_emb_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -0.9007711306720867,
+            0.31806961708219733
+          ]
+        },
+        "C_emb_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.986105166214792,
+            -3.3741165799073216
+          ]
+        },
+        "C_emb_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.893994044707606,
+            -0.6821853145268745
+          ]
+        },
+        "C_emb_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.272586238679173,
+            -3.5068338307069533
+          ]
+        },
+        "C_emb_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -2.1045722027634057,
+            -0.8926829366576418
+          ]
+        },
+        "C_feat_sim_PCA_k8-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -4.622998381990695,
+            -2.91032366936834
+          ]
+        },
+        "C_feat_sim_PCA_k8-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.3615963340001604,
+            -0.4157447247109381
+          ]
+        },
+        "C_feat_sim_PCA_k16-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.101038842194563,
+            -3.364026279083508
+          ]
+        },
+        "C_feat_sim_PCA_k16-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.873383367376505,
+            -0.885325649692038
+          ]
+        },
+        "C_feat_sim_PCA_k32-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -5.273920986723169,
+            -3.334653398926075
+          ]
+        },
+        "C_feat_sim_PCA_k32-C_feat_sim": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -1.9961300582340542,
+            -0.8280438263980799
+          ]
+        },
+        "C_feat_sim-B": {
+          "effective_replicates": 1000,
+          "ci95": [
+            -3.5317003315516775,
+            -2.1674509212580753
+          ]
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 90.1867283810061
+}

@@ -37,3 +37,10 @@ B(길이+이력)가 A를 이겼다(#13 val, #15 test 1회). 프롬프트 의미(
 - C_feat_label(B + 범주 categorical), C_feat_sim(B + 유사도 7개)은 전역 B의 하이퍼파라미터·분위수별 반복 수를 고정해 재학습했다.
 - validation 전체 행 가중: B 49.929, C 49.198, C_feat_label 48.972, C_feat_sim 47.279(C_feat_sim−B CI [-3.56,-1.85]). 사용자 가중·첫 턴·후속 턴 모두 C_feat_sim이 가장 좋고 CI가 0을 넘지 않는다.
 - 결론: 범주를 별도 모델로 나누기보다 연속 유사도를 B의 특징으로 넣는 쪽이 낫다. 이미 여러 번 본 validation 기준이므로 test 확인은 별도 결정이 필요하다.
+
+## 후속 2: MiniLM 임베딩 PCA 성분을 전역 B 특징으로
+
+- 이전 실행은 384차원 임베딩을 저장하지 않아 embed_save.py로 같은 모델·프롬프트를 한 번 더 임베딩해 저장소 밖 embeddings.npz(float16)로 보관했다.
+- PCA는 train에서만 적합했다(k 선택은 내부 fit 행, validation 예측은 전체 purged train). k∈{8,16,32}는 #13 train 내부 홀드아웃 pinball로 선택했고 두 변형 모두 k=32(탐색 범위 상한)가 선택됐다. 전역 B 하이퍼파라미터·반복 수는 고정했다.
+- validation 전체 행 가중: B 49.929, C_feat_sim 47.279, C_emb_PCA(k=32) 46.337, C_feat_sim_PCA(k=32) 46.204. 두 PCA 변형은 모든 턴·가중에서 B와 C_feat_sim보다 낫고 CI가 0을 넘지 않는다. PCA 변형 둘 사이 차이는 작다.
+- 한계: 선택된 k가 범위 상한이라 더 큰 k가 나을 수 있다. validation은 이미 여러 번 본 기간이며 test 확인은 별도 결정이 필요하다.
