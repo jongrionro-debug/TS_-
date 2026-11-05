@@ -129,3 +129,29 @@ python3 scripts/verify.py
 python3 -m unittest discover -s wildchat/tests
 python3 scripts/verify.py
 ```
+
+## H1: 같은 대화 순차 특징의 validation 재검증 (#23)
+
+[temporal.py](temporal.py)는 B(31개), B+H1(40개), C_emb_PCA(k=32, 63개), C_emb_PCA+H1(72개)를 동일한 #13 정제 train/validation과 내부 분할에서 비교한다. 네 조건 각각에 같은 3개 LightGBM 후보·최대 500회·40회 조기 종료를 적용하고, 설정·분위수별 반복 수는 train 내부 홀드아웃 행 가중 평균 pinball로만 정한다. 전체 정제 train으로 재학습하며 validation은 보고에만 쓴다. #19의 전역 B 설정을 모든 PCA 조건에 고정한 실험과는 선택 절차가 다르다.
+
+[temporal_features.py](temporal_features.py)의 H1은 같은 원본 대화의 이전 유효 응답만 누적한다. 출력 EWMA(α=0.3), 누적 평균·모집단 표준편차(ddof=0), 최근 두 출력 차이·원래 user 턴 간격당 기울기, 직전 유효 출력/입력 비율·그 EWMA, 현재/직전 유효 입력 배율, 관측 수의 9개다. 특징을 기록한 뒤 현재 응답을 갱신한다. 불완전한 쌍은 건너뛰되 원래 턴 위치를 유지하고 사용자나 중복 그룹 간에는 상태를 공유하지 않는다. EWMA는 첫 유효 값으로 초기화한다. 이력이 없으면 count=0 외에는 NaN, 1개면 std=0, 2개 미만이면 차이·기울기는 NaN이다. 입력이 0이면 해당 비율은 NaN이고 비율 EWMA에서만 제외한다.
+
+이번 실행의 운영자 지시에 따라 기존 MiniLM 캐시를 재사용한다. `--embedding-reference`의 기존 SHA256, 캐시 형식·384차원·유한값·키 유일성·train/validation 전체 키와의 정확한 일치를 검사한다. 불일치하면 중단하며 자동 재생성하지 않는다. cache의 float16을 float32로 바꾸고 로컬 [PCA](category_pca.py)를 내부 fit 행/전체 정제 train에서 각각 적합한다. 원문이나 다른 분할을 읽을 필요가 없다. JSONL 접근은 실행 중 train/validation 두 경로로 제한한다.
+
+```sh
+export WILDCHAT_DATA_DIR=/workspace/data/wildchat-1m
+OPENBLAS_NUM_THREADS=1 /workspace/venvs/wildchat/bin/python wildchat/temporal.py \
+  --prepared "$WILDCHAT_DATA_DIR/derived/issue5-shard0" \
+  --source "$WILDCHAT_DATA_DIR/data/train-00000-of-00014.parquet" \
+  --embeddings "$WILDCHAT_DATA_DIR/derived/issue19-categories/embeddings.npz" \
+  --embedding-reference wildchat/results/category_pca.json \
+  --output wildchat/results --seed 42 --inner-fraction 0.8 --threads 4 \
+  --max-rounds 500 --early-stopping-rounds 40 --bootstrap-replicates 1000
+OPENBLAS_NUM_THREADS=1 /workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_temporal wildchat.tests.test_revalidate wildchat.tests.test_metrics wildchat.tests.test_category wildchat.tests.test_prepare.FeatureTests wildchat.tests.test_prepare.GroupSplitTests
+python3 -m unittest discover -s wildchat/tests
+python3 scripts/verify.py
+```
+
+출력은 [temporal_h1.json](results/temporal_h1.json), [temporal_h1.md](results/temporal_h1.md), [temporal_h1.log](results/temporal_h1.log)다. 첫/후속/전체 턴×행/사용자 가중별 네 조건의 val pinball과 B+H1−B·C_emb_PCA+H1−C_emb_PCA를 보고한다. 사용자 paired bootstrap 1,000회(seed 42, PCG64)는 모든 조건·턴·가중에 같은 추출을 공유하며 percentile 선형 보간 95% CI를 계산한다. 분위수는 정렬하지 않는다. 테스트는 합성 자료만 사용하며 현재·미래 응답 변경 불변성, 대화 간 격리, invalid 쌍·0분모, 캐시 정합성, validation의 모델/PCA 적합 배제, paired bootstrap을 검사한다.
+
+이미 반복 관측한 validation에 대한 후속 비교이며 독립 test 확인이나 Mac 탐색의 확증으로 해석하지 않는다. 첫 샤드 고정 표본·가시 텍스트 길이에 한정하고 CI는 학습·선택 불확실성을 포함하지 않는다. 설계는 [ADR 0004](../docs/decisions/0004-wildchat-h1-validation.md)를 따른다. 전체 `verify`를 막던 TraceLab 링크 오류 8건은 원본 릴리스 커밋 링크로 수정했으며 원본·로컬 해시 보존 방식은 [WORKFLOW §8](../WORKFLOW.md#8-검증-명령과-기존-한계)에 있다.

@@ -144,8 +144,18 @@
       "sha256": "9a47bf4775b4989635dafc41944d711ac727e8fe41eae3f3d39d0f00765d33e4"
     },
     "tracelab/source/LICENSE-DATASET.md": {
-      "bytes": 2061,
-      "sha256": "1e96a0ec55f98ee0e4e2432626c0201104ebfb7f98cecf0a31d5313ddad92e9a"
+      "bytes": 2352,
+      "sha256": "bae2f3d868f9a31b8e08626942a2825e68e29462743a0fe28137ae286f68edeb",
+      "upstream_copy": {
+        "bytes": 2061,
+        "sha256": "1e96a0ec55f98ee0e4e2432626c0201104ebfb7f98cecf0a31d5313ddad92e9a",
+        "url": "https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE-DATASET.md"
+      },
+      "local_modification": {
+        "date": "2026-11-06",
+        "rewritten_links": 1,
+        "description": "Added local-copy notice and resolved unavailable relative Markdown links to the recorded release commit; other content unchanged."
+      }
     },
     "tracelab/source/docs_commit.json": {
       "bytes": 59225,
@@ -160,8 +170,18 @@
       "sha256": "fe72ac339e3e3d7f848bef468023880157e76cae0a450e7375644a2269a6442c"
     },
     "tracelab/source/release_README.md": {
-      "bytes": 16679,
-      "sha256": "4b3259783b8e84dbda953b9eabf47fbb7a077b0cfb5ee3138eecd79d5a0c3afb"
+      "bytes": 17313,
+      "sha256": "ad6d20dc1e29f7495234ce1769c0491ad6da070bbca5a2eb03d46d76be7c0cb1",
+      "upstream_copy": {
+        "bytes": 16679,
+        "sha256": "4b3259783b8e84dbda953b9eabf47fbb7a077b0cfb5ee3138eecd79d5a0c3afb",
+        "url": "https://github.com/uw-syfi/TraceLab/blob/fc06157/README.md"
+      },
+      "local_modification": {
+        "date": "2026-11-06",
+        "rewritten_links": 8,
+        "description": "Added local-copy notice and resolved unavailable relative Markdown links to the recorded release commit; other content unchanged."
+      }
     },
     "tracelab/source/release_extract_claude_rounds.py": {
       "bytes": 24552,
