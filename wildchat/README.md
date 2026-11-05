@@ -154,4 +154,4 @@ python3 scripts/verify.py
 
 출력은 [temporal_h1.json](results/temporal_h1.json), [temporal_h1.md](results/temporal_h1.md), [temporal_h1.log](results/temporal_h1.log)다. 첫/후속/전체 턴×행/사용자 가중별 네 조건의 val pinball과 B+H1−B·C_emb_PCA+H1−C_emb_PCA를 보고한다. 사용자 paired bootstrap 1,000회(seed 42, PCG64)는 모든 조건·턴·가중에 같은 추출을 공유하며 percentile 선형 보간 95% CI를 계산한다. 분위수는 정렬하지 않는다. 테스트는 합성 자료만 사용하며 현재·미래 응답 변경 불변성, 대화 간 격리, invalid 쌍·0분모, 캐시 정합성, validation의 모델/PCA 적합 배제, paired bootstrap을 검사한다.
 
-이미 반복 관측한 validation에 대한 후속 비교이며 독립 test 확인이나 Mac 탐색의 확증으로 해석하지 않는다. 첫 샤드 고정 표본·가시 텍스트 길이에 한정하고 CI는 학습·선택 불확실성을 포함하지 않는다. 설계는 [ADR 0004](../docs/decisions/0004-wildchat-h1-validation.md)를 따른다. 전체 `verify`의 기존 TraceLab 링크 오류 8건은 [WORKFLOW §8](../WORKFLOW.md#8-검증-명령과-기존-한계)에 기록돼 있다.
+이미 반복 관측한 validation에 대한 후속 비교이며 독립 test 확인이나 Mac 탐색의 확증으로 해석하지 않는다. 첫 샤드 고정 표본·가시 텍스트 길이에 한정하고 CI는 학습·선택 불확실성을 포함하지 않는다. 설계는 [ADR 0004](../docs/decisions/0004-wildchat-h1-validation.md)를 따른다. 전체 `verify`를 막던 TraceLab 링크 오류 8건은 원본 릴리스 커밋 링크로 수정했으며 원본·로컬 해시 보존 방식은 [WORKFLOW §8](../WORKFLOW.md#8-검증-명령과-기존-한계)에 있다.
