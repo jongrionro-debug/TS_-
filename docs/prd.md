@@ -1,8 +1,8 @@
 # 프로젝트 기획서: 대화 이력을 활용한 LLM 응답 토큰 예측
 
 - 과목: 시계열 데이터 분석 및 실습
-- 최초 작성일: 2026-10-22 / 최종 갱신일: 2026-11-03
-- 현재 상태: WildChat 조사·전처리·탐색 실험·사용자 분리 재검증·최종 test 1회 평가 완료
+- 최초 작성일: 2026-10-22 / 최종 갱신일: 2026-11-06
+- 현재 상태: WildChat 조사·전처리·사용자 분리 재검증·최종 test 1회 평가 완료; #19 의미 특징에 이어 #23 H1 validation 전용 후속 비교
 - 현재 데이터: WildChat-1M 첫 Parquet 샤드의 고정 표본
 - 보존 트랙: BurstGPT_3의 다음 10분 집계 수요 설계·완료된 EDA
 - 용도: 연구 정의·허용하는 결론·변경 관리의 정본. 실제 수치는 각 실행 산출물을 따른다.
@@ -73,6 +73,14 @@
 손실은 낮을수록 좋다. 이 고정 표본에서 B의 전체·후속 턴 예측이 A보다 개선됐으며 첫 턴 행 가중 차이의 CI는 0을 포함한다. 첫 턴의 사용자 가중 결과는 별도로 보고서에 제공한다. 세부 기준선 대비 비교·다른 지표는 [최종 보고서](../wildchat/results/test_final.md)와 [기계 판독 결과](../wildchat/results/test_final.json)가 정본이다.
 
 **`finalize.py freeze/evaluate`를 다시 실행하지 않는다.** 독점 [실행 로그](../wildchat/results/test_final.log)는 실패를 포함한 재시도 차단 기록이다. 결과를 본 뒤 모델·설정·예측 코드 변경이나 재평가를 하지 않는다. 기존 코드·설정·해시·로그·산출물을 보존한다. 이후 연구 범위는 별도 결정이 필요하며 추가 평가를 자동 후속 작업으로 잡지 않는다.
+
+### 후속 H1 순차 특징 비교 (#23, validation 전용)
+
+#19에서 추가된 [MiniLM 임베딩 PCA 특징](decisions/0003-wildchat-category-condition-c.md)에 이어, #23의 사용자 결정에 따라 B·B+H1·C_emb_PCA(k=32)·C_emb_PCA+H1을 같은 정제 train/validation에서 비교한다. H1은 같은 원본 대화의 이전 유효 출력 EWMA(α=0.3), 누적 평균·모집단 표준편차, 최근 두 출력 차이·원래 user 턴 간격당 기울기, 직전 유효 출력/입력 비율·비율 EWMA, 현재/직전 유효 입력 배율, 관측 수다. 현재 응답을 누적하기 전에 특징을 기록하며 다른 대화를 섞지 않는다.
+
+네 조건에 동일한 3개 후보·train 내부 홀드아웃 선택과 조기 종료를 적용하고 전체 정제 train으로 재학습한다. PCA는 선택 시 내부 fit만, 보고 시 전체 정제 train만으로 적합한다. k=32는 사전 고정이다. 운영자 지시에 따라 기존 임베딩 캐시의 해시·형식·전체 키 정합성을 확인해 재사용한다. 첫/후속/전체 턴×행/사용자 가중 val pinball과 두 H1 추가 차이의 사용자 paired bootstrap 1,000회(seed 42) 95% CI를 보고한다. 최종 test 재접근·재평가 없이 기존 고정 파일을 보존한다.
+
+결과는 [temporal_h1.md](../wildchat/results/temporal_h1.md)·[JSON](../wildchat/results/temporal_h1.json), 설계·결측 처리·탐색과의 차이는 [ADR 0004](decisions/0004-wildchat-h1-validation.md), 명령은 [README](../wildchat/README.md)에 있다. 반복 사용한 validation의 후속 분석이므로 독립 확증으로 해석하지 않는다.
 
 ### 단계별 기록과 결론의 한계
 
