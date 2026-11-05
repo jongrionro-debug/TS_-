@@ -7,7 +7,7 @@ trace and the prebuilt DuckDB database distributed as GitHub Release assets (e.g
 
 > Note: This dataset license applies to the **released trace data only**. All source
 > code in this repository (collection, sanitization, analysis, validation, and the web
-> app) is licensed separately under the Apache License 2.0 — see [`LICENSE`](LICENSE).
+> app) is licensed separately under the Apache License 2.0 — see [`LICENSE`](https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE).
 
 ## You are free to
 

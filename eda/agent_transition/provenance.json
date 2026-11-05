@@ -144,8 +144,17 @@
       "sha256": "9a47bf4775b4989635dafc41944d711ac727e8fe41eae3f3d39d0f00765d33e4"
     },
     "tracelab/source/LICENSE-DATASET.md": {
-      "bytes": 2061,
-      "sha256": "1e96a0ec55f98ee0e4e2432626c0201104ebfb7f98cecf0a31d5313ddad92e9a"
+      "bytes": 2110,
+      "sha256": "980a249165e2d6cfeb11e61248dd670d12d62d535a91fb9083f98972b40563cd",
+      "upstream_bytes": 2061,
+      "upstream_sha256": "1e96a0ec55f98ee0e4e2432626c0201104ebfb7f98cecf0a31d5313ddad92e9a",
+      "local_adaptation": {
+        "date": "2026-11-05",
+        "reason": "Issue 21 verification retry: resolve upstream-relative links absent from this partial local copy; text unchanged.",
+        "link_replacements": {
+          "LICENSE": "https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE"
+        }
+      }
     },
     "tracelab/source/docs_commit.json": {
       "bytes": 59225,
@@ -160,8 +169,21 @@
       "sha256": "fe72ac339e3e3d7f848bef468023880157e76cae0a450e7375644a2269a6442c"
     },
     "tracelab/source/release_README.md": {
-      "bytes": 16679,
-      "sha256": "4b3259783b8e84dbda953b9eabf47fbb7a077b0cfb5ee3138eecd79d5a0c3afb"
+      "bytes": 17071,
+      "sha256": "2f407740a3401b911461e61d4a33a4d9eae0fdbe28358ee2f62d7eada7e28838",
+      "upstream_bytes": 16679,
+      "upstream_sha256": "4b3259783b8e84dbda953b9eabf47fbb7a077b0cfb5ee3138eecd79d5a0c3afb",
+      "local_adaptation": {
+        "date": "2026-11-05",
+        "reason": "Issue 21 verification retry: resolve upstream-relative links absent from this partial local copy; text unchanged.",
+        "link_replacements": {
+          "LICENSE": "https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE",
+          "artifacts/utils/README.md": "https://github.com/uw-syfi/TraceLab/blob/fc06157/artifacts/utils/README.md",
+          "web/README.md": "https://github.com/uw-syfi/TraceLab/blob/fc06157/web/README.md",
+          "config/services.json": "https://github.com/uw-syfi/TraceLab/blob/fc06157/config/services.json",
+          "docs/prompt_cache_accounting.md": "https://github.com/uw-syfi/TraceLab/blob/fc06157/docs/prompt_cache_accounting.md"
+        }
+      }
     },
     "tracelab/source/release_extract_claude_rounds.py": {
       "bytes": 24552,

@@ -16,7 +16,7 @@ actually produce in the wild — then explore them in your browser.
 [**Web app**](#-web-app) ·
 [**Data format**](#-data-format)
 
-[![License: Apache 2.0](https://img.shields.io/badge/code-Apache%202.0-4b2e83.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/code-Apache%202.0-4b2e83.svg)](https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE)
 [![Dataset: CC BY 4.0](https://img.shields.io/badge/dataset-CC%20BY%204.0-b7a57a.svg)](LICENSE-DATASET.md)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](pyproject.toml)
 [![Built with uv](https://img.shields.io/badge/built%20with-uv-7c3aed.svg)](https://github.com/astral-sh/uv)
@@ -246,7 +246,7 @@ pseudonymous `user` values.
 Every analysis is a self-contained experiment under `artifacts/<category>/<experiment>/`.
 Read that folder's `README.md` for the question it answers and exactly how it computes its
 metric; shared metric definitions live in
-[`artifacts/utils/README.md`](artifacts/utils/README.md). Most experiments accept the
+[`artifacts/utils/README.md`](https://github.com/uw-syfi/TraceLab/blob/fc06157/artifacts/utils/README.md). Most experiments accept the
 released DuckDB at `trace/syfi_coding_trace.duckdb`; JSONL inputs are still supported for
 scripts that expose `-i` / `--input`. Outputs are written into each experiment folder:
 
@@ -334,8 +334,8 @@ The whole stack runs locally. From the repo root:
 ```
 
 The dev workflow (ports, individual services, status checks) is documented in
-[`web/README.md`](web/README.md). Ports and the LLM backend live in
-[`config/services.json`](config/services.json).
+[`web/README.md`](https://github.com/uw-syfi/TraceLab/blob/fc06157/web/README.md). Ports and the LLM backend live in
+[`config/services.json`](https://github.com/uw-syfi/TraceLab/blob/fc06157/config/services.json).
 
 ---
 
@@ -371,7 +371,7 @@ rows it is copied from `usage.cache_creation_input_tokens`; for Codex rows it is
 `newly_append_tokens` still includes both Claude uncached `input_tokens` and Claude
 cache-write tokens.
 
-See [`docs/prompt_cache_accounting.md`](docs/prompt_cache_accounting.md) for the full
+See [`docs/prompt_cache_accounting.md`](https://github.com/uw-syfi/TraceLab/blob/fc06157/docs/prompt_cache_accounting.md) for the full
 prompt-cache accounting derivation.
 </details>
 
@@ -397,7 +397,7 @@ timestamp.
 The single-source-of-truth metric definitions (effective tool latency, observable
 generation time, human input wait, user-turn response time, prefix hit ratio, adjusted
 append, KV active ratio, growth buckets) are collected in
-[`artifacts/utils/README.md`](artifacts/utils/README.md).
+[`artifacts/utils/README.md`](https://github.com/uw-syfi/TraceLab/blob/fc06157/artifacts/utils/README.md).
 
 ---
 
@@ -407,11 +407,11 @@ Contributions are welcome — whether it's a new analysis experiment, a validato
 a donated sanitized trace. A good experiment is **self-contained**: one script, a
 `README.md` stating the question and metric, and outputs that regenerate from the public
 trace. By submitting a contribution you agree to license it under the project's
-[Apache 2.0](LICENSE) (code) / [CC BY 4.0](LICENSE-DATASET.md) (data) terms.
+[Apache 2.0](https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE) (code) / [CC BY 4.0](LICENSE-DATASET.md) (data) terms.
 
 ## 📄 License
 
-- **Code** — [Apache License 2.0](LICENSE)
+- **Code** — [Apache License 2.0](https://github.com/uw-syfi/TraceLab/blob/fc06157/LICENSE)
 - **Public trace dataset** — [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE-DATASET.md)
 
 <div align="center">

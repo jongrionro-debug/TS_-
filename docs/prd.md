@@ -30,6 +30,8 @@
 
 다른 자료에서 실제 user 제출시각의 의미가 검증된 경우에만 전처리의 명시적 옵션으로 간격 lag를 허용한다. 현재 샤드에는 해당하지 않는다. RNN·Transformer·전체 에이전트 작업량 예측은 현재 범위 밖이다.
 
+위 표는 완료된 A/B 연구의 입력 정의다. 별도 승인된 validation 전용 확장은 [ADR 0003](decisions/0003-wildchat-category-condition-c.md)의 의미·임베딩 특징과 [ADR 0004](decisions/0004-wildchat-cross-conversation-history.md)의 사용자별 대화 간 출력 이력을 따른다. #21은 B/C_emb_PCA 각각에 동일 split의 과거 완료 대화 통계를 추가한 네 조건을 비교한다. 요청시각이 없는 첫 턴에는 새 이력을 결측 처리하며 현재 응답 완료시각을 입력으로 사용하지 않는다. 기존 최종 평가 및 고정 코드·결과는 변경하지 않는다.
+
 ### 데이터와 원래 분할 (#4~#6)
 
 - 출처: AllenAI WildChat-1M, 리비전 `7d6490e462285cf85d91eabea0f9a954fbddcd1f`. 출처·라이선스·판정 기준은 [감사 보고서](../wildchat/results/data_audit.md)에 있다.
