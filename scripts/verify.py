@@ -7,6 +7,7 @@ Skips .git, data/, ref/ (large binaries). Exit 0 = pass, 1 = fail.
 Usage: python3 scripts/verify.py
 """
 import json, re, sys
+import subprocess
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -44,6 +45,10 @@ for p in files("*.md"):
         dest = (ROOT / path.lstrip("/")) if path.startswith("/") else (p.parent / path)
         if not dest.exists():
             errors.append(f"{p.relative_to(ROOT)}: broken link -> {target}")
+
+context = subprocess.run([sys.executable, str(ROOT / "scripts/check_context.py")], check=False)
+if context.returncode:
+    errors.append("context layout check failed")
 
 for e in errors:
     print("FAIL", e)

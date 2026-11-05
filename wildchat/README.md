@@ -1,6 +1,6 @@
 # WildChat 응답 토큰 예측 — 조사부터 최종 평가까지
 
-2026-11-03 기준 #4~#7 조사·전처리·탐색 실험, #13 사용자 분리 재검증, #15 최종 test 1회 평가를 완료했다. 현재 정의는 [PRD](../docs/prd.md), 최종 결과는 [test_final.md](results/test_final.md)와 [test_final.json](results/test_final.json)이다. 아래 명령은 단계별 실행 방법과 과거 실행 이력을 구분해 읽는다.
+2026-11-03 기준 #4~#7 조사·전처리·탐색 실험, #13 사용자 분리 재검증, #15 최종 test 1회 평가를 완료했다. 현재 정의는 [PRD](../docs/project.md), 최종 결과는 [test_final.md](results/test_final.md)와 [test_final.json](results/test_final.json)이다. 아래 명령은 단계별 실행 방법과 과거 실행 이력을 구분해 읽는다.
 
 현재 비교는 고정 분위수·직전 응답 비율·대화 누적 평균·A·B의 5개이며, train 내부에서만 튜닝하고 사용자 분리·분위수 무정렬·사용자 bootstrap을 적용한다. #7의 validation 튜닝·3모델·분위수 정렬은 과거 탐색 규칙이다. **최종 test는 이미 한 번 사용했으므로 `finalize.py freeze/evaluate`를 재실행하지 않는다.**
 

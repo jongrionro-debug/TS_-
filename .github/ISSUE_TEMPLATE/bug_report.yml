@@ -1,0 +1,68 @@
+name: Bug Report
+description: 재현 가능한 문제와 기대 동작을 보고합니다.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        가능한 경우 최소 재현 절차와 실제 결과를 함께 적어 주세요.
+        Acceptance Criteria는 수정 후 검증할 수 있는 문장으로 작성합니다.
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: 어떤 문제가 발생했으며 사용자나 시스템에 어떤 영향이 있는지 설명해 주세요.
+      placeholder: 문제의 범위와 영향받는 기능을 적어 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: 문제를 재현하는 최소 절차를 순서대로 적어 주세요.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: 정상적으로 기대하는 결과를 적어 주세요.
+      placeholder: 어떤 결과가 확인되어야 하는지 적어 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: 현재 실제로 관찰되는 결과와 오류 메시지를 적어 주세요.
+      placeholder: 로그·스크린샷·오류 메시지가 있으면 민감정보를 제거하고 첨부해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: 재현에 영향을 줄 수 있는 환경 정보를 적어 주세요.
+      placeholder: OS, 브라우저, 앱 버전, 실행 방식 등
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: 수정 후 재현 절차와 테스트로 확인할 수 있는 완료 조건을 적어 주세요.
+      placeholder: |
+        - [ ] 같은 조건에서 문제가 더 이상 재현되지 않는다.
+        - [ ] 관련 회귀 조건이 정상 동작한다.
+    validations:
+      required: true

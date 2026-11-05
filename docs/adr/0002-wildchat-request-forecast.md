@@ -24,4 +24,4 @@ BurstGPT의 데이터, 목표, A/B/C 비교 및 평가를 보존하고 WildChat�
 - #13에서 사용자 분리·train 내부 튜닝·단순 기준선 2개 추가·분위수 무정렬·사용자 bootstrap으로 평가를 보정했다. 현재 비교는 fixed·직전 응답 비율·대화 누적 평균·A·B다. [재검증 결과](../../wildchat/results/revalidation.md)를 따른다.
 - #15에서 소유자 승인에 따른 최종 test 1회 평가를 완료했다. test 승인 대기나 모델 구현 예정 상태가 아니다. [최종 결과](../../wildchat/results/test_final.md)·고정 설정·로그를 보존하고 재평가하지 않는다.
 - 현재 작업 안내는 WildChat을 우선하되 BurstGPT 설계·EDA와 TraceLab·Exgentic 후보 검토는 이력으로 보존한다. 독립 트랙이라는 원래 결정과 토큰 의미는 바꾸지 않는다.
-- 현재 연구 정의·한계는 [PRD](../prd.md), 단계별 명령은 [WildChat README](../../wildchat/README.md)가 정본이다. 이번 갱신은 새 연구 결정이 아닌 이미 수행한 작업의 상태 반영이다.
+- 현재 연구 정의·한계는 [PRD](../project.md), 단계별 명령은 [WildChat README](../../wildchat/README.md)가 정본이다. 이번 갱신은 새 연구 결정이 아닌 이미 수행한 작업의 상태 반영이다.

@@ -2,7 +2,7 @@
 
 Oct 23, 2026 · @HYsynergy
 
-> 보존 자료(2026-11-03 확인): 2026-10-23 BurstGPT 집계 수요 Proposal의 발표 원고다. 현재 WildChat의 연구 정의·완료 결과는 [PRD](../docs/prd.md)와 [최종 보고서](../wildchat/results/test_final.md)를 따른다. 아래 “current”는 당시 발표 구성을 가리킨다.
+> 보존 자료(2026-11-03 확인): 2026-10-23 BurstGPT 집계 수요 Proposal의 발표 원고다. 현재 WildChat의 연구 정의·완료 결과는 [PRD](../docs/project.md)와 [최종 보고서](../wildchat/results/test_final.md)를 따른다. 아래 “current”는 당시 발표 구성을 가리킨다.
 
 ## Timing guide
 

@@ -1,5 +1,6 @@
 # ADR-0001: GitHub Issue 기반 에이전트 작업 흐름 도입
 - 상태: 채택 (Phase 0 커밋 `21132c8` 반영 완료; 현재 절차는 아래 갱신 참고)
+- 후속 결정: [ADR 0003](0003-common-context-layout.md)이 공통 문서 경로·명명만 부분 대체한다. 나머지 결정은 유지한다.
 - 날짜: 2026-11-02
 - 관련: PR "Phase 0: agent workflow scaffolding"
 
@@ -23,7 +24,7 @@ PR을 결과물로 삼는다. box의 work-issue.sh가 이슈 1건씩 Context Pac
 - AGENTS.md 반영: 완료
 
 ## 현재 적용 상태 (2026-11-03 갱신)
-- 이 문서는 box 자동화 도입 이력이다. 현재 로컬 협업과 기계 worker의 적용 범위는 [WORKFLOW.md](../../WORKFLOW.md)를 따른다.
+- 이 문서는 box 자동화 도입 이력이다. 현재 로컬 협업과 기계 worker의 적용 범위는 [WORKFLOW.md](../workflow.md)를 따른다.
 - 2026-10-30 사용자 위임에 따라 Git 요청은 필요한 커밋·push·PR·병합·기본 브랜치 반영까지 포함한다. 위 도입 당시의 “머지는 사람만”은 현재 제한으로 적용하지 않는다.
 - 로컬 채팅 요청은 이슈 생성 없이 진행하며 기존 작업을 보존한다. 자동 Notion 카드 생성이나 별도 worktree를 요구하지 않는다.
 - WildChat에 `unittest` 기반 테스트와 고정 의존성이 추가됐다. “테스트가 없다”는 위 결과는 도입 당시 상태이며 현재 검증 명령·환경 한계는 WORKFLOW.md §8을 따른다.

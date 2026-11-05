@@ -1,6 +1,6 @@
-# WORKFLOW.md — 로컬 협업과 이슈→PR 실행 계약
+# 작업 절차 — 로컬 협업과 이슈→PR 실행 계약
 
-최종 갱신: 2026-11-03. 현재 연구·완료 단계는 [PRD](docs/prd.md), 실행 환경은 [WildChat README](wildchat/README.md)를 따른다. 이 문서는 저장소에서 확인할 수 있는 절차를 정의하며 box의 외부 자동화가 현재 실행 중이라고 보장하지 않는다.
+최종 갱신: 2026-11-04. 현재 연구·완료 단계는 [현재 프로젝트](project.md), 실행 환경은 [WildChat README](../wildchat/README.md)를 따른다. 이 문서는 저장소에서 확인할 수 있는 절차를 정의하며 box의 외부 자동화가 현재 실행 중이라고 보장하지 않는다.
 
 ## 0. 적용 범위와 사용자 위임
 - 로컬 채팅 요청은 요청 자체가 작업 범위다. GitHub 이슈·Notion 카드 없이도 조사·문서 수정·검증을 진행한다.
@@ -9,6 +9,9 @@
 - 과거의 “머지는 사람만”, “기본 브랜치 반영 금지”는 위 위임으로 대체됐다. 로컬 문서 수정 요청만으로 외부 게시까지 자동 수행하지는 않는다.
 
 ## 1. 상태 (GitHub 라벨이 원본)
+
+작업 정의는 [task.yml](../.github/ISSUE_TEMPLATE/task.yml), 변경·검증 결과는 [PR 템플릿](../.github/pull_request_template.md)을 사용한다. box의 mode·difficulty 필드는 작업 폼에 유지한다.
+
 agent:triage → agent:ready → agent:in-progress → agent:review → merge → closed
                        ↘ agent:needs-decision / agent:blocked
 - ready 조건: Goal·AC 존재, mode·difficulty 지정, Mac 필요 아님
@@ -46,7 +49,7 @@ box worker의 최종 출력 형식이다. 일반 채팅 작업은 결과·핵심
 ```json
 {
   "issue": 42, "status": "done|partial|blocked|needs_decision",
-  "plan": ["..."], "changed_files": ["readme.md"],
+  "plan": ["..."], "changed_files": ["README.md"],
   "tests_run": ["python3 scripts/verify.py"], "results": "0 errors",
   "ac_check": [{"ac": "...", "met": true, "evidence": "..."}],
   "risks": ["..."], "decisions_needed": ["..."],
@@ -73,5 +76,5 @@ box 자동화의 모델 이름은 저장소 밖 설정에서 관리하며 이 �
 ## 8. 검증 명령과 기존 한계
 - `python3 scripts/verify.py`: 표준 라이브러리만 사용. JSON/ipynb 파싱과 Markdown 상대 링크의 존재를 검사하며 모델 성능·외부 URL·노트북 재현을 검증하지는 않는다.
 - `python3 -m unittest discover -s wildchat/tests`: 합성 자료 기반 기존 테스트. NumPy·LightGBM·PyArrow·tiktoken 부재 시 관련 테스트는 skip된다. 실제 실험을 검증했다고 대신 보고하지 않는다.
-- WildChat 의존성이 준비된 환경의 명령·선택 테스트는 [wildchat/README.md](wildchat/README.md)를 따른다. 문서 갱신을 위해 의존성을 새로 설치하거나 학습·최종 평가를 재실행할 필요는 없다.
+- WildChat 의존성이 준비된 환경의 명령·선택 테스트는 [wildchat/README.md](../wildchat/README.md)를 따른다. 문서 갱신을 위해 의존성을 새로 설치하거나 학습·최종 평가를 재실행할 필요는 없다.
 - 2026-11-03 문서 점검 기준, 외부에서 보관한 `eda/agent_transition/tracelab/source/LICENSE-DATASET.md`와 `release_README.md`에는 upstream 저장소 기준 상대 링크 8건이 로컬에 없다. 계속 사용하는 사본은 `provenance.json`의 SHA256과 출처 의미를 지켜야 하지만, 해시 기록 자체가 미사용 사본의 영구 보존 이유는 아니다. 해당 사본이 남아 있는 현재 전체 verify는 기존 오류 8건으로 실패하며, 자체 문서의 새 오류와 구분한다.
