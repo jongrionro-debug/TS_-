@@ -74,4 +74,4 @@ box 자동화의 모델 이름은 저장소 밖 설정에서 관리하며 이 �
 - `python3 scripts/verify.py`: 표준 라이브러리만 사용. JSON/ipynb 파싱과 Markdown 상대 링크의 존재를 검사하며 모델 성능·외부 URL·노트북 재현을 검증하지는 않는다.
 - `python3 -m unittest discover -s wildchat/tests`: 합성 자료 기반 기존 테스트. NumPy·LightGBM·PyArrow·tiktoken 부재 시 관련 테스트는 skip된다. 실제 실험을 검증했다고 대신 보고하지 않는다.
 - WildChat 의존성이 준비된 환경의 명령·선택 테스트는 [wildchat/README.md](wildchat/README.md)를 따른다. 문서 갱신을 위해 의존성을 새로 설치하거나 학습·최종 평가를 재실행할 필요는 없다.
-- 2026-11-03 문서 점검 기준, 외부에서 보관한 `eda/agent_transition/tracelab/source/LICENSE-DATASET.md`와 `release_README.md`에는 upstream 저장소 기준 상대 링크 8건이 로컬에 없다. 계속 사용하는 사본은 `provenance.json`의 SHA256과 출처 의미를 지켜야 하지만, 해시 기록 자체가 미사용 사본의 영구 보존 이유는 아니다. 해당 사본이 남아 있는 현재 전체 verify는 기존 오류 8건으로 실패하며, 자체 문서의 새 오류와 구분한다.
+- 2026-11-03 점검에서 TraceLab 외부 문서 사본의 upstream 상대 링크 8건이 실패했다. 2026-11-05 #21 검증 재시도에서 누락 대상을 기록된 release commit(`fc06157`)의 URL로 수정했다. `eda/agent_transition/provenance.json`은 원본 bytes/SHA256을 `upstream_bytes`/`upstream_sha256`으로 보존하고 현재 사본의 bytes/SHA256 및 링크 변경 내역을 함께 기록한다. 검증기는 변경하지 않았으며 외부 URL의 유효성은 검증 범위 밖이다. 해시 기록 자체가 미사용 사본의 영구 보존 이유는 아니다.

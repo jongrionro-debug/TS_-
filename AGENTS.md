@@ -25,7 +25,7 @@
 - WildChat 의존성은 `wildchat/requirements.txt`에 고정돼 있다. box의 `/workspace/venvs/wildchat/bin/python`은 과거 실행 환경이며 로컬에 있다고 가정하지 않는다.
 - 빌드·별도 린트·타입체크 설정은 없다. 새 의존성·테스트 프레임워크를 임의로 추가하지 않는다.
 - BurstGPT 노트북은 `data/BurstGPT_3.csv`와 노트북 의존성이 필요하다. CSV는 gitignore 대상이며 환경별 존재 여부를 확인한다.
-- 전체 검증에는 보존된 TraceLab 외부 문서 사본의 기존 링크 오류가 있다. [WORKFLOW.md §8](WORKFLOW.md#8-검증-명령과-기존-한계)를 따르고 실패를 통과로 보고하지 않는다.
+- TraceLab 외부 문서 사본의 기존 링크 오류는 원본 release commit URL로 수정했다. 출처·원본 및 로컬 해시는 [WORKFLOW.md §8](WORKFLOW.md#8-검증-명령과-기존-한계)을 따르며 검증 실패를 통과로 보고하지 않는다.
 
 ## 3. 실험·자료의 유지와 정리
 - WildChat은 첫 Parquet 샤드의 고정 표본 결과다. 전체 14개 샤드나 실제 API 사용량·GPU 효과로 일반화하지 않는다.
