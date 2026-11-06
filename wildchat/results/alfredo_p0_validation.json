@@ -1,0 +1,76 @@
+{
+  "scope": "P0; no heldout data access; no external posting",
+  "recorded_at_kst": "2026-11-06T19:42:46.821454+09:00",
+  "related_tests": {
+    "command": "OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 /workspace/venvs/wildchat/bin/python -m unittest wildchat.tests.test_alfredo_p0 wildchat.tests.test_revalidate wildchat.tests.test_experiment wildchat.tests.test_metrics wildchat.tests.test_category wildchat.tests.test_prepare.FeatureTests wildchat.tests.test_prepare.GroupSplitTests",
+    "run": 62,
+    "passed": 62,
+    "skipped": 0,
+    "exit_code": 0
+  },
+  "standard_python_tests": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s wildchat/tests",
+    "run": 69,
+    "passed": 49,
+    "skipped": 20,
+    "exit_code": 0
+  },
+  "verify": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/verify.py",
+    "exit_code": 1,
+    "errors": 8,
+    "new_errors": 0,
+    "stdout": "FAIL eda/agent_transition/tracelab/source/LICENSE-DATASET.md: broken link -> LICENSE\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> artifacts/utils/README.md\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> web/README.md\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> config/services.json\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> docs/prompt_cache_accounting.md\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> artifacts/utils/README.md\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> LICENSE\nFAIL eda/agent_transition/tracelab/source/release_README.md: broken link -> LICENSE\nverify: 33 json/ipynb files, 172 relative md links, 8 errors\n",
+    "classification": "8 pre-existing TraceLab relative-link errors documented in WORKFLOW section 8"
+  },
+  "integrity_checks": {
+    "tracked_files_unchanged": true,
+    "original_checkout_unchanged": true,
+    "original_branch": "agent/issue-23-h1-val-b-c-emb-pca",
+    "PR24_reference_exact_git_blob": true,
+    "executed_numerical_code_hashes_match": true,
+    "metadata_totals_consistent": true,
+    "all_bootstrap_effective_replicates": 1000,
+    "git_diff_check_passed": true,
+    "new_file_whitespace_checks": [
+      "wildchat/alfredo_h1_features.py",
+      "wildchat/alfredo_p0.py",
+      "wildchat/alfredo_p0_reference.json",
+      "wildchat/alfredo_p0_report.py",
+      "wildchat/alfredo_p0_support.py",
+      "wildchat/results/alfredo_p0_validation.json",
+      "wildchat/results/forecast_output_explainer.md",
+      "wildchat/results/lag1_ablation.json",
+      "wildchat/results/lag1_ablation.log",
+      "wildchat/results/lag1_ablation.md",
+      "wildchat/results/representation.json",
+      "wildchat/results/representation.md",
+      "wildchat/results/ten_minute_bins.json",
+      "wildchat/results/ten_minute_bins.md",
+      "wildchat/tests/test_alfredo_p0.py"
+    ]
+  },
+  "diagram": {
+    "png_created": false,
+    "command": "PYTHONDONTWRITEBYTECODE=1 /workspace/venvs/wildchat/bin/python -m wildchat.alfredo_p0 --task diagram --output /tmp/alfredo-p0-plot-attempt",
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/workspace/repos/TS_-p0/wildchat/alfredo_p0.py\", line 532, in <module>\n    main()\n    ~~~~^^\n  File \"/workspace/repos/TS_-p0/wildchat/alfredo_p0.py\", line 527, in main\n    globals()[args.task](args)\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/workspace/repos/TS_-p0/wildchat/alfredo_p0.py\", line 436, in diagram\n    import matplotlib\nModuleNotFoundError: No module named 'matplotlib'\n",
+    "isolated_install_command": "PIP_CONFIG_FILE=/dev/null /workspace/venvs/wildchat/bin/python -m pip --isolated install --index-url https://pypi.org/simple --target /tmp/alfredo-p0-plotdeps matplotlib==3.10.8 --no-warn-script-location --disable-pip-version-check --no-input",
+    "install_exit_code": 1,
+    "reason": "matplotlib missing; PyPI DNS unavailable; no escalation or environment changes"
+  },
+  "data_not_committed": [
+    "raw data",
+    "embeddings",
+    "model binaries",
+    "row-level predictions",
+    "user IDs",
+    "conversation text"
+  ],
+  "handoff": {
+    "requested_directory": "/workspace/codex-runs/alfredo-p0",
+    "write_succeeded": false,
+    "error": "OSError [Errno 30] Read-only file system",
+    "fallback_directory": "/tmp/alfredo-p0-handoff"
+  }
+}
