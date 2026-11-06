@@ -1,0 +1,55 @@
+{
+  "scope": "toy aggregation executed; matplotlib rendering failed; no model trained/evaluated",
+  "recorded_at_kst": "2026-11-06T19:42:46.741393+09:00",
+  "command": "/workspace/repos/TS_-p0/wildchat/alfredo_p0_report.py bin-notes --output /tmp/alfredo-p0-bin-final.md",
+  "timezone": "KST UTC+09:00",
+  "requests_minute_from_09_00_input_output": [
+    [
+      1,
+      100,
+      220
+    ],
+    [
+      7,
+      50,
+      80
+    ],
+    [
+      12,
+      120,
+      300
+    ],
+    [
+      18,
+      80,
+      100
+    ],
+    [
+      23,
+      90,
+      180
+    ]
+  ],
+  "arrival_bin_start_minute_sums_input_output": {
+    "0": [
+      150,
+      300
+    ],
+    "10": [
+      200,
+      400
+    ],
+    "20": [
+      90,
+      180
+    ]
+  },
+  "output_is_final_not_available_at_start": true,
+  "source": "hypothetical values, not WildChat rows",
+  "png_created": false,
+  "failure": "ModuleNotFoundError: matplotlib; isolated /tmp installation failed: PyPI DNS name resolution",
+  "code_sha256": {
+    "wildchat/alfredo_p0.py": "e634ae7167ea91670edfce95672561f20bebe1e616e01e546a655e45aed1c3b2",
+    "wildchat/alfredo_p0_report.py": "23a2dea23fd1a32aae5a105166f4b9bc5363c45645fb58bd815860a41f6b4824"
+  }
+}
