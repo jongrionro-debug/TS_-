@@ -2,7 +2,7 @@
 
 시계열 데이터 분석 및 실습 과목 프로젝트(Group 5). FreeInference agentic trace에서 **LLM 요청이 시작될 때 그 요청의 completion 토큰 P10/P50/P90을 예측**하고, 세션 상태가 현재 요청 정보·직전 출력 lag 이상으로 기여하는지 검증한다. 요청별 예측은 10분 출력 토큰 수요 뷰로 모아 보인다.
 
-현재 상태: 1~13주 데이터 감사·10분 집계·EDA와 A·L·B 특징 생성기·합성 누출 테스트 구현. 현재 입력 기반 연결과 엄격 완료 시각 조건을 적용한다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
+현재 상태: 1~13주 데이터 감사·10분 집계·EDA·A/L/B 특징과 고정 분할·기준선 4종 validation 평가·세션 bootstrap CI 구현. 현재 입력 기반 연결과 엄격 완료 시각 조건을 적용한다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
 
 ```
 요청 i (세션 S, step k)      start_ms ──────────── end_ms
@@ -27,7 +27,17 @@ Issue → geass(Codex 구현 → 고정 검증 → Claude 검수) → PR → 사
 
 ## A·L·B 특징 생성 재현
 
-같은 준비 데이터와 의존성으로 `python -m freeinference.features`를 실행한다. [집계 산출물](freeinference/outputs/features/features.json)에 1~13주의 생성 시간·행 수·특징별 결측률이 기록된다. 특징 정의·결측 규칙·4절 항목 대조표는 [project.md](docs/project.md)에 있으며, 요청별 특징은 `build_features` API로 반환한다. C·분할·학습·평가는 포함하지 않는다.
+같은 준비 데이터와 의존성으로 `python -m freeinference.features`를 실행한다. [집계 산출물](freeinference/outputs/features/features.json)에 1~13주의 생성 시간·행 수·특징별 결측률이 기록된다. 특징 정의·결측 규칙·4절 항목 대조표는 [project.md](docs/project.md)에 있으며, 요청별 특징은 `build_features` API로 반환한다. 특징 생성 명령은 C·분할·학습·평가를 포함하지 않는다.
+
+## 기준선 validation 평가 재현
+
+준비된 1~13주 데이터만 사용한다. Ubuntu 분석 환경에서는 다음과 같이 실행한다.
+
+```sh
+FREEINFERENCE_DATA_DIR=~/data/freeinference/bb26cf7 OPENBLAS_NUM_THREADS=1 ~/.venvs/ts-freeinference/bin/python -m freeinference.evaluate
+```
+
+[기준선 보고서](freeinference/outputs/baselines/baselines.md)와 [집계 JSON](freeinference/outputs/baselines/baselines.json)을 생성한다. 1~10주 train 정답의 종료 경계 마스크로 기준선 4종을 맞추고, 11~13주 validation의 요청·세션 가중 지표와 fixed 대비 세션 bootstrap 95% CI(B=2000, seed=20261109)를 기록한다. 분할·holdout·대체 규칙과 재사용 API는 [project.md 4·5절](docs/project.md)을 따른다. 명령·환경·소요 시간·소스 해시는 JSON에 기록한다. 요청별 값·식별자를 내보내지 않으며 test는 로더가 거부한다. 실제 데이터 평가는 아래 검증 명령에 포함하지 않는다.
 
 ## 검증
 

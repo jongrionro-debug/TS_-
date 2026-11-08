@@ -97,6 +97,13 @@ def _window_ewma(values):
     return value
 
 
+def history_allowed(row, predecessor):
+    """Shared current-input link and strict predecessor-completion gate."""
+    return (row["step"] > 0 and row["link_reason"] in LINK_REASONS
+            and predecessor is not None and pd.notna(predecessor["end_ms"])
+            and predecessor["end_ms"] < row["start_ms"])
+
+
 def build_features(requests, sessions, tool_calls):
     """Return {A, L, B} DataFrames aligned positionally with requests.
 
@@ -154,9 +161,7 @@ def build_features(requests, sessions, tool_calls):
             if pd.notna(row["step_trigger"]) and row["step_trigger"] == "user":
                 bisect.insort(user_steps, step)
             predecessor = by_step.get(step - 1)
-            if (step == 0 or row["link_reason"] not in LINK_REASONS or predecessor is None
-                    or pd.isna(records[predecessor]["end_ms"])
-                    or records[predecessor]["end_ms"] >= start):
+            if not history_allowed(row, records[predecessor] if predecessor is not None else None):
                 continue
             recent = []
             for _, old_step, old_pos in reversed(available):
