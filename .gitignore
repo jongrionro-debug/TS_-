@@ -1,2 +1,5 @@
-/data/BurstGPT_3.csv
-/wildchat/**/__pycache__/
+.DS_Store
+/data/
+__pycache__/
+*.pyc
+.venv/

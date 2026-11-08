@@ -1,32 +1,26 @@
-## Summary
-Closes #<issue>
+<!-- 실제로 확인한 내용만 적습니다. Issue가 없으면 현재 요청을 설명하고 번호를 만들지 않습니다. -->
 
-<!-- 무엇을 왜 바꿨는지 3줄 이내 -->
+## 변경 이유와 결과
 
-## Acceptance Criteria
-- [ ] AC1 — 검증 방법:
-- [ ] AC2 — 검증 방법:
+<!-- 어떤 문제를 해결했고 동작이나 결과가 어떻게 달라졌나요? -->
 
-## Changes
-| 파일 | 변경 요지 |
-|---|---|
+## 관련 작업
 
-## Verification
-- tests_run: `python3 scripts/verify.py`
-- result: pass / fail
+<!-- 실제 Issue가 있으면 Closes #번호 또는 Refs #번호. 없으면 요청의 목표와 완료 조건. -->
 
-## Risks
--
+## 주요 변경
 
-## Decisions needed (사람)
-- 없음 / 항목
+<!-- 핵심 변경·완료 조건에 대한 결과·보존한 동작. -->
 
-## Agent metadata
-- worker: <실행 주체 / 로컬 채팅 또는 box worker>
-- difficulty / model: <low|medium|high> / <model>
-- codex_session: <session-id / 해당 없음>
-- base_commit: <sha>
-- attempts: <실제 검증·수정 횟수>
-- handoff: <box worker 인계 경로 / 해당 없음>
+## 검증
 
-<!-- Git 요청의 병합은 WORKFLOW.md §0의 사용자 위임과 이번 요청의 보류 여부를 따른다. -->
+<!-- 실제 명령·입력/환경·결과. 실패·skip·미실행과 이유도 적습니다.
+fixture 검사와 실제 모델·데이터·사용자 효과를 구분합니다. -->
+
+## 문서와 결정
+
+<!-- 갱신한 현재 문서와 관련 ADR 링크. 필요 없으면 그 이유. -->
+
+## 남은 점
+
+<!-- 미완료 범위·알려진 위험·후속 작업. 없으면 없음. -->

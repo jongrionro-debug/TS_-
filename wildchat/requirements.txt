@@ -1,8 +1,0 @@
-# 조사 실행 환경에서 확인한 버전
-datasets==5.1.0
-pyarrow==26.0.0
-tiktoken==0.14.0
-# #7 실행 환경: scipy는 LightGBM 4.7.0의 필수 런타임 의존성 (부트스트랩은 NumPy만 사용)
-lightgbm==4.7.0
-numpy==2.5.4
-scipy==1.18.1

@@ -1,5 +1,0 @@
-# Issue 19 only: separate venv for local zero-shot prompt classification (CPU)
-fastembed==0.9.1
-onnxruntime==1.31.1
-numpy==2.5.4
-pyarrow==26.0.1

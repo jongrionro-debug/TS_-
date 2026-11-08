@@ -1,0 +1,24 @@
+name: Context checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  context:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate document layout
+        run: python3 -B scripts/check_context.py
+      - name: Repository checks
+        run: python3 -B scripts/verify.py
+      - name: Unit tests
+        run: python3 -B -m unittest discover -s tests

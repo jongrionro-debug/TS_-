@@ -1,0 +1,54 @@
+name: 작업 요청
+description: 문제·목표·지킬 동작과 검증 가능한 완료 조건을 정합니다.
+title: "[Task] "
+labels: []
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: 현재 무엇이 불편하고 왜 바꿔야 하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: 작업을 마치면 무엇이 가능해야 하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: 바꿀 동작과 반드시 지킬 기존 동작·제약을 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: 입력·행동·예상 결과와 확인 방법을 적어 주세요.
+      placeholder: "- [ ] 특정 조건에서 기대한 결과를 확인한다."
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of Scope
+      description: 이번 작업에서 다루지 않을 범위. 없으면 없음.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: References
+      description: 관련 project.md·ADR·Issue·PR·코드 경로. 없으면 없음.
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      description: 대용량 다운로드·학습·최종 test 접근이 있으면 high
+      options: [low, medium, high]
