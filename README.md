@@ -2,7 +2,7 @@
 
 시계열 데이터 분석 및 실습 과목 프로젝트(Group 5). FreeInference agentic trace에서 **LLM 요청이 시작될 때 그 요청의 completion 토큰 P10/P50/P90을 예측**하고, 세션 상태가 현재 요청 정보·직전 출력 lag 이상으로 기여하는지 검증한다. 요청별 예측은 10분 출력 토큰 수요 뷰로 모아 보인다.
 
-현재 상태: 재설계 직후, 데이터 감사 전. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
+현재 상태: 1~13주 데이터 감사 완료, 직전 step 기준 시간 정합성은 조건부 성립. 실제 세션 연결의 시점 가용성은 추가 검증이 필요하다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
 
 ```
 요청 i (세션 S, step k)      start_ms ──────────── end_ms
@@ -16,6 +16,10 @@
 ## 작업 방식
 
 Issue → geass(Codex 구현 → 고정 검증 → Claude 검수) → PR → 사람이 병합. 절차는 [workflow.md](docs/workflow.md), 규칙은 [AGENTS.md](AGENTS.md).
+
+## 데이터 감사 재현
+
+고정 revision의 준비된 `release/`와 `REVISION` 파일을 `FREEINFERENCE_DATA_DIR`에 둔다(기본 `data/freeinference`). `pip install -r requirements.txt`로 의존성을 설치한 뒤 `python -m freeinference.audit`를 실행한다. [감사 결과](freeinference/outputs/audit/audit.md)는 train·validation만 다루며 test 주차와 test 시점 요청은 로더가 기본 거부한다. `block_ids`는 읽지 않는다.
 
 ## 검증
 
