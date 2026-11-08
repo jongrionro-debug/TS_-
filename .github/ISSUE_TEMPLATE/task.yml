@@ -1,7 +1,7 @@
 name: 작업 요청
 description: 문제·목표·지킬 동작과 검증 가능한 완료 조건을 정합니다.
 title: "[Task] "
-labels: ["agent:triage"]
+labels: []
 body:
   - type: textarea
     id: background
@@ -47,28 +47,8 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: mode
-    attributes:
-      label: Execution mode
-      options: [implement-and-verify, investigate-only, refactor, docs-only]
-    validations: { required: true }
-  - type: dropdown
-    id: difficulty
-    attributes:
-      label: Difficulty
-      description: "모델 선택 기준 — low: 가벼운 모델, medium: 기본, high: 최상위 모델"
-      options: [low, medium, high]
-      default: 1
-    validations: { required: true }
-  - type: dropdown
     id: risk
     attributes:
       label: Risk
+      description: 대용량 다운로드·학습·최종 test 접근이 있으면 high
       options: [low, medium, high]
-  - type: checkboxes
-    id: flags
-    attributes:
-      label: Flags
-      options:
-        - label: Mac 필요 (box에서 실행 불가)
-        - label: 사람 결정 필요 (설계 선택)

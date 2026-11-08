@@ -18,5 +18,7 @@ jobs:
           persist-credentials: false
       - name: Validate document layout
         run: python3 -B scripts/check_context.py
-      - name: Test layout guard
-        run: python3 -B -m unittest discover -s tests -p 'test_context_layout.py'
+      - name: Repository checks
+        run: python3 -B scripts/verify.py
+      - name: Unit tests
+        run: python3 -B -m unittest discover -s tests

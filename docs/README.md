@@ -37,10 +37,9 @@
 
 ## 이 프로젝트의 상세 문서
 
-- [현재 연구 정의·완료 단계·한계](project.md)
-- [상세 작업 절차·box 인계](workflow.md)
-- [WildChat 실행·테스트](../wildchat/README.md) · [EDA 결과](../eda/results/summary.md)
-- [TraceLab·Exgentic 조사 재현](../eda/agent_transition/README.md)
+- [현재 연구 정의·시점 계약·평가](project.md)
+- [geass 이슈 작업 절차](workflow.md)
+- 이전 WildChat 연구: 태그 `wildchat-final`
 
 ## 구조 확인
 

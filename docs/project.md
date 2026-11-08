@@ -1,96 +1,65 @@
-# 프로젝트 기획서: 대화 이력을 활용한 LLM 응답 토큰 예측
+# 프로젝트: 에이전트 세션 상태로 LLM 요청의 출력 토큰 수요 예측
 
-- 과목: 시계열 데이터 분석 및 실습
-- 최초 작성일: 2026-10-22 / 최종 갱신일: 2026-11-03
-- 현재 상태: WildChat 조사·전처리·탐색 실험·사용자 분리 재검증·최종 test 1회 평가 완료
-- 현재 데이터: WildChat-1M 첫 Parquet 샤드의 고정 표본
-- 보존 트랙: BurstGPT_3의 다음 10분 집계 수요 설계·완료된 EDA
-- 용도: 연구 정의·허용하는 결론·변경 관리의 정본. 실제 수치는 각 실행 산출물을 따른다.
+- 과목: 시계열 데이터 분석 및 실습 (Group 5, "Forecasting LLM Token Demand with Conversation State")
+- 최종 갱신일: 2026-11-08
+- 현재 상태: **재설계 직후. 데이터 감사 전.** 아래 정의는 [ADR 0005](adr/0005-freeinference-agentic-trace.md)의 제안이며 감사 결과에 따라 첫 학습 전에 확정한다.
+- 이전 연구: WildChat 현재 프롬프트 응답 길이 예측(최종 test 완료)은 태그 `wildchat-final`에 보존한다. 이 문서의 수치·정의와 섞지 않는다.
 
-## 현재 연구: WildChat의 현재 프롬프트 응답 길이
+## 1. 연구 질문
 
-### 연구 질문과 예측 단위
+> 에이전트 세션에서 LLM 요청이 시작될 때, **세션 상태**(앞선 요청·tool 호출의 진행)가 현재 요청 정보와 **최근 수요(직전 출력 lag)** 이상으로 그 요청의 completion 토큰 분포(P10/P50/P90)를 더 잘 예측하는가?
 
-> 현재 프롬프트의 길이만 쓰는 A보다 과거 대화 이력을 추가한 B가 해당 프롬프트의 출력 토큰 수를 더 잘 예측하는가?
+실용 출력은 요청마다의 completion 토큰 P10/P50/P90이며, 이를 시작시각 기준 10분 구간으로 모은 **출력 토큰 수요 뷰**를 함께 제시한다. 이번 데이터는 실제 요청 시작·종료 시각이 있어 10분 입력·출력 토큰 시계열을 실측으로 만들 수 있다.
 
-예측 시점은 현재 user 프롬프트 제출 직후, 정답은 바로 인접한 assistant 응답의 가시 텍스트 토큰 수다. 유효 표본은 비어 있지 않은 인접 user→assistant 쌍이다. 각 텍스트를 `tiktoken`의 `o200k_base`로 독립 계수한 재구성값이며, 모델에 실제 전달된 전체 문맥·API 청구 사용량·에이전트 내부 호출의 총량을 뜻하지 않는다.
+## 2. 데이터
 
-이는 BurstGPT의 다음 10분 집계 수요와 별개의 예측 문제다. 기존 집계 연구를 WildChat 결과로 검증하거나, TraceLab·Exgentic 후보를 현재 채택 데이터로 해석하지 않는다. 범위 추가 결정은 [ADR 0002](adr/0002-wildchat-request-forecast.md), 후보 조사의 실행·재현 근거는 [조사 README](../eda/agent_transition/README.md)에서 확인한다.
+- 출처: Hugging Face `harvardMadsys/freeinference_agentic_trace` (CC BY 4.0), 논문 *From Requests to Sessions: A Large-Scale Characterization of Human-Driven Agentic Workloads*. 사용할 revision은 감사 Issue에서 커밋 해시로 고정한다.
+- 범위(카드 기준): 2026-05-17~09-05의 16주, 12,002 세션, 267 계정, 14 harness, LLM 요청 1,186,582건, tool 호출 1,213,347건. **메시지 원문 없음.**
+- 사용 구성: `requests`(요청 단위: `session_id, step, start_ms, end_ms, ttft_ms, model, provider, stream, step_trigger, waited_for, link_reason, prompt_tokens, completion_tokens, cache_read_tokens, role_tokens, n_messages, tool_definition_names, finish_reason, transition, cause, block_ids`)와 `tool_calls`. `block_ids`는 크기가 커서 읽지 않는다. 원본 `traces/*.jsonl.zst`는 subagent 중첩 구조가 필요할 때만 쓴다.
+- 주의(카드): 입력 토큰은 provider tokenizer가 아닌 `o200k_base` 재계수, `completion_tokens`는 provider 보고값. 세션은 tool-call ID·assistant 메시지 반복으로 **사후 재구성**되며 주 경계를 넘지 않는다. 드문 tool 이름은 `other`로 치환. 주별 요청 수가 1만→19만 건으로 크게 증가하는 비정상 구간이다.
 
-### 입력과 제외 범위
+### 대표성과 결론 범위 (피드백 1)
 
-| 모델/정보 | 정의 |
-|---|---|
-| A | 현재 user 텍스트의 입력 토큰·문자·UTF-8 바이트 수 3개 |
-| B | A + 이전 user 턴 수·이전 1~3턴의 입력/출력 길이 lag·결측 지표 28개(총 31개) |
-| 과거 관측 가정 | 이전 인접 assistant 응답은 현재 프롬프트 전에 관측됐다고 가정 |
-| 결측 처리 | 유효하지 않은 과거 쌍도 턴 위치를 차지하며 null/NaN과 결측 지표로 유지 |
-| 제외 | 현재 assistant 응답·미래 메시지·대화 전체 통계·행 마지막 기록시각·사용자/그룹 ID를 모델 입력에 넣지 않음 |
-| 의미·시간 특징 | 프롬프트 유형·주제·언어·임베딩은 제외. 첫 샤드의 user 시각은 모두 결측이므로 턴 간격 수치도 제외 |
+무료 gateway를 쓰는 267개 계정의 코딩·어시스턴트 에이전트(오픈 가중치 계열 모델 중심) 16주 기록이다. 상용 API 전체, 다른 모델·harness, 이후 기간으로의 전이를 주장하지 않는다. 감사 단계에서 계정·harness·모델 집중도(상위 계정 점유율 등), 주별 구성 변화, 제외 세션(`manifest.json`)을 보고하고, 결과는 harness·모델별로도 나눠 본다.
 
-다른 자료에서 실제 user 제출시각의 의미가 검증된 경우에만 전처리의 명시적 옵션으로 간격 lag를 허용한다. 현재 샤드에는 해당하지 않는다. RNN·Transformer·전체 에이전트 작업량 예측은 현재 범위 밖이다.
+## 3. 예측 단위와 시점 계약
 
-### 데이터와 원래 분할 (#4~#6)
+요청 *i*의 시작 `s_i`, 종료 `e_i`, 정답 `y_i = completion_tokens`.
 
-- 출처: AllenAI WildChat-1M, 리비전 `7d6490e462285cf85d91eabea0f9a954fbddcd1f`. 출처·라이선스·판정 기준은 [감사 보고서](../wildchat/results/data_audit.md)에 있다.
-- 범위: 전체 14개 중 첫 샤드 `train-00000-of-00014.parquet`의 59,857개 대화 행. 지정 샤드를 순회한 결정적 부분 자료이며 전체 데이터의 무작위 표본이 아니다.
-- 그룹: 동일 conversation_hash·역할과 가시 텍스트 전체 목록·첫 user의 비어 있지 않은 텍스트가 정확히 같은 행을 추이적으로 연결한다. 유효 표본이 없거나 행 기록시각이 결측/비정상인 그룹은 제외한다.
-- 원래 분할: 그룹 최초 기록시각 순 그룹 수 기준 70%/15%/15%. 같은 경계시각은 뒤 구간, 경계를 넘는 그룹은 전체 제외한다. 중복 표본은 같은 분할 안에 유지한다.
-- #5 고정 표본은 train 115,500쌍·validation 22,968쌍·test 23,222쌍이다. 이후 #13/#15는 이 표본을 정제했으며 추가 샤드·표본 추출은 하지 않았다. 상세 수치는 [전처리 보고서](../wildchat/results/preparation.md)를 따른다.
-- 행 시각은 마지막 턴의 기록시각, assistant timestamp는 응답을 백엔드가 수신한 시각이다. 기록시각 순 분할은 실제 개별 요청 도착 순서를 보장하지 않는다.
+- 예측 시점은 `s_i`. 특징은 그 시점에 gateway가 알 수 있는 값만 쓴다.
+- 과거 요청 *j*의 결과(completion, finish_reason, tool 결과)는 `e_j < s_i`일 때만 이력에 넣는다. 병렬 subagent·동시 요청 때문에 `step` 순서만으로 판단하지 않는다.
+- 현재 요청의 `completion_tokens, end_ms, ttft_ms, finish_reason`, 현재 응답이 만든 tool 호출은 특징에서 제외한다.
+- 세션 연결이 사후 재구성이므로, 현재 요청의 `link_reason`처럼 현재 입력에 이미 포함된 정보로 연결된 경우만 세션 이력으로 인정한다. 이 가정은 감사 Issue에서 검증하고 안 되면 B를 그 범위로 줄인다.
 
-### 현재 평가 규칙: 사용자 분리와 train 내부 튜닝 (#13)
+## 4. 비교 모델 (LightGBM 분위수 회귀, P10/P50/P90)
 
-기존 train/validation 경계에서 `hashed_ip`가 양쪽에 나타나거나 ID가 결측인 원래 대화 그룹 전체를 제외한다. 정제 train은 81,307행·8,702사용자, validation은 12,920행·1,736사용자다. `hashed_ip`는 사용자 프록시이므로 공유 IP·IP 변경에 따른 식별 오차가 남는다.
+| 조건 | 입력 | 질문 |
+|---|---|---|
+| 기준선 | 고정 분위수, 모델별 분위수, 직전 completion, 세션 누적 평균 | 단순 규칙 대비 |
+| A | 현재 요청: `prompt_tokens`, `role_tokens` 분해, `cache_read_tokens`, `n_messages`, tool 정의 수, model·provider·harness·stream·`step_trigger`·`waited_for`·`transition` | 현재 요청만으로 |
+| L | A + 같은 세션 직전 완료 요청의 completion 1개 | 최근 수요 lag 통제 |
+| B | L + 세션 상태: step·turn 위치, 이전 k개 completion/prompt lag·EWMA·차분, 직전 finish_reason, 직전 tool 호출 수·범주·outcome·result_tokens, 세션 경과·직전 종료 후 간격 | **주 비교: B − L** |
+| C (보조) | B + 세션 간 정보: 같은 계정의 이전 세션 요약, 시작 시점 활성 세션 수·직전 10분 gateway 전체 출력 | 세션 간 효과 |
 
-정제 train 그룹 시작시각의 80% 경계로 내부 시간 홀드아웃을 만들고 같은 사용자·그룹 분리를 적용한다. A/B 각각 동일한 3개 설정 × P10/P50/P90 LightGBM 분위수 회귀를 비교한다. 설정과 분위수별 조기 종료 횟수는 **내부 홀드아웃의 행 가중 평균 pinball**로만 선택하고, 전체 정제 train으로 고정 횟수 재학습한다. validation은 보고에만 사용하며 학습에 합치지 않는다.
+주 가설 검정은 **B − L** 하나로 미리 고정하고, 나머지는 보조 비교로 보고한다(다중 비교 완화).
 
-현재 비교 모델은 다음 5개다. #7의 세 모델 제한은 #13에서 단순 기준선을 보강한 과거 범위로 구분한다.
+## 5. 분할과 평가
 
-1. fixed: train 출력의 경험적 P10/P50/P90.
-2. previous_ratio(a): 직전 응답 길이 × train에서 추정한 분위수별 비율. 직전 길이가 0/결측이면 fixed.
-3. cumulative_mean(b): 같은 원본 대화의 현재 턴 이전 유효 응답 전체의 누적 평균을 P50으로 사용. P10/P90은 train 잔차 분위수로 구성하며 이력이 없으면 fixed.
-4. A: 현재 프롬프트 길이만 사용.
-5. B: 현재 길이와 과거 대화 길이 이력 사용.
+- 시간 분할(주 단위, 결정적): train = 1~10주(05-17~07-25), validation = 11~13주(07-26~08-15), **test = 14~16주(08-16~09-05)**. 경계를 넘는 세션은 시작 주 기준으로 두고 경계 이후 정답은 학습에서 제외한다. 계정 분리 민감도 분석을 추가로 보고한다.
+- 하이퍼파라미터·조기 종료는 train 내부 시간 홀드아웃으로만 고른다. validation은 비교 보고용, test는 최종 평가 Issue에서 승인 후 1회.
+- 지표: 평균·분위수별 pinball, P50 MAE, P10–P90 coverage·폭. 요청 가중과 세션(또는 계정) 가중을 함께 보고하고 첫 요청(step 0)·후속 요청, harness·모델별로 나눈다.
+- 불확실성(피드백 2): 세션 단위(민감도: 계정 단위) 짝지은 bootstrap으로 B−L 등 차이의 95% CI. 같은 추출을 모든 모델에 공유하고 bootstrap 중 재학습하지 않는다. 시간 의존성 확인용으로 일 단위 블록 bootstrap을 보조로 둔다.
 
-음수 예측만 0으로 자르고 **분위수를 정렬하지 않는다**. 전체·첫 턴(`turn_index==0`)·후속 턴(`>0`) × 행 가중·사용자 가중으로 평균/분위수별 pinball, P50 MAE, coverage, 부호 있는 P90−P10 폭과 교차율을 보고한다. 사용자 가중은 각 턴 구분 안에서 사용자별 행 평균 후 사용자 동일 가중이다. 최선 기준선은 각 턴·가중 방식의 내부 홀드아웃 점수로 미리 고정한다.
+## 6. 탐색 분석 (피드백 2·3)
 
-평가 사용자를 같은 수로 복원 추출하는 짝지은 bootstrap(seed 42, 1,000회)을 사용한다. 같은 추출을 모든 모델·턴·가중에 공유하며 B−A와 B−기준선 차이의 2.5%/97.5% percentile(선형 보간)로 95% CI를 계산한다. bootstrap 중 재학습·재선택하지 않는다. [재검증 보고서](../wildchat/results/revalidation.md)와 [전체 설정·수치](../wildchat/results/revalidation.json)를 따른다.
+- 요청→10분 시계열 그림: 개별 요청이 `start_ms` 기준 10분 구간의 입력(prompt) 합·출력(completion) 합으로 모이는 과정을 도식과 실제 시계열로 보인다.
+- 세션 내: step 간 completion 자기상관, finish_reason·tool 범주별 다음 completion 분포, 상태 특징과 직전 completion lag의 상관(정보 중복 확인).
+- 세션 간: 계정 내 세션 간 상관, 동시 활성 세션 수와 요청 completion의 관계, 주별 분포 이동.
 
-### 최종 test 1회 평가: 승인 및 완료 (#15)
+## 7. 제외 범위
 
-2026-11-03 종현의 승인으로 당시 test 보류를 최종 평가 1회에 한해 해제했고, **같은 날 평가를 완료했다**. #13의 정제 train만 사용하고 설정·분위수별 반복 수를 유지했다. A는 P10/P50/P90 231/175/175회, B는 403/244/279회다. validation을 합치거나 재튜닝하지 않았다.
+다음 요청의 도착 시각·개수 예측, 메시지 의미·임베딩(원문 없음), prefix cache replay, RNN·Transformer, GPU·비용·SLO 효과 주장.
 
-접근 전에 [설정](../wildchat/results/test_final_config.json)·[SHA256](../wildchat/results/test_final_config.sha256)을 고정하고, 기존 validation 지표 재현과 학습 모델 해시를 확인했다. test는 한 번 읽었다. 원래 train 또는 validation과 사용자·그룹·원본 행이 겹치거나 ID가 결측인 test 대화 그룹을 test 쪽에서만 전체 제외했다. 23,222행 중 11,942행·1,770사용자가 남았고 교집합 0과 시간순서를 검사했다.
+## 8. 진행 상황
 
-| 최종 test 구분 | A 평균 pinball | B 평균 pinball | B−A [사용자 bootstrap 95% CI] |
-|---|---:|---:|---|
-| 전체·행 가중 | 55.849263 | 45.455475 | −10.393788 [−12.732540, −8.279974] |
-| 전체·사용자 가중 | 61.887119 | 55.443916 | −6.443203 [−7.324220, −5.585756] |
-| 후속 턴·행 가중 | 49.982683 | 34.123900 | −15.858784 [−20.675850, −11.998011] |
-| 첫 턴·행 가중 | 66.727114 | 66.466556 | −0.260558 [−1.813065, 1.574657] |
-
-손실은 낮을수록 좋다. 이 고정 표본에서 B의 전체·후속 턴 예측이 A보다 개선됐으며 첫 턴 행 가중 차이의 CI는 0을 포함한다. 첫 턴의 사용자 가중 결과는 별도로 보고서에 제공한다. 세부 기준선 대비 비교·다른 지표는 [최종 보고서](../wildchat/results/test_final.md)와 [기계 판독 결과](../wildchat/results/test_final.json)가 정본이다.
-
-**`finalize.py freeze/evaluate`를 다시 실행하지 않는다.** 독점 [실행 로그](../wildchat/results/test_final.log)는 실패를 포함한 재시도 차단 기록이다. 결과를 본 뒤 모델·설정·예측 코드 변경이나 재평가를 하지 않는다. 기존 코드·설정·해시·로그·산출물을 보존한다. 이후 연구 범위는 별도 결정이 필요하며 추가 평가를 자동 후속 작업으로 잡지 않는다.
-
-### 단계별 기록과 결론의 한계
-
-| 단계 | 상태·정본 |
-|---|---|
-| #4 데이터 적합성 조사 | 완료 — [data_audit.md](../wildchat/results/data_audit.md) |
-| #5 표본·중복 그룹·기록시각 순 분할 | 완료 — [preparation.md](../wildchat/results/preparation.md) |
-| #6 분포·상관·단순 기준 지표 | 완료 — [analysis.md](../wildchat/results/analysis.md) |
-| #7 탐색 분위수 실험 | 보존 — [report.md](../wildchat/results/report.md). validation 튜닝·분위수 정렬·대화 그룹 bootstrap을 사용한 과거 결과 |
-| #13 사용자 분리·내부 튜닝 | 완료 — [revalidation.md](../wildchat/results/revalidation.md). 기존 validation을 이미 본 뒤의 재검증 |
-| #15 최종 test | 완료 — [test_final.md](../wildchat/results/test_final.md). 당시 보류 규칙을 승인된 1회에 한해 해제 |
-
-- 첫 샤드의 정제된 모집단에 대한 결과다. 전체 WildChat·다른 모델·실제 서비스로의 일반화를 입증하지 않는다.
-- CI는 고정 학습 결과와 평가 표본에 조건부이며 학습·선택 불확실성, 시간 블록 상관, IP 식별 오차를 보정하지 않는다.
-- #7→#13은 평가 모집단과 절차가 함께 바뀌었다. validation→test는 기간과 사용자 구성이 다르다. 지표 차이를 개별 보정 요인이나 시간 효과로 분해하지 않는다.
-- 가시 텍스트 토큰 예측을 평가했으며 실제 API 사용량·GPU 이용률·비용·지연 개선을 입증하지 않는다.
-- 실행 환경·명령·테스트는 [wildchat/README.md](../wildchat/README.md), 작업/검증 절차는 [workflow.md](workflow.md)를 따른다. 생성 보고서와 수치는 손으로 수정하지 않는다.
-
-## 보조 실험과 남은 일
-
-BurstGPT의 완료된 EDA는 [EDA 결과](../eda/results/summary.md)와 [루트 실행 안내](../README.md#burstgpt-보존-트랙)로 재현한다. 과거 미실행 모델 계획은 현재 할 일로 이어받지 않는다. WildChat의 학습·최종 평가는 완료됐으며 추가 실험은 별도 범위 결정이 필요하다.
+작업은 Issue에서 관리한다([workflow.md](workflow.md)). 예정 순서: 데이터 감사·대표성 → 10분 시계열·EDA → 특징 생성기·누출 테스트 → 분할·기준선·평가 틀 → A/L/B/C validation 비교 → 10분 수요 뷰 → 최종 test 1회.

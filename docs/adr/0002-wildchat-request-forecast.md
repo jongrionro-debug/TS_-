@@ -1,5 +1,5 @@
 # ADR-0002: WildChat 현재 프롬프트 응답 토큰 예측을 별도 실험으로 추가
-- 상태: 채택
+- 상태: 채택 → Superseded by [ADR 0005](0005-freeinference-agentic-trace.md) (2026-11-08, 현재 연구 범위). 코드·결과는 태그 `wildchat-final`
 - 날짜: 2026-11-02
 - 관련: Issue #4
 
@@ -21,7 +21,7 @@ BurstGPT의 데이터, 목표, A/B/C 비교 및 평가를 보존하고 WildChat�
 
 ## 후속 구현 상태 (2026-11-03 갱신)
 - 위 “조사까지”는 #4의 범위다. 이후 #5 전처리·#6 분석·#7 길이 A 대 이력 B 분위수 실험을 완료했다.
-- #13에서 사용자 분리·train 내부 튜닝·단순 기준선 2개 추가·분위수 무정렬·사용자 bootstrap으로 평가를 보정했다. 현재 비교는 fixed·직전 응답 비율·대화 누적 평균·A·B다. [재검증 결과](../../wildchat/results/revalidation.md)를 따른다.
-- #15에서 소유자 승인에 따른 최종 test 1회 평가를 완료했다. test 승인 대기나 모델 구현 예정 상태가 아니다. [최종 결과](../../wildchat/results/test_final.md)·고정 설정·로그를 보존하고 재평가하지 않는다.
+- #13에서 사용자 분리·train 내부 튜닝·단순 기준선 2개 추가·분위수 무정렬·사용자 bootstrap으로 평가를 보정했다. 현재 비교는 fixed·직전 응답 비율·대화 누적 평균·A·B다. [재검증 결과](https://github.com/jongrionro-debug/TS_-/blob/wildchat-final/wildchat/results/revalidation.md)를 따른다.
+- #15에서 소유자 승인에 따른 최종 test 1회 평가를 완료했다. test 승인 대기나 모델 구현 예정 상태가 아니다. [최종 결과](https://github.com/jongrionro-debug/TS_-/blob/wildchat-final/wildchat/results/test_final.md)·고정 설정·로그를 보존하고 재평가하지 않는다.
 - 현재 작업 안내는 WildChat을 우선하되 BurstGPT 설계·EDA와 TraceLab·Exgentic 후보 검토는 이력으로 보존한다. 독립 트랙이라는 원래 결정과 토큰 의미는 바꾸지 않는다.
-- 현재 연구 정의·한계는 [PRD](../project.md), 단계별 명령은 [WildChat README](../../wildchat/README.md)가 정본이다. 이번 갱신은 새 연구 결정이 아닌 이미 수행한 작업의 상태 반영이다.
+- 현재 연구 정의·한계는 [PRD](../project.md), 단계별 명령은 [WildChat README](https://github.com/jongrionro-debug/TS_-/blob/wildchat-final/wildchat/README.md)가 정본이다. 이번 갱신은 새 연구 결정이 아닌 이미 수행한 작업의 상태 반영이다.

@@ -1,5 +1,5 @@
 # ADR-0004: 조건 C — 로컬 프롬프트 의미 분류 후 범주별 분위수 모델 (validation 전용)
-- 상태: 채택
+- 상태: 채택 → Superseded by [ADR 0005](0005-freeinference-agentic-trace.md) (2026-11-08). 코드·결과는 태그 `wildchat-final`
 - 날짜: 2026-11-05
 - 관련: Issue #19
 
