@@ -38,7 +38,7 @@
 ## 이 프로젝트의 상세 문서
 
 - [현재 연구 정의·시점 계약·평가](project.md)
-- [Issue→PR 작업 절차](workflow.md)
+- [geass 이슈 작업 절차](workflow.md)
 - 이전 WildChat 연구: 태그 `wildchat-final`
 
 ## 구조 확인
