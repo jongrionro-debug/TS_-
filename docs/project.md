@@ -2,7 +2,7 @@
 
 - 과목: 시계열 데이터 분석 및 실습 (Group 5, "Forecasting LLM Token Demand with Conversation State")
 - 최종 갱신일: 2026-11-08
-- 현재 상태: **재설계 직후. 데이터 감사 전.** 아래 정의는 [ADR 0005](adr/0005-freeinference-agentic-trace.md)의 제안이며 감사 결과에 따라 첫 학습 전에 확정한다.
+- 현재 상태: **1~13주 데이터 감사 완료, 특징 설계 전.** 세션 이력의 시간 정합성은 직전 step 대리 기준 조건부 성립이며 실제 연결의 시점 가용성은 특징 생성 전에 검증해야 한다. [감사 결과](../freeinference/outputs/audit/audit.md), [ADR 0005](adr/0005-freeinference-agentic-trace.md).
 - 이전 연구: WildChat 현재 프롬프트 응답 길이 예측(최종 test 완료)은 태그 `wildchat-final`에 보존한다. 이 문서의 수치·정의와 섞지 않는다.
 
 ## 1. 연구 질문
@@ -13,7 +13,7 @@
 
 ## 2. 데이터
 
-- 출처: Hugging Face `harvardMadsys/freeinference_agentic_trace` (CC BY 4.0), 논문 *From Requests to Sessions: A Large-Scale Characterization of Human-Driven Agentic Workloads*. 사용할 revision은 감사 Issue에서 커밋 해시로 고정한다.
+- 출처: Hugging Face `harvardMadsys/freeinference_agentic_trace` (CC BY 4.0), 논문 *From Requests to Sessions: A Large-Scale Characterization of Human-Driven Agentic Workloads*. 사용 revision은 `bb26cf72c9c20f2b05f765d88548156a74d3c253`이다.
 - 범위(카드 기준): 2026-05-17~09-05의 16주, 12,002 세션, 267 계정, 14 harness, LLM 요청 1,186,582건, tool 호출 1,213,347건. **메시지 원문 없음.**
 - 사용 구성: `requests`(요청 단위: `session_id, step, start_ms, end_ms, ttft_ms, model, provider, stream, step_trigger, waited_for, link_reason, prompt_tokens, completion_tokens, cache_read_tokens, role_tokens, n_messages, tool_definition_names, finish_reason, transition, cause, block_ids`)와 `tool_calls`. `block_ids`는 크기가 커서 읽지 않는다. 원본 `traces/*.jsonl.zst`는 subagent 중첩 구조가 필요할 때만 쓴다.
 - 주의(카드): 입력 토큰은 provider tokenizer가 아닌 `o200k_base` 재계수, `completion_tokens`는 provider 보고값. 세션은 tool-call ID·assistant 메시지 반복으로 **사후 재구성**되며 주 경계를 넘지 않는다. 드문 tool 이름은 `other`로 치환. 주별 요청 수가 1만→19만 건으로 크게 증가하는 비정상 구간이다.
@@ -29,7 +29,7 @@
 - 예측 시점은 `s_i`. 특징은 그 시점에 gateway가 알 수 있는 값만 쓴다.
 - 과거 요청 *j*의 결과(completion, finish_reason, tool 결과)는 `e_j < s_i`일 때만 이력에 넣는다. 병렬 subagent·동시 요청 때문에 `step` 순서만으로 판단하지 않는다.
 - 현재 요청의 `completion_tokens, end_ms, ttft_ms, finish_reason`, 현재 응답이 만든 tool 호출은 특징에서 제외한다.
-- 세션 연결이 사후 재구성이므로, 현재 요청의 `link_reason`처럼 현재 입력에 이미 포함된 정보로 연결된 경우만 세션 이력으로 인정한다. 이 가정은 감사 Issue에서 검증하고 안 되면 B를 그 범위로 줄인다.
+- 세션 연결이 사후 재구성이므로, 현재 입력에 이미 포함된 정보로 연결된 경우만 세션 이력으로 인정한다. 감사에서는 실제 연결 대상 대신 직전 step을 사용했을 때 718,627쌍 중 718,615쌍(99.9983%)이 엄격 완료되어 99.9% 기준으로 **조건부 성립**했다. 미완료 12쌍은 이력에서 제외한다. 직전 step은 실제 연결의 대리이므로 연결 단서의 예측 시점 가용성은 별도 검증이 필요하다. 특징 생성 전에 누출 방지 테스트로 검증하고 확인되지 않은 연결은 사용하지 않는다.
 
 ## 4. 비교 모델 (LightGBM 분위수 회귀, P10/P50/P90)
 
@@ -62,4 +62,4 @@
 
 ## 8. 진행 상황
 
-작업은 Issue에서 관리한다([workflow.md](workflow.md)). 예정 순서: 데이터 감사·대표성 → 10분 시계열·EDA → 특징 생성기·누출 테스트 → 분할·기준선·평가 틀 → A/L/B/C validation 비교 → 10분 수요 뷰 → 최종 test 1회.
+작업은 Issue에서 관리한다([workflow.md](workflow.md)). 다음 순서: 10분 시계열·EDA → 특징 생성기·누출 테스트 → 분할·기준선·평가 틀 → A/L/B/C validation 비교 → 10분 수요 뷰 → 최종 test 1회.

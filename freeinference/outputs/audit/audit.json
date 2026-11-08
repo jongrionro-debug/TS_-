@@ -1,0 +1,1704 @@
+{
+  "revision": "bb26cf72c9c20f2b05f765d88548156a74d3c253",
+  "scope": "weeks 1–13, train and validation only",
+  "weeks": [
+    {
+      "week": "2026-05-17_2026-05-23",
+      "requests": 10738,
+      "sessions": 125,
+      "accounts": 8,
+      "top_1_account_request_share": 0.4411436021605513,
+      "top_5_account_request_share": 0.9848202644812815,
+      "distributions": {
+        "harness": {
+          "cline": {
+            "count": 4737,
+            "share": 0.4411436021605513
+          },
+          "opencode": {
+            "count": 2301,
+            "share": 0.21428571428571427
+          },
+          "hermes": {
+            "count": 1956,
+            "share": 0.18215682622462284
+          },
+          "kilo": {
+            "count": 1594,
+            "share": 0.14844477556341962
+          },
+          "pi": {
+            "count": 150,
+            "share": 0.013969081765691935
+          }
+        },
+        "model": {
+          "glm-5.1": {
+            "count": 6661,
+            "share": 0.6203203576084932
+          },
+          "minimax-m2.7": {
+            "count": 2070,
+            "share": 0.1927733283665487
+          },
+          "deepseek-v4-pro": {
+            "count": 1039,
+            "share": 0.09675917303035947
+          },
+          "glm-5-turbo": {
+            "count": 946,
+            "share": 0.08809834233563048
+          },
+          "minimax-m2.5": {
+            "count": 22,
+            "share": 0.0020487986589681506
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 7606,
+            "share": 0.7083255727323524
+          },
+          "C": {
+            "count": 1570,
+            "share": 0.1462097224809089
+          },
+          "G": {
+            "count": 1026,
+            "share": 0.09554851927733284
+          },
+          "H": {
+            "count": 534,
+            "share": 0.04972993108586329
+          },
+          "J": {
+            "count": 1,
+            "share": 9.312721177127957e-05
+          },
+          "K": {
+            "count": 1,
+            "share": 9.312721177127957e-05
+          }
+        }
+      },
+      "excluded_sessions": {},
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-05-24_2026-05-30",
+      "requests": 12827,
+      "sessions": 170,
+      "accounts": 9,
+      "top_1_account_request_share": 0.34988695719965696,
+      "top_5_account_request_share": 0.8464956731893661,
+      "distributions": {
+        "harness": {
+          "kilo": {
+            "count": 4984,
+            "share": 0.38855539097216807
+          },
+          "pi": {
+            "count": 2863,
+            "share": 0.22320106026350667
+          },
+          "opencode": {
+            "count": 2667,
+            "share": 0.2079207920792079
+          },
+          "hermes": {
+            "count": 1188,
+            "share": 0.09261713572932097
+          },
+          "cline": {
+            "count": 1125,
+            "share": 0.08770562095579637
+          }
+        },
+        "model": {
+          "minimax-m2.7": {
+            "count": 7888,
+            "share": 0.6149528338660638
+          },
+          "glm-5.1": {
+            "count": 3688,
+            "share": 0.28751851563109065
+          },
+          "glm-5-turbo": {
+            "count": 803,
+            "share": 0.06260232322444843
+          },
+          "minimax-fast": {
+            "count": 256,
+            "share": 0.01995790130194122
+          },
+          "deepseek-v4-pro": {
+            "count": 139,
+            "share": 0.010836516722538396
+          },
+          "minimax-m2.5": {
+            "count": 53,
+            "share": 0.004131909253917518
+          }
+        },
+        "provider": {
+          "C": {
+            "count": 7151,
+            "share": 0.557495907071022
+          },
+          "B": {
+            "count": 4490,
+            "share": 0.3500428783035784
+          },
+          "G": {
+            "count": 1185,
+            "share": 0.09238325407343884
+          },
+          "A": {
+            "count": 1,
+            "share": 7.796055196070789e-05
+          }
+        }
+      },
+      "excluded_sessions": {},
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-05-31_2026-06-06",
+      "requests": 7324,
+      "sessions": 76,
+      "accounts": 10,
+      "top_1_account_request_share": 0.3767067176406335,
+      "top_5_account_request_share": 0.9160294920808302,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 3645,
+            "share": 0.4976788640087384
+          },
+          "kilo": {
+            "count": 2090,
+            "share": 0.2853631895139268
+          },
+          "opencode": {
+            "count": 1343,
+            "share": 0.18336974330966685
+          },
+          "eval:swe-bench": {
+            "count": 203,
+            "share": 0.027717094483888587
+          },
+          "cline": {
+            "count": 43,
+            "share": 0.005871108683779356
+          }
+        },
+        "model": {
+          "minimax-m2.7": {
+            "count": 4690,
+            "share": 0.6403604587657018
+          },
+          "glm-5.1": {
+            "count": 2034,
+            "share": 0.2777170944838886
+          },
+          "minimax-m2.5": {
+            "count": 514,
+            "share": 0.0701802293828509
+          },
+          "minimax-fast": {
+            "count": 61,
+            "share": 0.008328782086291644
+          },
+          "glm-5-turbo": {
+            "count": 25,
+            "share": 0.003413435281267067
+          }
+        },
+        "provider": {
+          "C": {
+            "count": 4225,
+            "share": 0.5768705625341344
+          },
+          "B": {
+            "count": 2059,
+            "share": 0.2811305297651557
+          },
+          "G": {
+            "count": 1020,
+            "share": 0.13926815947569635
+          },
+          "J": {
+            "count": 20,
+            "share": 0.002730748225013654
+          }
+        }
+      },
+      "excluded_sessions": {},
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-06-07_2026-06-13",
+      "requests": 6859,
+      "sessions": 80,
+      "accounts": 7,
+      "top_1_account_request_share": 0.5553287651261116,
+      "top_5_account_request_share": 0.981192593672547,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 4735,
+            "share": 0.6903338679107741
+          },
+          "kilo": {
+            "count": 1815,
+            "share": 0.26461583321183846
+          },
+          "opencode": {
+            "count": 290,
+            "share": 0.0422802157748943
+          },
+          "cline": {
+            "count": 19,
+            "share": 0.002770083102493075
+          }
+        },
+        "model": {
+          "glm-5.1": {
+            "count": 4163,
+            "share": 0.6069397871409826
+          },
+          "minimax-m2.7": {
+            "count": 1625,
+            "share": 0.23691500218690772
+          },
+          "minimax-fast": {
+            "count": 510,
+            "share": 0.07435486222481412
+          },
+          "glm-4.7": {
+            "count": 487,
+            "share": 0.07100160373232249
+          },
+          "glm-5-turbo": {
+            "count": 59,
+            "share": 0.008601837002478496
+          },
+          "minimax-m2.5": {
+            "count": 10,
+            "share": 0.0014579384749963552
+          },
+          "deepseek-v4-pro": {
+            "count": 5,
+            "share": 0.0007289692374981776
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 4316,
+            "share": 0.6292462458084269
+          },
+          "C": {
+            "count": 1937,
+            "share": 0.282402682606794
+          },
+          "G": {
+            "count": 587,
+            "share": 0.08558098848228604
+          },
+          "K": {
+            "count": 18,
+            "share": 0.0026242892549934393
+          },
+          "J": {
+            "count": 1,
+            "share": 0.0001457938474996355
+          }
+        }
+      },
+      "excluded_sessions": {},
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-06-14_2026-06-20",
+      "requests": 35659,
+      "sessions": 479,
+      "accounts": 23,
+      "top_1_account_request_share": 0.3980481785804425,
+      "top_5_account_request_share": 0.7640988249810707,
+      "distributions": {
+        "harness": {
+          "eval:swe-bench": {
+            "count": 18015,
+            "share": 0.5052020527776999
+          },
+          "pi": {
+            "count": 9839,
+            "share": 0.2759191228020976
+          },
+          "openclaw": {
+            "count": 2759,
+            "share": 0.07737177150228554
+          },
+          "hermes": {
+            "count": 2253,
+            "share": 0.0631818054348131
+          },
+          "kilo": {
+            "count": 1972,
+            "share": 0.05530160688746179
+          },
+          "opencode": {
+            "count": 696,
+            "share": 0.01951821419557475
+          },
+          "codex": {
+            "count": 105,
+            "share": 0.0029445581760565356
+          },
+          "copilot": {
+            "count": 20,
+            "share": 0.0005608682240107687
+          }
+        },
+        "model": {
+          "qwen3.6-35b": {
+            "count": 16171,
+            "share": 0.45349000252390703
+          },
+          "glm-5.1": {
+            "count": 6346,
+            "share": 0.1779634874786169
+          },
+          "kimi-k2.7-code": {
+            "count": 3993,
+            "share": 0.11197734092374996
+          },
+          "minimax-m3": {
+            "count": 3638,
+            "share": 0.10202192994755882
+          },
+          "glm-5.2": {
+            "count": 2738,
+            "share": 0.07678285986707423
+          },
+          "glm-5-turbo": {
+            "count": 1581,
+            "share": 0.04433663310805126
+          },
+          "minimax-m2.7": {
+            "count": 1187,
+            "share": 0.03328752909503912
+          },
+          "gpt-oss-20b": {
+            "count": 5,
+            "share": 0.00014021705600269216
+          }
+        },
+        "provider": {
+          "A": {
+            "count": 16171,
+            "share": 0.45349000252390703
+          },
+          "B": {
+            "count": 9818,
+            "share": 0.27533021116688633
+          },
+          "C": {
+            "count": 4018,
+            "share": 0.11267842620376342
+          },
+          "F": {
+            "count": 2339,
+            "share": 0.06559353879805939
+          },
+          "E": {
+            "count": 2333,
+            "share": 0.06542527833085617
+          },
+          "G": {
+            "count": 975,
+            "share": 0.027342325920524973
+          },
+          "I": {
+            "count": 5,
+            "share": 0.00014021705600269216
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 3
+      },
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-06-21_2026-06-27",
+      "requests": 56310,
+      "sessions": 715,
+      "accounts": 50,
+      "top_1_account_request_share": 0.261303498490499,
+      "top_5_account_request_share": 0.6808559758479844,
+      "distributions": {
+        "harness": {
+          "eval:swe-bench": {
+            "count": 23904,
+            "share": 0.4245071923281833
+          },
+          "pi": {
+            "count": 13653,
+            "share": 0.24246137453383057
+          },
+          "openclaw": {
+            "count": 4017,
+            "share": 0.07133724027703782
+          },
+          "kilo": {
+            "count": 3650,
+            "share": 0.06481974782454271
+          },
+          "opencode": {
+            "count": 3093,
+            "share": 0.05492807671816729
+          },
+          "hermes": {
+            "count": 2935,
+            "share": 0.052122180784940506
+          },
+          "copilot": {
+            "count": 2360,
+            "share": 0.04191085064819748
+          },
+          "zcode": {
+            "count": 1236,
+            "share": 0.021949920085242408
+          },
+          "oh-my-pi": {
+            "count": 838,
+            "share": 0.01488190374711419
+          },
+          "claude-code": {
+            "count": 276,
+            "share": 0.004901438465636654
+          },
+          "codex": {
+            "count": 253,
+            "share": 0.004492985260166933
+          },
+          "cline": {
+            "count": 95,
+            "share": 0.0016870893269401528
+          }
+        },
+        "model": {
+          "qwen3.6-35b": {
+            "count": 21939,
+            "share": 0.38961108151305274
+          },
+          "kimi-k2.7-code": {
+            "count": 9106,
+            "share": 0.16171195169596875
+          },
+          "glm-5.1": {
+            "count": 8830,
+            "share": 0.1568105132303321
+          },
+          "minimax-m3": {
+            "count": 6707,
+            "share": 0.11910850648197478
+          },
+          "glm-5.2": {
+            "count": 5507,
+            "share": 0.0977979044574676
+          },
+          "glm-5-turbo": {
+            "count": 3445,
+            "share": 0.061179186645356064
+          },
+          "minimax-m2.5": {
+            "count": 566,
+            "share": 0.010051500621559226
+          },
+          "minimax-m2.7": {
+            "count": 177,
+            "share": 0.003143313798614811
+          },
+          "gpt-oss-20b": {
+            "count": 33,
+            "share": 0.0005860415556739478
+          }
+        },
+        "provider": {
+          "A": {
+            "count": 18478,
+            "share": 0.3281477535073699
+          },
+          "B": {
+            "count": 14834,
+            "share": 0.26343455869294974
+          },
+          "F": {
+            "count": 9971,
+            "share": 0.17707334398863434
+          },
+          "C": {
+            "count": 7337,
+            "share": 0.13029657254484106
+          },
+          "E": {
+            "count": 4692,
+            "share": 0.08332445391582312
+          },
+          "D": {
+            "count": 491,
+            "share": 0.008719587995027527
+          },
+          "G": {
+            "count": 444,
+            "share": 0.007884922749067661
+          },
+          "I": {
+            "count": 33,
+            "share": 0.0005860415556739478
+          },
+          "J": {
+            "count": 30,
+            "share": 0.0005327650506126798
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 8
+      },
+      "sessions_crossing_week_boundary": 3
+    },
+    {
+      "week": "2026-06-28_2026-07-04",
+      "requests": 50615,
+      "sessions": 628,
+      "accounts": 49,
+      "top_1_account_request_share": 0.20418848167539266,
+      "top_5_account_request_share": 0.5303763706411143,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 21305,
+            "share": 0.4209226513879285
+          },
+          "opencode": {
+            "count": 13906,
+            "share": 0.27474068951891734
+          },
+          "oh-my-pi": {
+            "count": 2615,
+            "share": 0.05166452632618789
+          },
+          "hermes": {
+            "count": 2190,
+            "share": 0.043267805986367674
+          },
+          "zcode": {
+            "count": 2081,
+            "share": 0.04111429418156673
+          },
+          "openclaw": {
+            "count": 1704,
+            "share": 0.03366590931542033
+          },
+          "claude-code": {
+            "count": 1604,
+            "share": 0.03169021041193322
+          },
+          "kilo": {
+            "count": 1590,
+            "share": 0.031413612565445025
+          },
+          "copilot": {
+            "count": 1472,
+            "share": 0.029082287859330237
+          },
+          "zoo": {
+            "count": 1093,
+            "share": 0.021594389015114096
+          },
+          "cline": {
+            "count": 706,
+            "share": 0.013948434258618986
+          },
+          "codex": {
+            "count": 349,
+            "share": 0.006895189173170009
+          }
+        },
+        "model": {
+          "minimax-m3": {
+            "count": 17569,
+            "share": 0.3471105403536501
+          },
+          "glm-5.1": {
+            "count": 10165,
+            "share": 0.2008297935394646
+          },
+          "kimi-k2.7-code": {
+            "count": 8463,
+            "share": 0.167203398202114
+          },
+          "glm-5.2": {
+            "count": 7443,
+            "share": 0.1470512693865455
+          },
+          "qwen3.6-35b": {
+            "count": 3857,
+            "share": 0.07620270670749778
+          },
+          "glm-5-turbo": {
+            "count": 1336,
+            "share": 0.026395337350587772
+          },
+          "minimax-m2.7": {
+            "count": 1163,
+            "share": 0.022977378247555073
+          },
+          "minimax-m2.5": {
+            "count": 619,
+            "share": 0.012229576212585202
+          }
+        },
+        "provider": {
+          "C": {
+            "count": 17839,
+            "share": 0.3524449273930653
+          },
+          "B": {
+            "count": 16763,
+            "share": 0.331186407191544
+          },
+          "E": {
+            "count": 8064,
+            "share": 0.15932035957720042
+          },
+          "D": {
+            "count": 4139,
+            "share": 0.08177417761533143
+          },
+          "A": {
+            "count": 3750,
+            "share": 0.07408870888076657
+          },
+          "J": {
+            "count": 60,
+            "share": 0.0011854193420922652
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 19
+      },
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-07-05_2026-07-11",
+      "requests": 68302,
+      "sessions": 978,
+      "accounts": 49,
+      "top_1_account_request_share": 0.271968609996779,
+      "top_5_account_request_share": 0.5253286873005183,
+      "distributions": {
+        "harness": {
+          "eval:swe-bench": {
+            "count": 18576,
+            "share": 0.271968609996779
+          },
+          "opencode": {
+            "count": 16986,
+            "share": 0.24868964305584024
+          },
+          "pi": {
+            "count": 9652,
+            "share": 0.14131357793329624
+          },
+          "kilo": {
+            "count": 8196,
+            "share": 0.11999648619366929
+          },
+          "oh-my-pi": {
+            "count": 3564,
+            "share": 0.05218002401100993
+          },
+          "codex": {
+            "count": 2592,
+            "share": 0.037949108371643586
+          },
+          "copilot": {
+            "count": 2080,
+            "share": 0.03045298819946707
+          },
+          "zcode": {
+            "count": 2058,
+            "share": 0.030130889285818863
+          },
+          "hermes": {
+            "count": 1932,
+            "share": 0.0282861409621973
+          },
+          "zoo": {
+            "count": 1563,
+            "share": 0.02288366372873415
+          },
+          "claude-code": {
+            "count": 666,
+            "share": 0.009750812567713976
+          },
+          "cline": {
+            "count": 357,
+            "share": 0.005226786916927762
+          },
+          "openclaw": {
+            "count": 80,
+            "share": 0.0011712687769025796
+          }
+        },
+        "model": {
+          "qwen3.6-35b": {
+            "count": 21947,
+            "share": 0.3213229480835115
+          },
+          "glm-5.1": {
+            "count": 17798,
+            "share": 0.26057802114140144
+          },
+          "glm-5.2": {
+            "count": 11996,
+            "share": 0.17563175309654183
+          },
+          "minimax-m3": {
+            "count": 8283,
+            "share": 0.12127024098855085
+          },
+          "minimax-m2.7": {
+            "count": 3051,
+            "share": 0.04466926297912213
+          },
+          "kimi-k2.7-code": {
+            "count": 2281,
+            "share": 0.033395801001434806
+          },
+          "glm-5-turbo": {
+            "count": 2240,
+            "share": 0.032795525753272235
+          },
+          "minimax-m2.5": {
+            "count": 679,
+            "share": 0.009941143743960646
+          },
+          "deepseek-v4-flash": {
+            "count": 14,
+            "share": 0.00020497203595795145
+          },
+          "diffusiongemma": {
+            "count": 13,
+            "share": 0.00019033117624666921
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 28129,
+            "share": 0.41183274281865834
+          },
+          "A": {
+            "count": 21950,
+            "share": 0.3213668706626453
+          },
+          "C": {
+            "count": 9632,
+            "share": 0.1410207607390706
+          },
+          "D": {
+            "count": 6367,
+            "share": 0.09321835378173407
+          },
+          "E": {
+            "count": 2201,
+            "share": 0.032224532224532226
+          },
+          "I": {
+            "count": 13,
+            "share": 0.00019033117624666921
+          },
+          "H": {
+            "count": 10,
+            "share": 0.00014640859711282246
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 59
+      },
+      "sessions_crossing_week_boundary": 1
+    },
+    {
+      "week": "2026-07-12_2026-07-18",
+      "requests": 72025,
+      "sessions": 969,
+      "accounts": 54,
+      "top_1_account_request_share": 0.11421034363068379,
+      "top_5_account_request_share": 0.4592294342242277,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 13928,
+            "share": 0.19337729954876778
+          },
+          "oh-my-pi": {
+            "count": 11659,
+            "share": 0.161874349184311
+          },
+          "opencode": {
+            "count": 11503,
+            "share": 0.1597084345713294
+          },
+          "hermes": {
+            "count": 9270,
+            "share": 0.12870531065602223
+          },
+          "codex": {
+            "count": 8116,
+            "share": 0.11268309614717112
+          },
+          "claude-code": {
+            "count": 6590,
+            "share": 0.09149600833044082
+          },
+          "kilo": {
+            "count": 4468,
+            "share": 0.062034015966678235
+          },
+          "copilot": {
+            "count": 3300,
+            "share": 0.045817424505380074
+          },
+          "zcode": {
+            "count": 3103,
+            "share": 0.043082263103089206
+          },
+          "openclaw": {
+            "count": 81,
+            "share": 0.0011246095105866018
+          },
+          "zoo": {
+            "count": 7,
+            "share": 9.71884762235335e-05
+          }
+        },
+        "model": {
+          "glm-5.2": {
+            "count": 20013,
+            "share": 0.27786185352308224
+          },
+          "glm-5.1": {
+            "count": 18623,
+            "share": 0.2585629989586949
+          },
+          "deepseek-v4-flash": {
+            "count": 13059,
+            "share": 0.18131204442901772
+          },
+          "minimax-m3": {
+            "count": 7304,
+            "share": 0.10140923290524123
+          },
+          "kimi-k2.7-code": {
+            "count": 6485,
+            "share": 0.09003818118708781
+          },
+          "qwen3.6-35b": {
+            "count": 4237,
+            "share": 0.05882679625130163
+          },
+          "glm-5-turbo": {
+            "count": 1890,
+            "share": 0.026240888580354043
+          },
+          "claude-opus-4-8": {
+            "count": 401,
+            "share": 0.0055675112808052755
+          },
+          "diffusiongemma": {
+            "count": 7,
+            "share": 9.71884762235335e-05
+          },
+          "minimax-m2.5": {
+            "count": 6,
+            "share": 8.330440819160014e-05
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 39130,
+            "share": 0.5432835820895522
+          },
+          "A": {
+            "count": 17176,
+            "share": 0.23847275251648734
+          },
+          "C": {
+            "count": 7547,
+            "share": 0.10478306143700104
+          },
+          "E": {
+            "count": 5093,
+            "share": 0.07071155848663659
+          },
+          "D": {
+            "count": 3072,
+            "share": 0.04265185699409927
+          },
+          "I": {
+            "count": 7,
+            "share": 9.71884762235335e-05
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 233
+      },
+      "sessions_crossing_week_boundary": 2
+    },
+    {
+      "week": "2026-07-19_2026-07-25",
+      "requests": 78804,
+      "sessions": 927,
+      "accounts": 66,
+      "top_1_account_request_share": 0.10051520227399624,
+      "top_5_account_request_share": 0.4239251814628699,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 18485,
+            "share": 0.23456931120247704
+          },
+          "hermes": {
+            "count": 14285,
+            "share": 0.18127252423734835
+          },
+          "claude-code": {
+            "count": 12237,
+            "share": 0.15528399573625704
+          },
+          "opencode": {
+            "count": 10410,
+            "share": 0.13209989340642608
+          },
+          "codex": {
+            "count": 7995,
+            "share": 0.10145424090147709
+          },
+          "oh-my-pi": {
+            "count": 5923,
+            "share": 0.0751611593320136
+          },
+          "kilo": {
+            "count": 3685,
+            "share": 0.046761585706309325
+          },
+          "copilot": {
+            "count": 2823,
+            "share": 0.03582305466727577
+          },
+          "zcode": {
+            "count": 2687,
+            "share": 0.03409725394650018
+          },
+          "cline": {
+            "count": 215,
+            "share": 0.002728287904167301
+          },
+          "openclaw": {
+            "count": 59,
+            "share": 0.0007486929597482361
+          }
+        },
+        "model": {
+          "deepseek-v4-flash": {
+            "count": 26125,
+            "share": 0.3315187046342825
+          },
+          "glm-5.1": {
+            "count": 21062,
+            "share": 0.2672706969189381
+          },
+          "glm-5.2": {
+            "count": 16303,
+            "share": 0.20688036140297447
+          },
+          "kimi-k2.7-code": {
+            "count": 7983,
+            "share": 0.101301964367291
+          },
+          "minimax-m3": {
+            "count": 3986,
+            "share": 0.05058118877214354
+          },
+          "glm-5-turbo": {
+            "count": 1963,
+            "share": 0.024909903050606568
+          },
+          "qwen3.6-35b": {
+            "count": 612,
+            "share": 0.0077661032434901784
+          },
+          "minimax-m2.5": {
+            "count": 562,
+            "share": 0.0071316176843815035
+          },
+          "claude-opus-4-8": {
+            "count": 181,
+            "share": 0.0022968377239734024
+          },
+          "diffusiongemma": {
+            "count": 27,
+            "share": 0.00034262220191868436
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 35950,
+            "share": 0.4561951169991371
+          },
+          "A": {
+            "count": 26546,
+            "share": 0.33686107304197754
+          },
+          "E": {
+            "count": 7149,
+            "share": 0.09071874524135831
+          },
+          "D": {
+            "count": 5175,
+            "share": 0.06566925536774783
+          },
+          "C": {
+            "count": 3957,
+            "share": 0.050213187147860515
+          },
+          "I": {
+            "count": 27,
+            "share": 0.00034262220191868436
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 71
+      },
+      "sessions_crossing_week_boundary": 0
+    },
+    {
+      "week": "2026-07-26_2026-08-01",
+      "requests": 84524,
+      "sessions": 1198,
+      "accounts": 71,
+      "top_1_account_request_share": 0.11945719558941839,
+      "top_5_account_request_share": 0.38456533055700154,
+      "distributions": {
+        "harness": {
+          "hermes": {
+            "count": 20129,
+            "share": 0.23814537882731532
+          },
+          "pi": {
+            "count": 16965,
+            "share": 0.2007122237471014
+          },
+          "opencode": {
+            "count": 13999,
+            "share": 0.16562159859921444
+          },
+          "claude-code": {
+            "count": 11564,
+            "share": 0.13681321281529507
+          },
+          "codex": {
+            "count": 5887,
+            "share": 0.06964885712933605
+          },
+          "oh-my-pi": {
+            "count": 5439,
+            "share": 0.06434858738346505
+          },
+          "kilo": {
+            "count": 4873,
+            "share": 0.05765226444560125
+          },
+          "zcode": {
+            "count": 2705,
+            "share": 0.03200274478254697
+          },
+          "copilot": {
+            "count": 1651,
+            "share": 0.01953291372864512
+          },
+          "openclaw": {
+            "count": 484,
+            "share": 0.005726184279021343
+          },
+          "openhands": {
+            "count": 298,
+            "share": 0.003525625857744546
+          },
+          "cline": {
+            "count": 271,
+            "share": 0.003206189957881785
+          },
+          "zoo": {
+            "count": 259,
+            "share": 0.003064218446831669
+          }
+        },
+        "model": {
+          "deepseek-v4-flash": {
+            "count": 24746,
+            "share": 0.29276891770384744
+          },
+          "glm-5.1": {
+            "count": 21462,
+            "share": 0.25391604751313235
+          },
+          "glm-5.2": {
+            "count": 17179,
+            "share": 0.20324404902749516
+          },
+          "kimi-k2.7-code": {
+            "count": 7484,
+            "share": 0.08854289905825564
+          },
+          "minimax-m3": {
+            "count": 5744,
+            "share": 0.06795702995598883
+          },
+          "qwen3.6-35b": {
+            "count": 4733,
+            "share": 0.05599593015001656
+          },
+          "minimax-m2.5": {
+            "count": 3104,
+            "share": 0.036723297524963325
+          },
+          "diffusiongemma": {
+            "count": 72,
+            "share": 0.0008518290663006956
+          }
+        },
+        "provider": {
+          "B": {
+            "count": 32435,
+            "share": 0.3837371634092092
+          },
+          "A": {
+            "count": 29082,
+            "share": 0.34406795702995596
+          },
+          "D": {
+            "count": 11206,
+            "share": 0.13257772940229995
+          },
+          "C": {
+            "count": 7289,
+            "share": 0.08623586200369127
+          },
+          "E": {
+            "count": 4444,
+            "share": 0.052576782925559604
+          },
+          "I": {
+            "count": 68,
+            "share": 0.0008045052292839903
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 207
+      },
+      "sessions_crossing_week_boundary": 1
+    },
+    {
+      "week": "2026-08-02_2026-08-08",
+      "requests": 79546,
+      "sessions": 973,
+      "accounts": 74,
+      "top_1_account_request_share": 0.11818318960098559,
+      "top_5_account_request_share": 0.4214165388580193,
+      "distributions": {
+        "harness": {
+          "hermes": {
+            "count": 22999,
+            "share": 0.28912830312020715
+          },
+          "pi": {
+            "count": 19206,
+            "share": 0.24144520151861815
+          },
+          "claude-code": {
+            "count": 8766,
+            "share": 0.11020038719734493
+          },
+          "opencode": {
+            "count": 6746,
+            "share": 0.08480627561411007
+          },
+          "codex": {
+            "count": 6490,
+            "share": 0.08158801196791793
+          },
+          "oh-my-pi": {
+            "count": 5390,
+            "share": 0.06775953536318607
+          },
+          "kilo": {
+            "count": 5347,
+            "share": 0.06721896764136474
+          },
+          "zcode": {
+            "count": 1489,
+            "share": 0.018718728785859753
+          },
+          "copilot": {
+            "count": 1385,
+            "share": 0.017411309179594197
+          },
+          "openhands": {
+            "count": 1322,
+            "share": 0.0166193146104141
+          },
+          "openclaw": {
+            "count": 332,
+            "share": 0.004173685666155432
+          },
+          "cline": {
+            "count": 74,
+            "share": 0.0009302793352274156
+          }
+        },
+        "model": {
+          "deepseek-v4-flash": {
+            "count": 42710,
+            "share": 0.536922032534634
+          },
+          "glm-5.2": {
+            "count": 15703,
+            "share": 0.19740778920373117
+          },
+          "glm-5.1": {
+            "count": 14861,
+            "share": 0.18682271892992733
+          },
+          "minimax-m3": {
+            "count": 4690,
+            "share": 0.05895959570562945
+          },
+          "kimi-k2.7-code": {
+            "count": 775,
+            "share": 0.009742790335151987
+          },
+          "qwen3.6-35b": {
+            "count": 581,
+            "share": 0.0073039499157720065
+          },
+          "minimax-m2.5": {
+            "count": 226,
+            "share": 0.002841123375153999
+          }
+        },
+        "provider": {
+          "A": {
+            "count": 42690,
+            "share": 0.5366706056872753
+          },
+          "B": {
+            "count": 28466,
+            "share": 0.3578558318457245
+          },
+          "D": {
+            "count": 3957,
+            "share": 0.04974480174993086
+          },
+          "C": {
+            "count": 3672,
+            "share": 0.04616196917506851
+          },
+          "E": {
+            "count": 761,
+            "share": 0.009566791542000855
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 219
+      },
+      "sessions_crossing_week_boundary": 1
+    },
+    {
+      "week": "2026-08-09_2026-08-15",
+      "requests": 163970,
+      "sessions": 1558,
+      "accounts": 104,
+      "top_1_account_request_share": 0.12418735134475818,
+      "top_5_account_request_share": 0.3608708910166494,
+      "distributions": {
+        "harness": {
+          "pi": {
+            "count": 56889,
+            "share": 0.3469476123681161
+          },
+          "hermes": {
+            "count": 46179,
+            "share": 0.2816307861194121
+          },
+          "opencode": {
+            "count": 18782,
+            "share": 0.1145453436604257
+          },
+          "codex": {
+            "count": 11604,
+            "share": 0.07076904311764347
+          },
+          "kilo": {
+            "count": 8480,
+            "share": 0.05171677745929133
+          },
+          "oh-my-pi": {
+            "count": 6692,
+            "share": 0.04081234372141245
+          },
+          "claude-code": {
+            "count": 4857,
+            "share": 0.029621272183936086
+          },
+          "zcode": {
+            "count": 4022,
+            "share": 0.0245288772336403
+          },
+          "copilot": {
+            "count": 2610,
+            "share": 0.015917545892541317
+          },
+          "openclaw": {
+            "count": 1778,
+            "share": 0.010843446972007075
+          },
+          "cline": {
+            "count": 1516,
+            "share": 0.009245593706165763
+          },
+          "openhands": {
+            "count": 297,
+            "share": 0.0018113069463926328
+          },
+          "zoo": {
+            "count": 264,
+            "share": 0.0016100506190156736
+          }
+        },
+        "model": {
+          "deepseek-v4-flash": {
+            "count": 109675,
+            "share": 0.6688723546990303
+          },
+          "glm-5.2": {
+            "count": 21124,
+            "share": 0.12882844422760262
+          },
+          "glm-5.1": {
+            "count": 13380,
+            "share": 0.08160029273647619
+          },
+          "minimax-m3": {
+            "count": 10204,
+            "share": 0.06223089589559066
+          },
+          "qwen3.6-35b": {
+            "count": 4972,
+            "share": 0.030322619991461852
+          },
+          "minimax-m2.5": {
+            "count": 3202,
+            "share": 0.019527962432152223
+          },
+          "kimi-k2.7-code": {
+            "count": 1333,
+            "share": 0.008129535890711716
+          },
+          "diffusiongemma": {
+            "count": 80,
+            "share": 0.00048789412697444653
+          }
+        },
+        "provider": {
+          "A": {
+            "count": 114321,
+            "share": 0.6972068061230713
+          },
+          "B": {
+            "count": 32277,
+            "share": 0.19684698420442764
+          },
+          "D": {
+            "count": 8634,
+            "share": 0.052655973653717145
+          },
+          "C": {
+            "count": 7340,
+            "share": 0.04476428614990547
+          },
+          "E": {
+            "count": 1318,
+            "share": 0.008038055741904008
+          },
+          "I": {
+            "count": 80,
+            "share": 0.00048789412697444653
+          }
+        }
+      },
+      "excluded_sessions": {
+        "the first request's phrases name no harness": 222
+      },
+      "sessions_crossing_week_boundary": 3
+    }
+  ],
+  "overall": {
+    "requests": 727503,
+    "sessions": 8876,
+    "accounts": 195,
+    "top_1_account_request_share": 0.10088205821831663,
+    "top_5_account_request_share": 0.32085503427477274,
+    "distributions": {
+      "harness": {
+        "pi": {
+          "count": 191315,
+          "share": 0.2629748605847673
+        },
+        "hermes": {
+          "count": 125316,
+          "share": 0.17225495977336175
+        },
+        "opencode": {
+          "count": 102722,
+          "share": 0.14119804316958143
+        },
+        "eval:swe-bench": {
+          "count": 60698,
+          "share": 0.0834333329209639
+        },
+        "kilo": {
+          "count": 52744,
+          "share": 0.0725000446733553
+        },
+        "claude-code": {
+          "count": 46560,
+          "share": 0.06399973608356255
+        },
+        "codex": {
+          "count": 43391,
+          "share": 0.059643740300727284
+        },
+        "oh-my-pi": {
+          "count": 42120,
+          "share": 0.05789666846734653
+        },
+        "zcode": {
+          "count": 19381,
+          "share": 0.02664043997069428
+        },
+        "copilot": {
+          "count": 17701,
+          "share": 0.02433117114293687
+        },
+        "openclaw": {
+          "count": 11294,
+          "share": 0.015524334607554882
+        },
+        "cline": {
+          "count": 9158,
+          "share": 0.012588264240834746
+        },
+        "zoo": {
+          "count": 3186,
+          "share": 0.004379363384068519
+        },
+        "openhands": {
+          "count": 1917,
+          "share": 0.0026350406802446175
+        }
+      },
+      "model": {
+        "deepseek-v4-flash": {
+          "count": 216329,
+          "share": 0.29735822395234107
+        },
+        "glm-5.1": {
+          "count": 149073,
+          "share": 0.20491049521445273
+        },
+        "glm-5.2": {
+          "count": 118006,
+          "share": 0.16220689124306018
+        },
+        "qwen3.6-35b": {
+          "count": 79049,
+          "share": 0.10865797116987834
+        },
+        "minimax-m3": {
+          "count": 68125,
+          "share": 0.09364222553034146
+        },
+        "kimi-k2.7-code": {
+          "count": 47903,
+          "share": 0.06584577658099004
+        },
+        "minimax-m2.7": {
+          "count": 21851,
+          "share": 0.030035614973409043
+        },
+        "glm-5-turbo": {
+          "count": 14288,
+          "share": 0.019639781554165413
+        },
+        "minimax-m2.5": {
+          "count": 9563,
+          "share": 0.013144962976097694
+        },
+        "deepseek-v4-pro": {
+          "count": 1183,
+          "share": 0.0016261101328791771
+        },
+        "minimax-fast": {
+          "count": 827,
+          "share": 0.0011367650717591543
+        },
+        "claude-opus-4-8": {
+          "count": 582,
+          "share": 0.0007999967010445318
+        },
+        "glm-4.7": {
+          "count": 487,
+          "share": 0.0006694130470939639
+        },
+        "diffusiongemma": {
+          "count": 199,
+          "share": 0.0002735383909069791
+        },
+        "gpt-oss-20b": {
+          "count": 38,
+          "share": 5.223346158022716e-05
+        }
+      },
+      "provider": {
+        "A": {
+          "count": 290165,
+          "share": 0.3988505889322793
+        },
+        "B": {
+          "count": 256273,
+          "share": 0.3522638394618304
+        },
+        "C": {
+          "count": 83514,
+          "share": 0.11479540290555502
+        },
+        "D": {
+          "count": 43041,
+          "share": 0.05916264262827782
+        },
+        "E": {
+          "count": 36055,
+          "share": 0.049559933086186586
+        },
+        "F": {
+          "count": 12310,
+          "share": 0.016920892422436745
+        },
+        "G": {
+          "count": 5237,
+          "share": 0.007198595744622359
+        },
+        "H": {
+          "count": 544,
+          "share": 0.0007477632394643046
+        },
+        "I": {
+          "count": 233,
+          "share": 0.0003202735933734981
+        },
+        "J": {
+          "count": 112,
+          "share": 0.00015395125518382743
+        },
+        "K": {
+          "count": 19,
+          "share": 2.611673079011358e-05
+        }
+      }
+    },
+    "excluded_sessions": {
+      "the first request's phrases name no harness": 1041
+    },
+    "end_before_start": 0,
+    "missing_start_or_end": 0,
+    "adjacent_step_pairs_with_end_times": 718627,
+    "adjacent_step_end_order_inversions": 0,
+    "adjacent_step_end_order_inversion_rate": 0.0,
+    "adjacent_step_pairs_not_strictly_completed": 12,
+    "adjacent_step_pairs_not_strictly_completed_rate": 1.6698509797154854e-05,
+    "sessions_crossing_week_boundary": 11,
+    "link_reason": {
+      "tool_call_id": {
+        "count": 676235,
+        "share": 0.929528812939603
+      },
+      "assistant_message": {
+        "count": 42392,
+        "share": 0.05827055008707868
+      },
+      "<missing>": {
+        "count": 8876,
+        "share": 0.012200636973318323
+      }
+    },
+    "link_reason_adjacent_pairs": {
+      "assistant_message": {
+        "later_step_requests": 42392,
+        "adjacent_pairs": 42392,
+        "strictly_completed": 42382,
+        "strictly_completed_rate": 0.9997641064351764,
+        "not_strictly_completed": 10,
+        "unassessable_requests": 0
+      },
+      "tool_call_id": {
+        "later_step_requests": 676235,
+        "adjacent_pairs": 676235,
+        "strictly_completed": 676233,
+        "strictly_completed_rate": 0.9999970424482614,
+        "not_strictly_completed": 2,
+        "unassessable_requests": 0
+      }
+    },
+    "link_reason_by_first_step": {
+      "step_0": {
+        "<missing>": {
+          "count": 8876,
+          "share": 1.0
+        }
+      },
+      "later_steps": {
+        "tool_call_id": {
+          "count": 676235,
+          "share": 0.9410097310565843
+        },
+        "assistant_message": {
+          "count": 42392,
+          "share": 0.058990268943415705
+        }
+      }
+    },
+    "duplicate_session_step_rows": 0,
+    "missing_steps": 0
+  }
+}
