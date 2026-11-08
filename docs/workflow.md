@@ -1,6 +1,6 @@
 # 작업 절차 — geass 이슈 흐름
 
-최종 갱신: 2026-11-08. 결정 이유는 [ADR 0007](adr/0007-geass-issue-workflow.md). 하네스 자체의 동작은 geass 저장소(`~/Desktop/geass`, jongrionro-debug/geass)의 README를 따른다.
+최종 갱신: 2026-11-09. 결정 이유는 [ADR 0007](adr/0007-geass-issue-workflow.md). 하네스 자체의 동작은 geass 저장소(`~/Desktop/geass`, jongrionro-debug/geass)의 README를 따른다.
 
 ## 1. 흐름
 
@@ -33,4 +33,4 @@ Claude Code에서는 `/geass doctor`, `/geass plan "목표"`, `/geass run <번�
 - `python3 scripts/verify.py`: 표준 라이브러리만 사용. JSON 파싱, Markdown 상대 링크, 문서 구조([check_context.py](../scripts/check_context.py))를 검사한다.
 - `python3 -m unittest discover -s tests`: 합성 fixture 테스트. 분석 의존성(pandas·pyarrow·lightgbm 등)이 없는 Python에서는 관련 테스트가 skip되며 skip 수를 보고한다.
 - geass 검증은 로컬 Python에서 실행된다. 분석 의존성 고정은 첫 코드 Issue에서 `requirements.txt`로 정한다.
-- geass는 이슈별 worktree에서 돌아 Git 제외 `data/`·`.venv/`가 보이지 않는다. 실데이터는 `FREEINFERENCE_DATA_DIR`(Mac: `~/data/freeinference/bb26cf7`, 1~13주만)로 읽고, 분석 패키지가 있는 venv(Mac: `~/.venvs/ts-freeinference`)를 PATH 앞에 둔 셸에서 `geass run`을 실행한다. verify.toml의 `implement_env = true`가 이 경로를 Codex 구현 단계에 넘긴다.
+- geass는 이슈별 worktree에서 돌아 Git 제외 `data/`·`.venv/`가 보이지 않는다. 실데이터는 `FREEINFERENCE_DATA_DIR`(`~/data/freeinference/bb26cf7`, 1~13주만)로 읽고, 분석 패키지가 있는 venv(`~/.venvs/ts-freeinference`)를 PATH 앞에 둔 셸에서 `geass run`을 실행한다. 주 작업 환경은 Ubuntu 서버(저장소 `~/projects/TS_-`, geass `~/projects/geass`)이며 Mac(`~/Desktop/TS_정확한`, `~/Desktop/geass`)도 같은 데이터·venv 경로를 쓴다. verify.toml의 `implement_env = true`가 이 경로를 Codex 구현 단계에 넘긴다.
