@@ -1,6 +1,6 @@
 # ADR-0001: GitHub Issue 기반 에이전트 작업 흐름 도입
 - 상태: 채택 (Phase 0 커밋 `21132c8` 반영 완료; 현재 절차는 아래 갱신 참고)
-- 후속 결정: [ADR 0003](0003-common-context-layout.md)이 공통 문서 경로·명명을, [ADR 0006](0006-geass-issue-workflow.md)이 box worker·라벨 상태 기계·handoff를 대체한다(2026-11-08). Issue 원본·PR 결과 원칙은 유지한다.
+- 후속 결정: [ADR 0003](0003-common-context-layout.md)이 공통 문서 경로·명명을, [ADR 0006](0006-issue-flow-skill.md)이 box worker·라벨 상태 기계·handoff를 대체한다(2026-11-08). Issue 원본·PR 결과 원칙은 유지한다.
 - 날짜: 2026-11-02
 - 관련: PR "Phase 0: agent workflow scaffolding"
 

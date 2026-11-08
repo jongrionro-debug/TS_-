@@ -41,4 +41,4 @@ ADR은 구조·계약·운영·연구 방향에 오래 영향을 주는 선택�
 - [0003 · 세 저장소의 맥락 문서 경로와 역할을 통일한다](0003-common-context-layout.md)
 - [ADR-0004: 조건 C — 로컬 프롬프트 의미 분류 후 범주별 분위수 모델](0004-wildchat-category-condition-c.md)
 - [0005 · 연구 데이터를 FreeInference agentic trace로 바꾸고 요청 단위 출력 토큰을 예측한다](0005-freeinference-agentic-trace.md)
-- [0006 · 작업 흐름을 geass 이슈 하네스로 바꾼다](0006-geass-issue-workflow.md)
+- [0006 · 작업 흐름을 Opus 기획·Codex 구현·Opus 검수의 Issue→PR 스킬로 바꾼다](0006-issue-flow-skill.md)
