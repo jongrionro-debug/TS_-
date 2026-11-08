@@ -1,0 +1,12 @@
+implement_env = true   # FREEINFERENCE_DATA_DIR를 Codex 구현 단계에 넘긴다(비밀값 아님)
+
+[[command]]
+name = "context"
+argv = ["python3", "scripts/verify.py"]
+timeout_sec = 120
+
+[[command]]
+name = "unit"
+argv = ["python3", "-m", "unittest", "discover", "-s", "tests"]
+timeout_sec = 600
+env = ["FREEINFERENCE_DATA_DIR"]
