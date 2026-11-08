@@ -2,7 +2,7 @@
 
 시계열 데이터 분석 및 실습 과목 프로젝트(Group 5). FreeInference agentic trace에서 **LLM 요청이 시작될 때 그 요청의 completion 토큰 P10/P50/P90을 예측**하고, 세션 상태가 현재 요청 정보·직전 출력 lag 이상으로 기여하는지 검증한다. 요청별 예측은 10분 출력 토큰 수요 뷰로 모아 보인다.
 
-현재 상태: 1~13주 데이터 감사 및 10분 집계·EDA 완료, 직전 step 기준 시간 정합성은 조건부 성립. 실제 세션 연결의 시점 가용성은 추가 검증이 필요하다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
+현재 상태: 1~13주 데이터 감사·10분 집계·EDA와 A·L·B 특징 생성기·합성 누출 테스트 구현. 현재 입력 기반 연결과 엄격 완료 시각 조건을 적용한다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
 
 ```
 요청 i (세션 S, step k)      start_ms ──────────── end_ms
@@ -24,6 +24,10 @@ Issue → geass(Codex 구현 → 고정 검증 → Claude 검수) → PR → 사
 ## 10분 집계와 EDA 재현
 
 같은 준비 데이터와 의존성으로 `python -m freeinference.eda`를 실행한다. [EDA 결과](freeinference/outputs/eda/eda.md)에 train·validation별 표, 생성 그림과 실행 revision이 기록된다.
+
+## A·L·B 특징 생성 재현
+
+같은 준비 데이터와 의존성으로 `python -m freeinference.features`를 실행한다. [집계 산출물](freeinference/outputs/features/features.json)에 1~13주의 생성 시간·행 수·특징별 결측률이 기록된다. 특징 정의·결측 규칙·4절 항목 대조표는 [project.md](docs/project.md)에 있으며, 요청별 특징은 `build_features` API로 반환한다. C·분할·학습·평가는 포함하지 않는다.
 
 ## 검증
 
