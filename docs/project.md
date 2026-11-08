@@ -2,7 +2,7 @@
 
 - 과목: 시계열 데이터 분석 및 실습 (Group 5, "Forecasting LLM Token Demand with Conversation State")
 - 최종 갱신일: 2026-11-08
-- 현재 상태: **1~13주 데이터 감사 완료, 특징 설계 전.** 세션 이력의 시간 정합성은 직전 step 대리 기준 조건부 성립이며 실제 연결의 시점 가용성은 특징 생성 전에 검증해야 한다. [감사 결과](../freeinference/outputs/audit/audit.md), [ADR 0005](adr/0005-freeinference-agentic-trace.md).
+- 현재 상태: **1~13주 데이터 감사와 이슈 범위 EDA 완료, 특징 설계 전.** 세션 이력의 시간 정합성은 직전 step 대리 기준 조건부 성립이며 실제 연결의 시점 가용성은 특징 생성 전에 검증해야 한다. [감사 결과](../freeinference/outputs/audit/audit.md), [ADR 0005](adr/0005-freeinference-agentic-trace.md).
 - 이전 연구: WildChat 현재 프롬프트 응답 길이 예측(최종 test 완료)은 태그 `wildchat-final`에 보존한다. 이 문서의 수치·정의와 섞지 않는다.
 
 ## 1. 연구 질문
@@ -56,10 +56,12 @@
 - 세션 내: step 간 completion 자기상관, finish_reason·tool 범주별 다음 completion 분포, 상태 특징과 직전 completion lag의 상관(정보 중복 확인).
 - 세션 간: 계정 내 세션 간 상관, 동시 활성 세션 수와 요청 completion의 관계, 주별 분포 이동.
 
+10분 집계와 인접 step·동시 활성 세션·주별 분포의 결과 및 재현 명령은 [EDA 결과](../freeinference/outputs/eda/eda.md)에 있다. 상태 특징과 lag의 중복 및 계정 내 세션 간 상관은 이후 분석 범위다.
+
 ## 7. 제외 범위
 
 다음 요청의 도착 시각·개수 예측, 메시지 의미·임베딩(원문 없음), prefix cache replay, RNN·Transformer, GPU·비용·SLO 효과 주장.
 
 ## 8. 진행 상황
 
-작업은 Issue에서 관리한다([workflow.md](workflow.md)). 다음 순서: 10분 시계열·EDA → 특징 생성기·누출 테스트 → 분할·기준선·평가 틀 → A/L/B/C validation 비교 → 10분 수요 뷰 → 최종 test 1회.
+작업은 Issue에서 관리한다([workflow.md](workflow.md)). 다음 순서: 특징 생성기·누출 테스트 → 분할·기준선·평가 틀 → A/L/B/C validation 비교 → 10분 수요 뷰 → 최종 test 1회.
