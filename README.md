@@ -15,7 +15,7 @@
 
 ## 작업 방식
 
-Issue(Opus 기획) → Codex 구현 → Opus 검수 → PR → 사용자 승인 후 병합. `/issue-flow` 스킬로 진행하며 절차는 [workflow.md](docs/workflow.md), 규칙은 [AGENTS.md](AGENTS.md).
+Issue → geass(Codex 구현 → 고정 검증 → Claude 검수) → PR → 사람이 병합. 절차는 [workflow.md](docs/workflow.md), 규칙은 [AGENTS.md](AGENTS.md).
 
 ## 검증
 
@@ -24,7 +24,7 @@ python3 scripts/verify.py
 python3 -m unittest discover -s tests
 ```
 
-같은 명령을 검수 단계와 CI에서 실행한다. 원본 trace는 `data/`(Git 제외)에 두며 커밋하지 않는다.
+같은 명령이 [.harness/verify.toml](.harness/verify.toml)과 CI에서 실행된다. 원본 trace는 `data/`(Git 제외)에 두며 커밋하지 않는다.
 
 ## 이전 연구
 
