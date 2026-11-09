@@ -49,6 +49,10 @@ FREEINFERENCE_DATA_DIR=~/data/freeinference/bb26cf7 OPENBLAS_NUM_THREADS=1 ~/.ve
 
 [모델 보고서](freeinference/outputs/models/models.md)와 [집계 JSON](freeinference/outputs/models/models.json)에 기준선 4종·A/L/B의 validation 지표, 주 비교 B−L 및 보조 비교의 세션 bootstrap 95% CI, 선택 설정·반복 수·중요도·교차 비율·실행 환경을 기록한다. 각 분위수는 동일한 고정 격자의 원척도·`log1p` 후보를 1~9주 fit/10주 holdout의 원척도 pinball로 선택하고 1~10주 train_target으로 재학습한다. validation 정답은 선택에 쓰지 않는다. 주 판정은 요청 가중 mean pinball B−L CI 상한 < 0일 때 validation 개선이며, test 결론으로 확대하지 않는다. 범주·결측·분할 계약은 [project.md 4·5절](docs/project.md)을 따른다. 요청별 값·식별자는 저장하지 않으며, 실데이터 실행은 아래 검증에 포함하지 않는다.
 
+## 10분 출력 토큰 수요 뷰 재현
+
+같은 1~13주 데이터와 분석 환경에서 `OPENBLAS_NUM_THREADS=1 python -m freeinference.demand`를 실행한다. `FREEINFERENCE_DATA_DIR`은 준비된 데이터 위치를 가리킨다. [수요 뷰](freeinference/outputs/demand/demand.md)는 validation 요청 시작 기준 현재 추정과 일 블록 bootstrap을 기록한다.
+
 ## 검증
 
 ```sh
