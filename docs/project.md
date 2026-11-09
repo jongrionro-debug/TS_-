@@ -9,7 +9,7 @@
 
 > 에이전트 세션에서 LLM 요청이 시작될 때, **세션 상태**(앞선 요청·tool 호출의 진행)가 현재 요청 정보와 **최근 수요(직전 출력 lag)** 이상으로 그 요청의 completion 토큰 분포(P10/P50/P90)를 더 잘 예측하는가?
 
-실용 출력은 요청마다의 completion 토큰 P10/P50/P90이며, 이를 시작시각 기준 10분 구간으로 모은 **출력 토큰 수요 뷰**를 함께 제시한다. 이번 데이터는 실제 요청 시작·종료 시각이 있어 10분 입력·출력 토큰 시계열을 실측으로 만들 수 있다.
+실용 출력은 요청마다의 completion 토큰 P10/P50/P90이며, 이를 요청 시작 UTC 10분 구간 [시작, 끝)으로 모은 **출력 토큰 수요 뷰**를 함께 제시한다. 실측은 구간에서 시작한 요청의 completion 합이며 빈 구간은 0이다. 요청 도착에 따라 완성되는 현재 추정(nowcast)이다. 이번 데이터는 실제 요청 시작·종료 시각이 있어 10분 입력·출력 토큰 시계열을 실측으로 만들 수 있다.
 
 ## 2. 데이터
 
@@ -93,6 +93,8 @@ A 입력의 결측 목록·역할은 결측으로 유지하고, 명시적 빈 to
 - 불확실성(피드백 2): `freeinference.evaluate.paired_bootstrap`은 예측기 이름 → P10/P50/P90 DataFrame 사전과 기준 예측기 이름, `cluster_columns`를 받는다. 기본 군집은 `(week, session_id)`, `BOOTSTRAP_B=2000`, `BOOTSTRAP_SEED=20261109`로 고정한다. validation 전체의 세션을 복원 추출해 **같은 추출을 모든 예측기·구간·가중에 공유**하며 재학습하지 않는다. 세션의 모든 행은 같은 횟수만큼 포함한다. 차이(예측기−기준)의 2.5·97.5 백분위(`linear`)를 95% CI로 기록한다. 일부 구간이 빈 추출은 그 구간 CI에서 제외하고 유효 반복 수를 기록한다. 모델 산출물은 L을 기준으로 B−L·C−L, B를 기준으로 C−B, A를 기준으로 L−A, fixed·previous_completion을 각각 기준으로 A/L/B/C 차이를 같은 함수·시드로 계산한다. 같은 함수와 시드로 계정 및 요청 시작 UTC 날짜의 겹치지 않는 일 블록 CI를 추가한다. 재학습 없이 train 등장·신규 계정과 validation 요청 수 상위 1·5개 계정 제외를 비교하고, 계정별 행 수 역수로 계정 가중 mean pinball을 계산한다. 세 군집의 요청 가중 CI 상한이 모두 0보다 작을 때 군집 방식에 견고하다고 기록한다. 일 블록은 21개로 불안정할 수 있다.
 - `evaluate_predictions`와 `paired_bootstrap`은 동일 행 순서·인덱스의 정답/예측을 요구한다. 세션 가중은 군집 열을 바꿔도 유지되며, 군집 열만 바꾸면 계정·일 블록 추출을 재사용할 수 있다. 실데이터 실행은 `python -m freeinference.evaluate`; 집계 [JSON](../freeinference/outputs/baselines/baselines.json)과 [보고서](../freeinference/outputs/baselines/baselines.md)에 데이터 revision·코드 HEAD/소스 해시·명령·환경·소요 시간·경계 제외 수·지표·대체율·CI를 기록한다. 요청별 예측·정답·식별자는 내보내지 않으며 실데이터 실행은 저장소 검증 명령에 넣지 않는다.
 
+10분 운영 뷰는 요청별 P50 합과 실측 합의 MAE·WAPE·평균 bias, P10/P90 합 범위의 포함률·평균 폭·폭/실측 중앙값을 전체·UTC 시간·주별로 보고한다. 실측 0 구간은 폭/실측 비율에서 제외한다. 분위수 합 범위는 완전 양의 상관을 가정한 보수적 범위이며 보정된 80% 합 구간이 아니다. P50 합도 합의 중앙값이 아니다. B−L·C−B의 MAE·WAPE 차이는 21개 UTC 일 블록 bootstrap으로 비교하며 주 가설 판정을 대신하지 않는다. [수요 뷰 결과](../freeinference/outputs/demand/demand.md).
+
 ## 6. 탐색 분석 (피드백 2·3)
 
 - 요청→10분 시계열 그림: 개별 요청이 `start_ms` 기준 10분 구간의 입력(prompt) 합·출력(completion) 합으로 모이는 과정을 도식과 실제 시계열로 보인다.
@@ -107,4 +109,4 @@ A 입력의 결측 목록·역할은 결측으로 유지하고, 명시적 빈 to
 
 ## 8. 진행 상황
 
-작업은 Issue에서 관리한다([workflow.md](workflow.md)). A/L/B/C validation 비교와 세션·계정·UTC 일 블록 bootstrap 및 계정 구성 민감도를 1~13주에서 평가했다([모델 결과](../freeinference/outputs/models/models.md), [특징 집계](../freeinference/outputs/features/features.json), [기준선 결과](../freeinference/outputs/baselines/baselines.md)). 주 판정은 기존 세션 CI 기준 B−L을 유지한다. 일 블록은 21개이고 CI는 학습·선택 불확실성을 포함하지 않는다. 최종 test는 읽지 않았고 결론을 유보한다. 다음 순서: 10분 수요 뷰 → 사용자 승인 후 최종 test 1회.
+작업은 Issue에서 관리한다([workflow.md](workflow.md)). A/L/B/C validation 비교와 세션·계정·UTC 일 블록 bootstrap 및 계정 구성 민감도를 1~13주에서 평가했다([모델 결과](../freeinference/outputs/models/models.md), [특징 집계](../freeinference/outputs/features/features.json), [기준선 결과](../freeinference/outputs/baselines/baselines.md)). 주 판정은 기존 세션 CI 기준 B−L을 유지한다. 일 블록은 21개이고 CI는 학습·선택 불확실성을 포함하지 않는다. 최종 test는 읽지 않았고 결론을 유보한다. 10분 수요 뷰는 validation에서 산출했다. 다음 순서: 사용자 승인 후 최종 test 1회.
