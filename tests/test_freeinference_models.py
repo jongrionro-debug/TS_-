@@ -342,6 +342,41 @@ class ModelTests(unittest.TestCase):
                 models.run(root, root / "forbidden")
             self.assertFalse((root / "forbidden").exists())
 
+    def test_account_sensitivity_membership_and_account_weight(self):
+        rows = pd.DataFrame({"account": ["a", "b", "a", "a", "b", "c"],
+                             "completion_tokens": [0., 0., 0., 0., 3., 6.]})
+        masks = pd.DataFrame({"train": [True, False, False, False, False, False],
+                              "validation": [False, False, True, True, True, True]})
+        before = models.account_subsets(rows, masks)
+        self.assertEqual(before["train_seen"].tolist(), [True, True, False, False])
+        rows.loc[masks.validation, "completion_tokens"] = 999.
+        after = models.account_subsets(rows, masks)
+        for key in before:
+            pd.testing.assert_series_equal(before[key], after[key])
+        frame = rows.loc[masks.validation].copy()
+        frame.completion_tokens = [0., 0., 3., 6.]
+        pred = pd.DataFrame(0., index=frame.index, columns=models.PREDICTION_COLUMNS)
+        # Mean pinball for a zero prediction is y/2; each account contributes equally.
+        self.assertAlmostEqual(models.account_mean_pinball(frame, {"p": pred})["p"], 1.5)
+
+    def test_account_and_day_cluster_bootstrap(self):
+        from freeinference import evaluate
+        rows = pd.DataFrame({"week": [1]*4, "session_id": ["s1", "s2", "s3", "s4"],
+                             "account": ["a", "a", "b", "b"], "utc_day": ["d1", "d2", "d1", "d2"],
+                             "step": [0]*4, "harness": ["h"]*4, "model": ["m"]*4,
+                             "completion_tokens": [1., 2., 3., 4.]})
+        pred = pd.DataFrame(0., index=rows.index, columns=models.PREDICTION_COLUMNS)
+        for column in ("account", "utc_day"):
+            codes = evaluate._codes(rows, [column])
+            draws = np.concatenate(list(evaluate.cluster_draws(2, B=30, seed=12)))
+            for cluster in (0, 1):
+                members = np.flatnonzero(codes == cluster)
+                np.testing.assert_array_equal(draws[:, codes[members[0]]], draws[:, codes[members[1]]])
+            args = dict(reference="p", cluster_columns=[column], B=30, seed=12)
+            first = evaluate.paired_bootstrap(rows, {"p": pred, "same": pred.copy()}, **args)
+            self.assertEqual(first, evaluate.paired_bootstrap(rows, {"p": pred, "same": pred.copy()}, **args))
+            self.assertEqual(first["groups"]["overall"]["differences"]["same"]["request"]["mean_pinball"], [0., 0.])
+
     def test_primary_interpretation_uses_request_mean_pinball_ci(self):
         metrics = {"overall": {"metrics": {key: {w: {"mean_pinball": score}
                     for w in ("request", "session")} for key, score in (("L", 2.), ("B", 1.))}}}
