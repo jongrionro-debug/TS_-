@@ -24,7 +24,7 @@ from .split import (FIT_WEEKS, HOLDOUT_START_MS, HOLDOUT_WEEK, SESSION_COLUMNS,
 
 SEED = 20261109
 NUM_THREADS = 4
-MAX_ROUNDS = 300
+MAX_ROUNDS = 3000
 EARLY_STOPPING_ROUNDS = 30
 TOP_GAIN = 10
 CATEGORICAL = ("model", "provider", "harness", "stream", "step_trigger",
@@ -39,6 +39,8 @@ PARAMETERS = {"objective": "quantile", "metric": "None", "seed": SEED,
               "deterministic": True, "force_col_wise": True,
               "num_threads": NUM_THREADS, "verbosity": -1}
 OUTPUT = Path(__file__).parent / "outputs" / "models"
+PREVIOUS_REVISION = "f2da61698358ac3a47171a6a8b133bd3c6f36e82"  # PR #39
+PREVIOUS_PATH = "freeinference/outputs/models/models.json"
 
 
 def pinball(y, prediction, q):
@@ -136,14 +138,26 @@ class QuantileModels:
                         return "original_pinball", pinball(
                             y_holdout, original_scale(prediction, transform), q), False
 
+                    evaluated_rounds = 0
+
+                    def record_round(env):
+                        # lgb.train returns a booster truncated to best_iteration;
+                        # count evaluations before early_stopping (order=30) runs.
+                        nonlocal evaluated_rounds
+                        evaluated_rounds = env.iteration + 1
+
+                    record_round.order = 20
                     model = lgb.train(params, training, num_boost_round=MAX_ROUNDS,
                                       valid_sets=[holdout], feval=score,
-                                      callbacks=[lgb.early_stopping(EARLY_STOPPING_ROUNDS,
+                                      callbacks=[record_round, lgb.early_stopping(EARLY_STOPPING_ROUNDS,
                                                                    first_metric_only=True, verbose=False)])
                     iterations = int(model.best_iteration)
                     loss = pinball(y_holdout, original_scale(model.predict(
                         x_holdout, num_iteration=iterations, num_threads=NUM_THREADS), transform), q)
                     candidates.append({"settings": dict(setting), "iterations": iterations,
+                                       "best_iteration": iterations,
+                                       "evaluated_rounds": evaluated_rounds,
+                                       "hit_max_rounds": evaluated_rounds >= MAX_ROUNDS,
                                        "holdout_pinball": loss})
                 best = min(candidates, key=lambda candidate: candidate["holdout_pinball"])
                 self.selection[condition][label] = {**best, "candidates": candidates}
@@ -206,6 +220,61 @@ def primary_result(metrics, bootstrap):
             "interpretation": interpretation, "final_conclusion": "reserved for approved final test issue"}
 
 
+def round_summary(selection):
+    by_condition_quantile = {
+        condition: {label: {"candidates": len(value["candidates"]),
+                            "hit_max_rounds": sum(c["hit_max_rounds"] for c in value["candidates"])}
+                    for label, value in values.items()}
+        for condition, values in selection.items()}
+    return {"definition": "evaluated_rounds >= max_rounds; best_iteration may be smaller",
+            "by_condition_quantile": by_condition_quantile,
+            "overall": {key: sum(value[key] for values in by_condition_quantile.values()
+                                  for value in values.values())
+                        for key in ("candidates", "hit_max_rounds")}}
+
+
+def compare_previous(result, previous, revision):
+    """Only aggregate values from the immutable #39 artifact, never raw data."""
+    selection = {}
+    for condition, values in result["selection"].items():
+        selection[condition] = {}
+        for label, current in values.items():
+            old = previous["selection"][condition][label]
+            selection[condition][label] = {
+                "previous": {key: old[key] for key in ("settings", "iterations", "holdout_pinball")},
+                "current": {key: current[key] for key in ("settings", "iterations", "holdout_pinball")},
+                "holdout_pinball_change": current["holdout_pinball"] - old["holdout_pinball"]}
+    comparisons = {}
+    for name, bootstrap in result["bootstrap"].items():
+        reference = bootstrap["reference"]
+        comparisons[name] = {}
+        for predictor, intervals in bootstrap["groups"]["overall"]["differences"].items():
+            if predictor == reference:
+                continue
+            comparisons[name][predictor] = {}
+            for weighting in ("request", "session"):
+                def difference(report):
+                    scores = report["metrics"]["overall"]["metrics"]
+                    return scores[predictor][weighting]["mean_pinball"] - scores[reference][weighting]["mean_pinball"]
+
+                old, current = difference(previous), difference(result)
+                comparisons[name][predictor][weighting] = {
+                    "previous_difference": old, "current_difference": current,
+                    "change": current - old,
+                    "previous_ci95": previous["bootstrap"][name]["groups"]["overall"]["differences"][predictor][weighting]["mean_pinball"],
+                    "current_ci95": intervals[weighting]["mean_pinball"]}
+    candidates = [c for values in previous["selection"].values() for value in values.values()
+                  for c in value["candidates"]]
+    return {"source_revision": revision, "source_path": PREVIOUS_PATH,
+            "max_rounds": previous["model_settings"]["max_rounds"],
+            "candidates": len(candidates),
+            # #39 did not record evaluated_rounds. This count is only a lower
+            # bound on candidates that exhausted the old iteration budget.
+            "best_iteration_at_max": sum(c["iterations"] == previous["model_settings"]["max_rounds"]
+                                         for c in candidates),
+            "selection": selection, "overall_mean_pinball": comparisons}
+
+
 def _markdown(result):
     primary = result["primary"]
     lines = ["# A/L/B LightGBM validation 비교", "",
@@ -222,7 +291,8 @@ def _markdown(result):
              f"- train 경계 제외 정답: {result['excluded_train_targets']}; fit 경계 제외: {result['excluded_fit_targets']}",
              f"- 고정 격자: `{json.dumps(result['model_settings']['grid'])}`",
              f"- 고정 학습 설정: `{json.dumps(result['model_settings']['parameters'])}`; "
-             f"최대 {MAX_ROUNDS}회, patience={EARLY_STOPPING_ROUNDS}.",
+             f"최대 {result['model_settings']['max_rounds']}회, "
+             f"patience={result['model_settings']['early_stopping_rounds']}.",
              "- 1~9주 fit_target으로 학습, 10주 holdout_target의 원척도 해당 q pinball로 조기 종료·격자 선택. "
              "동점은 격자 순서. 선택 설정·반복 수로 1~10주 train_target 전체에 재학습. validation 선택 없음.",
              "- 범주 사전은 선택 단계 fit_target, 최종 단계 train_target에서 고정. 미관측·결측 범주는 결측, "
@@ -240,6 +310,50 @@ def _markdown(result):
         for label, value in selection.items():
             lines.append(f"| {condition} | {label} | `{json.dumps(value['settings'])}` | "
                          f"{value['iterations']} | {value['holdout_pinball']:.6f} |")
+    summary = result["early_stopping"]
+    overall = summary["overall"]
+    lines += ["", "## 조기 종료 진단", "",
+              "`best_iteration`은 holdout 최적 반복 수, `evaluated_rounds`는 실제 평가한 반복 수다. "
+              "`hit_max_rounds`는 실제 평가 회차가 상한에 도달했는지 나타낸다. "
+              "최적 회차가 상한보다 작아도 patience를 채우기 전에 상한에 도달할 수 있다.", "",
+              f"전체 후보 {overall['candidates']}개 중 {overall['hit_max_rounds']}개가 "
+              f"{result['model_settings']['max_rounds']}회 상한에 도달했다.", "",
+              "| 조건 | 분위수 | 후보 수 | 상한 도달 후보 수 |", "|---|---|---:|---:|"]
+    for condition, values in summary["by_condition_quantile"].items():
+        for label, value in values.items():
+            lines.append(f"| {condition} | {label} | {value['candidates']} | {value['hit_max_rounds']} |")
+    if overall["hit_max_rounds"]:
+        lines += ["", f"한계: {result['model_settings']['max_rounds']}회에서도 상한에 도달한 후보가 있어 "
+                  "조기 종료·충분한 학습을 확인하지 못했다. "
+                  "이 비교에서 상한·격자·learning_rate·patience를 추가 변경하지 않았다."]
+    else:
+        lines += ["", "모든 후보가 상한 전에 종료했다. 후보별 최적·실제 평가 회차는 JSON에 기록했다."]
+    comparison = result.get("comparison_300_rounds")
+    if comparison is not None:
+        lines += ["", "## #39의 300회 결과 대비 변화", "",
+                  f"기준은 #39 커밋 `{comparison['source_revision']}`의 `{comparison['source_path']}` 집계값이다. "
+                  f"기준 후보 {comparison['candidates']}개 중 최적 반복 수가 300인 후보는 "
+                  f"{comparison['best_iteration_at_max']}개다. 기준에는 실제 평가 회차가 없어 "
+                  "현재의 상한 도달 집계와 직접 동일시할 수 없다. 변화는 현재 − 300회 결과다.", "",
+                  "| 조건 | 분위수 | 이전→현재 반복 수 | 이전 holdout pinball | 현재 holdout pinball | 변화 | 설정 변경 |",
+                  "|---|---|---:|---:|---:|---:|---|"]
+        for condition, values in comparison["selection"].items():
+            for label, value in values.items():
+                old, current = value["previous"], value["current"]
+                changed = "있음" if old["settings"] != current["settings"] else "없음"
+                lines.append(f"| {condition} | {label} | {old['iterations']}→{current['iterations']} | "
+                             f"{old['holdout_pinball']:.6f} | {current['holdout_pinball']:.6f} | "
+                             f"{value['holdout_pinball_change']:.6f} | {changed} |")
+        lines += ["", "validation 전체의 mean pinball 차이와 95% CI. B−L 요청 가중만 주 판정이며 나머지는 보조다.", "",
+                  "| 비교 | 예측기 | 가중 | 이전 차이 | 이전 95% CI | 현재 차이 | 현재 95% CI | 차이의 변화 |",
+                  "|---|---|---|---:|---|---:|---|---:|"]
+        for name, predictors in comparison["overall_mean_pinball"].items():
+            for predictor, weightings in predictors.items():
+                for weighting, value in weightings.items():
+                    old_ci, ci = value["previous_ci95"], value["current_ci95"]
+                    lines.append(f"| {name} | {predictor} | {weighting} | {value['previous_difference']:.6f} | "
+                                 f"[{old_ci[0]:.6f}, {old_ci[1]:.6f}] | {value['current_difference']:.6f} | "
+                                 f"[{ci[0]:.6f}, {ci[1]:.6f}] | {value['change']:.6f} |")
     lines += ["", "## gain 중요도 상위 항목", "", "| 조건 | 분위수 | 특징 | gain | 조건·분위수 내 비중 |",
               "|---|---|---|---:|---:|"]
     for condition, importance in result["importance_gain"].items():
@@ -274,8 +388,11 @@ def _markdown(result):
     return "\n".join(lines) + "\n"
 
 
-def run(root=None, output=OUTPUT):
+def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
     started = perf_counter()
+    previous = (json.loads(subprocess.check_output(
+        ["git", "show", f"{previous_revision}:{PREVIOUS_PATH}"], text=True,
+        cwd=Path(__file__).resolve().parent)) if previous_revision is not None else None)
     paths = weeks(root)
     if len(paths) != 13 or any(p.name[:10] != (FIRST_WEEK + timedelta(weeks=i)).isoformat()
                              for i, p in enumerate(paths)):
@@ -340,7 +457,8 @@ def run(root=None, output=OUTPUT):
                            "vocabulary": "fit_target for selection, train_target for refit; unknown/missing -> NA",
                            "numeric_missing": "native LightGBM missing handling",
                            "crossing": "sort each row after original-scale inverse transform"},
-        "selection": models.selection, "importance_gain": models.importance,
+        "selection": models.selection, "early_stopping": round_summary(models.selection),
+        "importance_gain": models.importance,
         "crossing_rates": crossing, "metrics": metrics, "bootstrap": bootstrap,
         "primary": primary_result(metrics, bootstrap),
         "limitations": ["validation only; test unread", "gateway population and period only",
@@ -349,6 +467,10 @@ def run(root=None, output=OUTPUT):
         "timing_seconds": {"load_features_history": loaded - started, "selection_refit": trained - loaded,
                            "prediction_metrics": evaluated - trained, "bootstrap": finished - evaluated},
         "elapsed_seconds": finished - started}
+    if result["early_stopping"]["overall"]["hit_max_rounds"]:
+        result["limitations"].append(f"candidates hit {MAX_ROUNDS}-round cap; early stopping not confirmed for all candidates")
+    if previous is not None:
+        result["comparison_300_rounds"] = compare_previous(result, previous, previous_revision)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     (output / "models.json").write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
