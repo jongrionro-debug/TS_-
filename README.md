@@ -2,7 +2,7 @@
 
 시계열 데이터 분석 및 실습 과목 프로젝트(Group 5). FreeInference agentic trace에서 **LLM 요청이 시작될 때 그 요청의 completion 토큰 P10/P50/P90을 예측**하고, 세션 상태가 현재 요청 정보·직전 출력 lag 이상으로 기여하는지 검증한다. 요청별 예측은 10분 출력 토큰 수요 뷰로 모아 보인다.
 
-현재 상태: 1~13주 데이터 감사·10분 집계·EDA·A/L/B 특징과 고정 분할·기준선 4종 validation 평가·세션 bootstrap CI 구현. 현재 입력 기반 연결과 엄격 완료 시각 조건을 적용한다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
+현재 상태: 1~13주 데이터 감사·EDA·A/L/B 특징·기준선 4종과 LightGBM validation 비교·세션 bootstrap CI까지 구현·실행했다. [주 지표 B−L CI](freeinference/outputs/models/models.md)는 validation 개선을 보였으며 최종 test는 미실행이다. 현재 입력 기반 연결과 엄격 완료 시각 조건을 적용한다. 연구 정의·시점 계약·평가는 [docs/project.md](docs/project.md), 결정 이유는 [ADR 0005](docs/adr/0005-freeinference-agentic-trace.md).
 
 ```
 요청 i (세션 S, step k)      start_ms ──────────── end_ms
@@ -38,6 +38,16 @@ FREEINFERENCE_DATA_DIR=~/data/freeinference/bb26cf7 OPENBLAS_NUM_THREADS=1 ~/.ve
 ```
 
 [기준선 보고서](freeinference/outputs/baselines/baselines.md)와 [집계 JSON](freeinference/outputs/baselines/baselines.json)을 생성한다. 1~10주 train 정답의 종료 경계 마스크로 기준선 4종을 맞추고, 11~13주 validation의 요청·세션 가중 지표와 fixed 대비 세션 bootstrap 95% CI(B=2000, seed=20261109)를 기록한다. 분할·holdout·대체 규칙과 재사용 API는 [project.md 4·5절](docs/project.md)을 따른다. 명령·환경·소요 시간·소스 해시는 JSON에 기록한다. 요청별 값·식별자를 내보내지 않으며 test는 로더가 거부한다. 실제 데이터 평가는 아래 검증 명령에 포함하지 않는다.
+
+## A·L·B LightGBM validation 비교 재현
+
+`requirements.txt`의 `lightgbm==4.7.0`을 포함한 분석 의존성을 설치한다. 지정 Ubuntu venv에서도 같은 버전을 확인했다. 준비된 1~13주 데이터로 실행한다.
+
+```sh
+FREEINFERENCE_DATA_DIR=~/data/freeinference/bb26cf7 OPENBLAS_NUM_THREADS=1 ~/.venvs/ts-freeinference/bin/python -m freeinference.models
+```
+
+[모델 보고서](freeinference/outputs/models/models.md)와 [집계 JSON](freeinference/outputs/models/models.json)에 기준선 4종·A/L/B의 validation 지표, 주 비교 B−L 및 보조 비교의 세션 bootstrap 95% CI, 선택 설정·반복 수·중요도·교차 비율·실행 환경을 기록한다. 각 분위수는 동일한 고정 격자의 원척도·`log1p` 후보를 1~9주 fit/10주 holdout의 원척도 pinball로 선택하고 1~10주 train_target으로 재학습한다. validation 정답은 선택에 쓰지 않는다. 주 판정은 요청 가중 mean pinball B−L CI 상한 < 0일 때 validation 개선이며, test 결론으로 확대하지 않는다. 범주·결측·분할 계약은 [project.md 4·5절](docs/project.md)을 따른다. 요청별 값·식별자는 저장하지 않으며, 실데이터 실행은 아래 검증에 포함하지 않는다.
 
 ## 검증
 
