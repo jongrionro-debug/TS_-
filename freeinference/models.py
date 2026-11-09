@@ -16,7 +16,7 @@ import pyarrow
 
 from .baselines import Baselines, PREDICTION_COLUMNS, QUANTILES, build_history
 from .evaluate import (BOOTSTRAP_B, BOOTSTRAP_SEED, METRICS, _set_counts,
-                       evaluate_predictions, paired_bootstrap)
+                       evaluate_predictions, paired_bootstrap, _losses)
 from .features import (C_EXTRA, FEATURE_SETS, REQUEST_COLUMNS, SESSION_COLUMNS as FEATURE_SESSION_COLUMNS,
                        build_cross_session_features, build_features)
 from .loader import FIRST_WEEK, REVISION, data_dir, load_table, weeks
@@ -210,6 +210,80 @@ def comparisons(rows, predictions):
                 ("conditions_minus_previous_completion", "previous_completion", ("A", "L", "B", "C")))}
 
 
+COMPARISONS = (("B_minus_L", "B", "L"), ("L_minus_A", "L", "A"),
+               ("C_minus_B", "C", "B"), ("C_minus_L", "C", "L"))
+
+
+def account_subsets(rows, masks):
+    """Membership and ranks depend only on train membership and validation counts."""
+    if rows.account.isna().any():
+        raise ValueError("Account keys must be non-null")
+    validation = rows.loc[masks.validation]
+    seen = validation.account.isin(rows.loc[masks.train, "account"])
+    # Stable first-occurrence tie break uses neither targets nor predictions.
+    counts = validation.account.value_counts(sort=False).sort_values(ascending=False, kind="stable")
+    return {"train_seen": seen, "new_account": ~seen,
+            "exclude_top_1": ~validation.account.isin(counts.index[:1]),
+            "exclude_top_5": ~validation.account.isin(counts.index[:5])}
+
+
+def account_mean_pinball(rows, predictions):
+    counts = rows.groupby("account", sort=False).account.transform("size").to_numpy()
+    return {name: float(np.average(_losses(rows.completion_tokens.to_numpy(dtype=float), frame)[:, 3],
+                                   weights=1 / counts)) for name, frame in predictions.items()}
+
+
+def robustness_results(rows, masks, predictions, session_bootstrap):
+    validation = rows.loc[masks.validation].copy()
+    validation["utc_day"] = pd.to_datetime(validation.start_ms, unit="ms", utc=True).dt.floor("D")
+    subsets = account_subsets(rows, masks)
+    def calculate(frame, frames, clusters):
+        return {name: paired_bootstrap(frame, {reference: frames[reference], target: frames[target]},
+                                       reference=reference, cluster_columns=(clusters,),
+                                       B=BOOTSTRAP_B, seed=BOOTSTRAP_SEED)
+                for name, target, reference in COMPARISONS}
+    account = calculate(validation, predictions, "account")
+    day = calculate(validation, predictions, "utc_day")
+    scores = evaluate_predictions(validation, predictions)["overall"]["metrics"]
+    result = {"definition": "UTC start day; account and session weights are inverse group row counts; no refitting",
+              "account_mean_pinball": account_mean_pinball(validation, predictions),
+              "comparisons": {}, "subsets": {}}
+    for name, target, reference in COMPARISONS:
+        entry = {"difference": {w: scores[target][w]["mean_pinball"] - scores[reference][w]["mean_pinball"]
+                                for w in ("request", "session")}, "clusters": {}}
+        for label, source in (("session", session_bootstrap), ("account", account), ("utc_day", day)):
+            data = source[name]
+            group = data["groups"]["overall"]
+            entry["clusters"][label] = {"count": data["clusters"], "valid_replicates": group["valid_replicates"],
+                "ci95": {w: group["differences"][target][w]["mean_pinball"] for w in ("request", "session")}}
+        entry["interpretation"] = ("군집 방식에 견고" if all(v["ci95"]["request"][1] < 0
+                                     for v in entry["clusters"].values()) else "군집 방식에 따라 차이 미확인")
+        result["comparisons"][name] = entry
+    for label, mask in subsets.items():
+        frame = validation.loc[mask]
+        if frame.empty:
+            result["subsets"][label] = {"rows": 0, "excluded_row_fraction": 1.0, "comparisons": {}}
+            continue
+        frames = {name: pred.loc[mask] for name, pred in predictions.items()}
+        metrics = evaluate_predictions(frame, frames)["overall"]
+        boots = calculate(frame, frames, "account")
+        comparisons = {}
+        for name, target, reference in COMPARISONS:
+            boot = boots[name]
+            group = boot["groups"]["overall"]
+            diff = {w: metrics["metrics"][target][w]["mean_pinball"] - metrics["metrics"][reference][w]["mean_pinball"]
+                    for w in ("request", "session")}
+            overall = result["comparisons"][name]["difference"]["request"]
+            comparisons[name] = {"difference": diff, "sign_changed": bool(np.sign(diff["request"]) != np.sign(overall)),
+                                 "clusters": boot["clusters"], "valid_replicates": group["valid_replicates"],
+                                 "all_metrics_ci95": group["differences"][target],
+                                 "ci95": {w: group["differences"][target][w]["mean_pinball"] for w in ("request", "session")}}
+        result["subsets"][label] = {"rows": len(frame), "excluded_row_fraction": float(1 - len(frame) / len(validation)),
+                                    "metrics": metrics, "account_mean_pinball": account_mean_pinball(frame, frames),
+                                    "comparisons": comparisons}
+    return result
+
+
 def primary_result(metrics, bootstrap):
     scores = metrics["overall"]["metrics"]
     intervals = bootstrap["B_minus_L"]["groups"]["overall"]["differences"]["B"]
@@ -340,8 +414,7 @@ def _markdown(result):
              f"- validation 정렬 전 교차 행 비율: `{json.dumps(result['crossing_rates'])}`",
              f"- bootstrap: (week, session_id) 세션 군집, B={BOOTSTRAP_B}, seed={BOOTSTRAP_SEED}, "
              "짝지은 95% 백분위 CI. 같은 추출을 비교·구간·가중에 공유하며 재학습하지 않는다.",
-             "- 한계: 무료 gateway의 특정 계정·기간·모델 구성에 한정한다. 계정·일 군집, 분포 이동·계정 분리 "
-             "민감도는 미검증이며 CI는 학습·선택 불확실성을 포함하지 않는다. test(14~16주)는 읽지 않았다.",
+             "- 한계: 무료 gateway의 특정 계정·기간·모델 구성에 한정한다. 일 블록은 21개이며 CI는 학습·선택 불확실성을 포함하지 않는다. test(14~16주)는 읽지 않았다.",
              "- 요청별 값·식별자는 저장하지 않는다. 전체 설정·소스 해시·지표·CI·gain: [models.json](models.json)",
              "", "## holdout 선택", "", "| 조건 | 분위수 | 설정 | 반복 수 | 원척도 holdout pinball |",
              "|---|---|---|---:|---:|"]
@@ -362,6 +435,25 @@ def _markdown(result):
                          f"조건별 동일 여부: `{json.dumps(regression['conditions'])}`. "
                          f"B−L CI 동일: `{regression['B_minus_L_bootstrap_equal']}`, "
                          f"주 판정 전체 동일: `{regression['primary_equal']}`."]
+    robust = result["robustness"]
+    supplemental += ["", "## 군집·계정 민감도", "", "요청 시작 UTC 날짜의 겹치지 않는 일 블록; 재학습 없음. 계정 가중은 각 계정의 행 수 역수다.", "",
+                     "| 비교 | 가중 | 차이 | 세션 CI (군집/유효) | 계정 CI (군집/유효) | 일 CI (군집/유효) | 판정 |",
+                     "|---|---|---:|---|---|---|---|"]
+    for name, entry in robust["comparisons"].items():
+        for weight in ("request", "session"):
+            cells = [f"{v['ci95'][weight]} ({v['count']}/{v['valid_replicates']})" for v in entry["clusters"].values()]
+            supplemental.append(f"| {name} | {weight} | {entry['difference'][weight]:.6f} | " + " | ".join(cells) + f" | {entry['interpretation']} |")
+    supplemental += ["", f"전체 계정 가중 mean pinball: `{json.dumps(robust['account_mean_pinball'])}`", "",
+                     "| 하위 집단 | 행 | 제외 행 비율 | 비교 | 요청·세션 가중 차이 | 계정 CI 요청·세션 (군집/유효) | 요청 차이 부호 변화 |",
+                     "|---|---:|---:|---|---|---|---|"]
+    for label, subset in robust["subsets"].items():
+        for name, entry in subset["comparisons"].items():
+            supplemental.append(f"| {label} | {subset['rows']} | {subset['excluded_row_fraction']:.6f} | {name} | {entry['difference']} | {entry['ci95']} ({entry['clusters']}/{entry['valid_replicates']}) | {entry['sign_changed']} |")
+    for label, subset in robust["subsets"].items():
+        if subset["rows"]:
+            supplemental.append(f"\n{label} 계정 가중 mean pinball: `{json.dumps(subset['account_mean_pinball'])}`\n")
+    if "regression_43" in result:
+        supplemental += ["", f"#43 회귀 비교: `{json.dumps(result['regression_43'])}`"]
     # Place supplementary findings before the holdout selection table.
     table_start = lines.index("## holdout 선택") - 1
     lines[table_start:table_start] = supplemental + [""]
@@ -476,7 +568,12 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION,
         print(f"week {number}: {len(rows):,} rows; features/history built", flush=True)
     rows = pd.concat(weekly, ignore_index=True)
     history = pd.concat(histories, ignore_index=True)
-    cross = build_cross_session_features(rows, pd.concat(session_frames, ignore_index=True))
+    session_metadata = pd.concat(session_frames, ignore_index=True)
+    account_keys = rows[["week", "session_id"]].merge(
+        session_metadata[["week", "session_id", "user_id"]], on=["week", "session_id"],
+        how="left", sort=False, validate="many_to_one")
+    rows["account"] = account_keys.user_id.to_numpy()
+    cross = build_cross_session_features(rows, session_metadata)
     cross_summary = {"diagnostics": cross.attrs["diagnostics"],
                      "missing_rate": {k: float(v) for k, v in cross.isna().mean().items()},
                      "weeks_missing_rate": {
@@ -500,6 +597,7 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION,
     evaluated = perf_counter()
     print("validation metrics ready; paired session bootstrap comparisons", flush=True)
     bootstrap = comparisons(validation, predictions)
+    robustness = robustness_results(rows, masks, predictions, bootstrap)
     finished = perf_counter()
     result = {
         "revision": REVISION,
@@ -532,9 +630,9 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION,
         "importance_gain": models.importance,
         "crossing_rates": crossing, "metrics": metrics, "bootstrap": bootstrap,
         "primary": primary_result(metrics, bootstrap),
-        "supplementary": supplementary_results(metrics, bootstrap),
+        "supplementary": supplementary_results(metrics, bootstrap), "robustness": robustness,
         "limitations": ["validation only; test unread", "gateway population and period only",
-                        "no account/day clustering or account-disjoint sensitivity",
+                        "day bootstrap has only 21 blocks; account subgroups are observational",
                         "bootstrap does not include refitting or model-selection uncertainty"],
         "timing_seconds": {"load_features_history": loaded - started, "selection_refit": trained - loaded,
                            "prediction_metrics": evaluated - trained, "bootstrap": finished - evaluated},
@@ -543,6 +641,14 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION,
         result["limitations"].append(f"candidates hit {MAX_ROUNDS}-round cap; early stopping not confirmed for all candidates")
     if previous is not None:
         result["comparison_300_rounds"] = compare_previous(result, previous, previous_revision)
+    reference_43 = json.loads(subprocess.check_output(
+        ["git", "show", f"HEAD:{PREVIOUS_PATH}"], text=True)) if previous_revision is not None else None
+    if reference_43 is not None:
+        result["regression_43"] = {
+            "selection_equal": {name: result["selection"][name] == reference_43["selection"][name] for name in ("A", "L", "B", "C")},
+            "metrics_equal": result["metrics"] == reference_43["metrics"],
+            "session_bootstrap_equal": result["bootstrap"] == reference_43["bootstrap"],
+            "primary_equal": result["primary"] == reference_43["primary"]}
     if regression is not None:
         result["regression_41"] = regression_previous(result, regression, regression_revision)
     output = Path(output)
