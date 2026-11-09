@@ -1,11 +1,148 @@
 {
   "revision": "bb26cf72c9c20f2b05f765d88548156a74d3c253",
   "scope": "weeks 1–13 only; no split, training or evaluation",
-  "command": "/Users/nojonghyeon/.venvs/ts-freeinference/bin/python -m freeinference.features",
+  "command": "FREEINFERENCE_DATA_DIR=\"$FREEINFERENCE_DATA_DIR\" OPENBLAS_NUM_THREADS=1 /home/jongr/.venvs/ts-freeinference/bin/python3 -m freeinference.features",
+  "source_sha256": "772bb67186729d5570ee17ad3340ccaee2fdffbcbf6718b1504129a4bb87ac53",
+  "cross_session": {
+    "window_ms": 600000,
+    "observation_start_ms": 1778976000000,
+    "generation_seconds": 8.247985420006444,
+    "diagnostics": {
+      "definition": "direct same-account parent/child within public week; exposures sum histories over query rows",
+      "overall": {
+        "rows": 727503,
+        "missing_end_requests": 0,
+        "inflight_excluded_unknown_end_mean": 0.0,
+        "inflight_excluded_unknown_end_max": 0,
+        "account_history_request_exposures": 8593529928.0,
+        "linked_parent_child_request_exposures": 3993121.0,
+        "linked_parent_child_fraction": 0.0004646659793421272
+      },
+      "weeks": {
+        "1": {
+          "rows": 10738,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 11878268.0,
+          "linked_parent_child_request_exposures": 18867.0,
+          "linked_parent_child_fraction": 0.0015883628825347264
+        },
+        "2": {
+          "rows": 12827,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 29646000.0,
+          "linked_parent_child_request_exposures": 33008.0,
+          "linked_parent_child_fraction": 0.0011134048438237874
+        },
+        "3": {
+          "rows": 7324,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 21729357.0,
+          "linked_parent_child_request_exposures": 19688.0,
+          "linked_parent_child_fraction": 0.0009060553425487924
+        },
+        "4": {
+          "rows": 6859,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 35678018.0,
+          "linked_parent_child_request_exposures": 0.0,
+          "linked_parent_child_fraction": 0.0
+        },
+        "5": {
+          "rows": 35659,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 148287813.0,
+          "linked_parent_child_request_exposures": 8621.0,
+          "linked_parent_child_fraction": 5.813694211000333e-05
+        },
+        "6": {
+          "rows": 56310,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 518619430.0,
+          "linked_parent_child_request_exposures": 57433.0,
+          "linked_parent_child_fraction": 0.0001107420907851447
+        },
+        "7": {
+          "rows": 50615,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 317893111.0,
+          "linked_parent_child_request_exposures": 371558.0,
+          "linked_parent_child_fraction": 0.0011688142559339702
+        },
+        "8": {
+          "rows": 68302,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 478961686.0,
+          "linked_parent_child_request_exposures": 544423.0,
+          "linked_parent_child_fraction": 0.001136673383098121
+        },
+        "9": {
+          "rows": 72025,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 573199447.0,
+          "linked_parent_child_request_exposures": 992723.0,
+          "linked_parent_child_fraction": 0.0017318980421137775
+        },
+        "10": {
+          "rows": 78804,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 881915657.0,
+          "linked_parent_child_request_exposures": 402379.0,
+          "linked_parent_child_fraction": 0.00045625564849224577
+        },
+        "11": {
+          "rows": 84524,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 1113718325.0,
+          "linked_parent_child_request_exposures": 617726.0,
+          "linked_parent_child_fraction": 0.0005546519134449907
+        },
+        "12": {
+          "rows": 79546,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 1353464513.0,
+          "linked_parent_child_request_exposures": 297639.0,
+          "linked_parent_child_fraction": 0.00021990897961578104
+        },
+        "13": {
+          "rows": 163970,
+          "missing_end_requests": 0,
+          "inflight_excluded_unknown_end_mean": 0.0,
+          "inflight_excluded_unknown_end_max": 0,
+          "account_history_request_exposures": 3108538303.0,
+          "linked_parent_child_request_exposures": 629056.0,
+          "linked_parent_child_fraction": 0.00020236392113711716
+        }
+      }
+    }
+  },
   "environment": {
-    "python": "3.14.5",
+    "python": "3.14.4",
     "pandas": "3.1.1",
-    "platform": "macOS-26.3-arm64-arm-64bit-Mach-O"
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
   },
   "feature_sets": {
     "A": [
@@ -103,14 +240,82 @@
       "previous_tool_outcome_missing",
       "session_elapsed_ms",
       "previous_end_gap_ms"
+    ],
+    "C": [
+      "prompt_tokens",
+      "cache_read_tokens",
+      "n_messages",
+      "model",
+      "provider",
+      "stream",
+      "harness",
+      "step_trigger",
+      "waited_for",
+      "transition",
+      "role_tokens_system",
+      "role_tokens_user",
+      "role_tokens_assistant",
+      "role_tokens_tool",
+      "role_tokens_tool_definitions",
+      "tool_definition_count",
+      "completion_lag_1",
+      "step",
+      "turn_index",
+      "turn_step",
+      "completion_lag_2",
+      "completion_lag_3",
+      "prompt_lag_1",
+      "prompt_lag_2",
+      "prompt_lag_3",
+      "completion_ewma",
+      "prompt_ewma",
+      "completion_diff",
+      "prompt_diff",
+      "previous_finish_reason",
+      "previous_tool_call_count",
+      "previous_tool_result_tokens",
+      "previous_tool_category_Read",
+      "previous_tool_category_Other",
+      "previous_tool_category_*Network",
+      "previous_tool_category_*Interpreter",
+      "previous_tool_category_*File Ops",
+      "previous_tool_category_*Search",
+      "previous_tool_category_*Wait/Poll",
+      "previous_tool_category_Edit",
+      "previous_tool_category_Write",
+      "previous_tool_category_Browser",
+      "previous_tool_category_*Git/VCS",
+      "previous_tool_category_*Build/Test",
+      "previous_tool_category_*Packages",
+      "previous_tool_category_MCP",
+      "previous_tool_category_Ask User",
+      "previous_tool_category_Subagent",
+      "previous_tool_category_other/missing",
+      "previous_tool_outcome_ok",
+      "previous_tool_outcome_error",
+      "previous_tool_outcome_timeout",
+      "previous_tool_outcome_denied",
+      "previous_tool_outcome_other",
+      "previous_tool_outcome_missing",
+      "session_elapsed_ms",
+      "previous_end_gap_ms",
+      "account_prev_completed_requests",
+      "account_prev_sessions",
+      "account_completion_mean",
+      "account_completion_last",
+      "account_last_end_gap_ms",
+      "gateway_inflight_requests",
+      "gateway_recent_sessions_10m",
+      "gateway_completion_10m",
+      "gateway_completed_requests_10m"
     ]
   },
   "lag_count": 3,
   "ewma_alpha": 0.5,
   "ewma_window": "up to 3 completed requests, end order, adjust=False",
   "rows": 727503,
-  "elapsed_seconds": 156.74785983300535,
-  "generation_seconds": 155.5342398751236,
+  "elapsed_seconds": 585.471230072988,
+  "generation_seconds": 582.868061575995,
   "missing_count": {
     "prompt_tokens": 0,
     "cache_read_tokens": 45090,
@@ -168,7 +373,16 @@
     "previous_tool_outcome_other": 8888,
     "previous_tool_outcome_missing": 8888,
     "session_elapsed_ms": 8888,
-    "previous_end_gap_ms": 8888
+    "previous_end_gap_ms": 8888,
+    "account_prev_completed_requests": 0,
+    "account_prev_sessions": 0,
+    "account_completion_mean": 10113,
+    "account_completion_last": 10113,
+    "account_last_end_gap_ms": 10113,
+    "gateway_inflight_requests": 0,
+    "gateway_recent_sessions_10m": 0,
+    "gateway_completion_10m": 0,
+    "gateway_completed_requests_10m": 0
   },
   "missing_rate": {
     "prompt_tokens": 0.0,
@@ -227,14 +441,23 @@
     "previous_tool_outcome_other": 0.012217131750659447,
     "previous_tool_outcome_missing": 0.012217131750659447,
     "session_elapsed_ms": 0.012217131750659447,
-    "previous_end_gap_ms": 0.012217131750659447
+    "previous_end_gap_ms": 0.012217131750659447,
+    "account_prev_completed_requests": 0.0,
+    "account_prev_sessions": 0.0,
+    "account_completion_mean": 0.01390097360423256,
+    "account_completion_last": 0.01390097360423256,
+    "account_last_end_gap_ms": 0.01390097360423256,
+    "gateway_inflight_requests": 0.0,
+    "gateway_recent_sessions_10m": 0.0,
+    "gateway_completion_10m": 0.0,
+    "gateway_completed_requests_10m": 0.0
   },
   "weeks": [
     {
       "week": "2026-05-17_2026-05-23",
       "rows": 10738,
-      "load_seconds": 0.06718812498729676,
-      "generation_seconds": 2.187433625018457,
+      "load_seconds": 0.07764519899501465,
+      "generation_seconds": 8.451674915995682,
       "history_available_rows": 10613,
       "missing_count": {
         "prompt_tokens": 0,
@@ -293,7 +516,16 @@
         "previous_tool_outcome_other": 125,
         "previous_tool_outcome_missing": 125,
         "session_elapsed_ms": 125,
-        "previous_end_gap_ms": 125
+        "previous_end_gap_ms": 125,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 292,
+        "account_completion_last": 292,
+        "account_last_end_gap_ms": 292,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -352,14 +584,23 @@
         "previous_tool_outcome_other": 0.011640901471409946,
         "previous_tool_outcome_missing": 0.011640901471409946,
         "session_elapsed_ms": 0.011640901471409946,
-        "previous_end_gap_ms": 0.011640901471409946
+        "previous_end_gap_ms": 0.011640901471409946,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.027193145837213634,
+        "account_completion_last": 0.027193145837213634,
+        "account_last_end_gap_ms": 0.027193145837213634,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-05-24_2026-05-30",
       "rows": 12827,
-      "load_seconds": 0.02892204199451953,
-      "generation_seconds": 2.5711803330050316,
+      "load_seconds": 0.08379629800037947,
+      "generation_seconds": 9.882559292993392,
       "history_available_rows": 12657,
       "missing_count": {
         "prompt_tokens": 0,
@@ -418,7 +659,16 @@
         "previous_tool_outcome_other": 170,
         "previous_tool_outcome_missing": 170,
         "session_elapsed_ms": 170,
-        "previous_end_gap_ms": 170
+        "previous_end_gap_ms": 170,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 73,
+        "account_completion_last": 73,
+        "account_last_end_gap_ms": 73,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -477,14 +727,23 @@
         "previous_tool_outcome_other": 0.01325329383332034,
         "previous_tool_outcome_missing": 0.01325329383332034,
         "session_elapsed_ms": 0.01325329383332034,
-        "previous_end_gap_ms": 0.01325329383332034
+        "previous_end_gap_ms": 0.01325329383332034,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.005691120293131675,
+        "account_completion_last": 0.005691120293131675,
+        "account_last_end_gap_ms": 0.005691120293131675,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-05-31_2026-06-06",
       "rows": 7324,
-      "load_seconds": 0.023472458007745445,
-      "generation_seconds": 1.5051428330189083,
+      "load_seconds": 0.06606089799606707,
+      "generation_seconds": 5.637438969002687,
       "history_available_rows": 7248,
       "missing_count": {
         "prompt_tokens": 0,
@@ -543,7 +802,16 @@
         "previous_tool_outcome_other": 76,
         "previous_tool_outcome_missing": 76,
         "session_elapsed_ms": 76,
-        "previous_end_gap_ms": 76
+        "previous_end_gap_ms": 76,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 254,
+        "account_completion_last": 254,
+        "account_last_end_gap_ms": 254,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -602,14 +870,23 @@
         "previous_tool_outcome_other": 0.010376843255051884,
         "previous_tool_outcome_missing": 0.010376843255051884,
         "session_elapsed_ms": 0.010376843255051884,
-        "previous_end_gap_ms": 0.010376843255051884
+        "previous_end_gap_ms": 0.010376843255051884,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.0346805024576734,
+        "account_completion_last": 0.0346805024576734,
+        "account_last_end_gap_ms": 0.0346805024576734,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-06-07_2026-06-13",
       "rows": 6859,
-      "load_seconds": 0.024705792020540684,
-      "generation_seconds": 1.393172832991695,
+      "load_seconds": 0.0718749000079697,
+      "generation_seconds": 5.312709252000786,
       "history_available_rows": 6779,
       "missing_count": {
         "prompt_tokens": 0,
@@ -668,7 +945,16 @@
         "previous_tool_outcome_other": 80,
         "previous_tool_outcome_missing": 80,
         "session_elapsed_ms": 80,
-        "previous_end_gap_ms": 80
+        "previous_end_gap_ms": 80,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 0,
+        "account_completion_last": 0,
+        "account_last_end_gap_ms": 0,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -727,14 +1013,23 @@
         "previous_tool_outcome_other": 0.011663507799970841,
         "previous_tool_outcome_missing": 0.011663507799970841,
         "session_elapsed_ms": 0.011663507799970841,
-        "previous_end_gap_ms": 0.011663507799970841
+        "previous_end_gap_ms": 0.011663507799970841,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.0,
+        "account_completion_last": 0.0,
+        "account_last_end_gap_ms": 0.0,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-06-14_2026-06-20",
       "rows": 35659,
-      "load_seconds": 0.046179625001968816,
-      "generation_seconds": 7.89979300001869,
+      "load_seconds": 0.11662819900084287,
+      "generation_seconds": 28.546375366990105,
       "history_available_rows": 35180,
       "missing_count": {
         "prompt_tokens": 0,
@@ -793,7 +1088,16 @@
         "previous_tool_outcome_other": 479,
         "previous_tool_outcome_missing": 479,
         "session_elapsed_ms": 479,
-        "previous_end_gap_ms": 479
+        "previous_end_gap_ms": 479,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 946,
+        "account_completion_last": 946,
+        "account_last_end_gap_ms": 946,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -852,14 +1156,23 @@
         "previous_tool_outcome_other": 0.01343279396505791,
         "previous_tool_outcome_missing": 0.01343279396505791,
         "session_elapsed_ms": 0.01343279396505791,
-        "previous_end_gap_ms": 0.01343279396505791
+        "previous_end_gap_ms": 0.01343279396505791,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.02652906699570936,
+        "account_completion_last": 0.02652906699570936,
+        "account_last_end_gap_ms": 0.02652906699570936,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-06-21_2026-06-27",
       "rows": 56310,
-      "load_seconds": 0.07539804201223888,
-      "generation_seconds": 12.037912458006758,
+      "load_seconds": 0.17319699699874036,
+      "generation_seconds": 45.7139146260015,
       "history_available_rows": 55593,
       "missing_count": {
         "prompt_tokens": 0,
@@ -918,7 +1231,16 @@
         "previous_tool_outcome_other": 717,
         "previous_tool_outcome_missing": 717,
         "session_elapsed_ms": 717,
-        "previous_end_gap_ms": 717
+        "previous_end_gap_ms": 717,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 1552,
+        "account_completion_last": 1552,
+        "account_last_end_gap_ms": 1552,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -977,14 +1299,23 @@
         "previous_tool_outcome_other": 0.012733084709643048,
         "previous_tool_outcome_missing": 0.012733084709643048,
         "session_elapsed_ms": 0.012733084709643048,
-        "previous_end_gap_ms": 0.012733084709643048
+        "previous_end_gap_ms": 0.012733084709643048,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.027561711951695968,
+        "account_completion_last": 0.027561711951695968,
+        "account_last_end_gap_ms": 0.027561711951695968,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-06-28_2026-07-04",
       "rows": 50615,
-      "load_seconds": 0.06598979199770838,
-      "generation_seconds": 10.771748291997937,
+      "load_seconds": 0.1795027000043774,
+      "generation_seconds": 40.338084809001884,
       "history_available_rows": 49987,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1043,7 +1374,16 @@
         "previous_tool_outcome_other": 628,
         "previous_tool_outcome_missing": 628,
         "session_elapsed_ms": 628,
-        "previous_end_gap_ms": 628
+        "previous_end_gap_ms": 628,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 973,
+        "account_completion_last": 973,
+        "account_last_end_gap_ms": 973,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1102,14 +1442,23 @@
         "previous_tool_outcome_other": 0.012407389113899043,
         "previous_tool_outcome_missing": 0.012407389113899043,
         "session_elapsed_ms": 0.012407389113899043,
-        "previous_end_gap_ms": 0.012407389113899043
+        "previous_end_gap_ms": 0.012407389113899043,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.019223550330929567,
+        "account_completion_last": 0.019223550330929567,
+        "account_last_end_gap_ms": 0.019223550330929567,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-07-05_2026-07-11",
       "rows": 68302,
-      "load_seconds": 0.081450749974465,
-      "generation_seconds": 14.785178750025807,
+      "load_seconds": 0.197163302989793,
+      "generation_seconds": 55.19301305200497,
       "history_available_rows": 67323,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1168,7 +1517,16 @@
         "previous_tool_outcome_other": 979,
         "previous_tool_outcome_missing": 979,
         "session_elapsed_ms": 979,
-        "previous_end_gap_ms": 979
+        "previous_end_gap_ms": 979,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 732,
+        "account_completion_last": 732,
+        "account_last_end_gap_ms": 732,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1227,14 +1585,23 @@
         "previous_tool_outcome_other": 0.01433340165734532,
         "previous_tool_outcome_missing": 0.01433340165734532,
         "session_elapsed_ms": 0.01433340165734532,
-        "previous_end_gap_ms": 0.01433340165734532
+        "previous_end_gap_ms": 0.01433340165734532,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.010717109308658605,
+        "account_completion_last": 0.010717109308658605,
+        "account_last_end_gap_ms": 0.010717109308658605,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-07-12_2026-07-18",
       "rows": 72025,
-      "load_seconds": 0.09269087499706075,
-      "generation_seconds": 15.316546334011946,
+      "load_seconds": 0.23719620499468874,
+      "generation_seconds": 56.11135108101007,
       "history_available_rows": 71054,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1293,7 +1660,16 @@
         "previous_tool_outcome_other": 971,
         "previous_tool_outcome_missing": 971,
         "session_elapsed_ms": 971,
-        "previous_end_gap_ms": 971
+        "previous_end_gap_ms": 971,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 519,
+        "account_completion_last": 519,
+        "account_last_end_gap_ms": 519,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1352,14 +1728,23 @@
         "previous_tool_outcome_other": 0.01348143005900729,
         "previous_tool_outcome_missing": 0.01348143005900729,
         "session_elapsed_ms": 0.01348143005900729,
-        "previous_end_gap_ms": 0.01348143005900729
+        "previous_end_gap_ms": 0.01348143005900729,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.007205831308573412,
+        "account_completion_last": 0.007205831308573412,
+        "account_last_end_gap_ms": 0.007205831308573412,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-07-19_2026-07-25",
       "rows": 78804,
-      "load_seconds": 0.16475950001040474,
-      "generation_seconds": 16.797629083011998,
+      "load_seconds": 0.29788540900335647,
+      "generation_seconds": 61.11344847799046,
       "history_available_rows": 77872,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1418,7 +1803,16 @@
         "previous_tool_outcome_other": 932,
         "previous_tool_outcome_missing": 932,
         "session_elapsed_ms": 932,
-        "previous_end_gap_ms": 932
+        "previous_end_gap_ms": 932,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 990,
+        "account_completion_last": 990,
+        "account_last_end_gap_ms": 990,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1477,14 +1871,23 @@
         "previous_tool_outcome_other": 0.011826810821785697,
         "previous_tool_outcome_missing": 0.011826810821785697,
         "session_elapsed_ms": 0.011826810821785697,
-        "previous_end_gap_ms": 0.011826810821785697
+        "previous_end_gap_ms": 0.011826810821785697,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.01256281407035176,
+        "account_completion_last": 0.01256281407035176,
+        "account_last_end_gap_ms": 0.01256281407035176,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-07-26_2026-08-01",
       "rows": 84524,
-      "load_seconds": 0.1264568749757018,
-      "generation_seconds": 17.84946141700493,
+      "load_seconds": 0.254835591011215,
+      "generation_seconds": 66.36611611199623,
       "history_available_rows": 83326,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1543,7 +1946,16 @@
         "previous_tool_outcome_other": 1198,
         "previous_tool_outcome_missing": 1198,
         "session_elapsed_ms": 1198,
-        "previous_end_gap_ms": 1198
+        "previous_end_gap_ms": 1198,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 982,
+        "account_completion_last": 982,
+        "account_last_end_gap_ms": 982,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1602,14 +2014,23 @@
         "previous_tool_outcome_other": 0.01417348918650324,
         "previous_tool_outcome_missing": 0.01417348918650324,
         "session_elapsed_ms": 0.01417348918650324,
-        "previous_end_gap_ms": 0.01417348918650324
+        "previous_end_gap_ms": 0.01417348918650324,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.011618001987601155,
+        "account_completion_last": 0.011618001987601155,
+        "account_last_end_gap_ms": 0.011618001987601155,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-08-02_2026-08-08",
       "rows": 79546,
-      "load_seconds": 0.10504016699269414,
-      "generation_seconds": 17.12581495800987,
+      "load_seconds": 0.24629249999998137,
+      "generation_seconds": 62.682770333994995,
       "history_available_rows": 78572,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1668,7 +2089,16 @@
         "previous_tool_outcome_other": 974,
         "previous_tool_outcome_missing": 974,
         "session_elapsed_ms": 974,
-        "previous_end_gap_ms": 974
+        "previous_end_gap_ms": 974,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 1233,
+        "account_completion_last": 1233,
+        "account_last_end_gap_ms": 1233,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1727,14 +2157,23 @@
         "previous_tool_outcome_other": 0.012244487466371658,
         "previous_tool_outcome_missing": 0.012244487466371658,
         "session_elapsed_ms": 0.012244487466371658,
-        "previous_end_gap_ms": 0.012244487466371658
+        "previous_end_gap_ms": 0.012244487466371658,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.015500465139667614,
+        "account_completion_last": 0.015500465139667614,
+        "account_last_end_gap_ms": 0.015500465139667614,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     },
     {
       "week": "2026-08-09_2026-08-15",
       "rows": 163970,
-      "load_seconds": 0.2315104579902254,
-      "generation_seconds": 35.293225959001575,
+      "load_seconds": 0.5078131979971658,
+      "generation_seconds": 129.27061986700573,
       "history_available_rows": 162411,
       "missing_count": {
         "prompt_tokens": 0,
@@ -1793,7 +2232,16 @@
         "previous_tool_outcome_other": 1559,
         "previous_tool_outcome_missing": 1559,
         "session_elapsed_ms": 1559,
-        "previous_end_gap_ms": 1559
+        "previous_end_gap_ms": 1559,
+        "account_prev_completed_requests": 0,
+        "account_prev_sessions": 0,
+        "account_completion_mean": 1567,
+        "account_completion_last": 1567,
+        "account_last_end_gap_ms": 1567,
+        "gateway_inflight_requests": 0,
+        "gateway_recent_sessions_10m": 0,
+        "gateway_completion_10m": 0,
+        "gateway_completed_requests_10m": 0
       },
       "missing_rate": {
         "prompt_tokens": 0.0,
@@ -1852,7 +2300,16 @@
         "previous_tool_outcome_other": 0.009507836799414526,
         "previous_tool_outcome_missing": 0.009507836799414526,
         "session_elapsed_ms": 0.009507836799414526,
-        "previous_end_gap_ms": 0.009507836799414526
+        "previous_end_gap_ms": 0.009507836799414526,
+        "account_prev_completed_requests": 0.0,
+        "account_prev_sessions": 0.0,
+        "account_completion_mean": 0.009556626212111972,
+        "account_completion_last": 0.009556626212111972,
+        "account_last_end_gap_ms": 0.009556626212111972,
+        "gateway_inflight_requests": 0.0,
+        "gateway_recent_sessions_10m": 0.0,
+        "gateway_completion_10m": 0.0,
+        "gateway_completed_requests_10m": 0.0
       }
     }
   ]

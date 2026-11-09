@@ -1,13 +1,15 @@
-"""Prediction-time A/L/B features from the pinned processed tables.
+"""Prediction-time A/L/B/C features from the pinned processed tables.
 
 No identifiers or targets are returned. Call once per release week, or supply
 ``week`` on all three tables to keep reconstructed sessions isolated by week.
 """
 import bisect
+import hashlib
 import json
+import shlex
 import platform
 import sys
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import perf_counter
 
@@ -44,7 +46,16 @@ B_EXTRA = (
     "completion_ewma", "prompt_ewma", "completion_diff", "prompt_diff",
     "previous_finish_reason", *TOOL_FEATURES, "session_elapsed_ms", "previous_end_gap_ms",
 )
+C_EXTRA = (
+    "account_prev_completed_requests", "account_prev_sessions", "account_completion_mean",
+    "account_completion_last", "account_last_end_gap_ms", "gateway_inflight_requests",
+    "gateway_recent_sessions_10m", "gateway_completion_10m", "gateway_completed_requests_10m",
+)
 FEATURE_SETS = {"A": A_FEATURES, "L": L_FEATURES, "B": (*L_FEATURES, *B_EXTRA)}
+FEATURE_SETS["C"] = (*FEATURE_SETS["B"], *C_EXTRA)
+GATEWAY_WINDOW_MS = 10 * 60 * 1000
+OBSERVATION_START_MS = int(datetime.combine(FIRST_WEEK, datetime.min.time(), timezone.utc).timestamp() * 1000)
+SESSION_COLUMNS = ["session_id", "harness", "user_id", "parent_session_id"]
 REQUEST_COLUMNS = list(dict.fromkeys([
     "session_id", "step", "start_ms", "end_ms", "link_reason", "completion_tokens",
     "finish_reason", "role_tokens", "tool_definition_names",
@@ -194,7 +205,156 @@ def build_features(requests, sessions, tool_calls):
                     history[name][pos] = value
     b = pd.concat([a, pd.DataFrame(history)], axis=1)
     b.index = requests.index
-    return {condition: b.loc[:, list(columns)].copy() for condition, columns in FEATURE_SETS.items()}
+    return {condition: b.loc[:, list(columns)].copy() for condition, columns in FEATURE_SETS.items() if condition != "C"}
+
+
+def _prefix_queries(ends, values, source_groups, starts, query_groups):
+    """Grouped cumulative sums/searchsorted, O((sources + queries) log n).
+
+    Return completed count, token sum and missing-token count. Negative group
+    codes represent an unknown account/parent and have no observable history.
+    """
+    result = np.zeros((len(starts), 3))
+    sources = pd.DataFrame({"group": source_groups, "end": ends, "value": values})
+    sources = sources.loc[sources.end.notna() & sources.group.ge(0)].sort_values(
+        ["group", "end"], kind="stable")
+    queries = pd.Series(np.arange(len(starts))).groupby(query_groups, sort=False)
+    by_group = sources.groupby("group", sort=False).indices
+    for group, positions in queries:
+        if group not in by_group:
+            continue
+        old = sources.iloc[by_group[group]]
+        positions = positions.to_numpy()
+        count = np.searchsorted(old.end.to_numpy(), starts[positions], side="left")
+        tokens = np.r_[0., old.value.fillna(0).to_numpy().cumsum()]
+        missing = np.r_[0, old.value.isna().to_numpy().cumsum()]
+        result[positions] = np.column_stack([count, tokens[count], missing[count]])
+    return result
+
+
+def build_cross_session_features(requests, sessions):
+    """Return the nine C additions in caller row/index order, across weeks.
+
+    Strictly completed outcomes only; current session excluded from account
+    history. Equal-end ties use (week, session_id, step) lexicographic order.
+    Only the three 10-minute window features are NA before a complete window
+    since the pinned release start. Aggregate diagnostics live in ``attrs``;
+    they are never model inputs and contain no identifiers or row values.
+    """
+    keys = ["week", "session_id"] if "week" in requests else ["session_id"]
+    for frame, label, unique in ((requests, "requests", [*keys, "step"]),
+                                 (sessions, "sessions", keys)):
+        if frame[unique].isna().any().any() or frame.duplicated(unique).any():
+            raise ValueError(f"{label} require unique non-null keys")
+    if requests.start_ms.isna().any() or (requests.end_ms < requests.start_ms).any():
+        raise ValueError("requests require start_ms and end >= start when known")
+    metadata = sessions[[*keys, "user_id", "parent_session_id"]].copy()
+    metadata["sid"] = np.arange(len(metadata))
+    rows = requests[[*keys, "step", "start_ms", "end_ms", "completion_tokens"]].merge(
+        metadata, on=keys, how="left", sort=False, validate="many_to_one", indicator=True)
+    if rows._merge.ne("both").any():
+        raise ValueError("request without a matching session")
+    starts, ends, tokens = (rows[name].to_numpy(dtype=float) for name in
+                            ("start_ms", "end_ms", "completion_tokens"))
+    sid = rows.sid.to_numpy()
+    accounts = pd.factorize(rows.user_id, sort=False)[0]
+    own = _prefix_queries(ends, tokens, sid, starts, sid)
+    account = _prefix_queries(ends, tokens, accounts, starts, accounts) - own
+    # Unknown account IDs cannot link separate sessions (even to each other).
+    account[accounts < 0] = 0
+    result = pd.DataFrame(np.nan, index=np.arange(len(rows)), columns=C_EXTRA)
+    result.account_prev_completed_requests = account[:, 0]
+    result.account_completion_mean = np.divide(
+        account[:, 1], account[:, 0], out=np.full(len(rows), np.nan),
+        where=(account[:, 0] > 0) & (account[:, 2] == 0))
+    result.account_prev_sessions = 0.
+    completed = rows.loc[rows.end_ms.notna()].copy()
+    completed["account"] = accounts[completed.index]
+    completed = completed.sort_values(["end_ms", *keys, "step"], kind="stable")
+    by_account = completed.groupby("account", sort=False)
+    queries = pd.Series(np.arange(len(rows))).groupby(accounts, sort=False)
+    for account_id, positions in queries:
+        if account_id < 0 or account_id not in by_account.indices:
+            continue
+        old = completed.iloc[by_account.indices[account_id]]
+        positions = positions.to_numpy()
+        first_ends = np.sort(old.drop_duplicates("sid").end_ms.to_numpy())
+        result.loc[positions, "account_prev_sessions"] = (
+            np.searchsorted(first_ends, starts[positions], side="left") - (own[positions, 0] > 0))
+        count = np.searchsorted(old.end_ms.to_numpy(), starts[positions], side="left")
+        # A contiguous run of one session: skip the whole run when it is the
+        # query session. Its predecessor is the most recent OTHER session.
+        old_sid = old.sid.to_numpy()
+        run_start = np.maximum.accumulate(np.where(
+            np.r_[True, old_sid[1:] != old_sid[:-1]], np.arange(len(old)), 0))
+        last = count - 1
+        same = (count > 0) & (old_sid[np.maximum(last, 0)] == sid[positions])
+        last[same] = run_start[last[same]] - 1
+        valid = last >= 0
+        target, source = positions[valid], last[valid]
+        result.loc[target, "account_completion_last"] = old.completion_tokens.to_numpy()[source]
+        result.loc[target, "account_last_end_gap_ms"] = starts[target] - old.end_ms.to_numpy()[source]
+
+    known = np.isfinite(ends)
+    result.gateway_inflight_requests = (
+        np.searchsorted(np.sort(starts[known]), starts, side="left")
+        - np.searchsorted(np.sort(ends[known]), starts, side="left"))
+    # Each session contributes a union of (start, start+10m] intervals. Counting
+    # these disjoint intervals gives distinct sessions without a per-row scan.
+    ordered = rows.sort_values(["sid", "start_ms"], kind="stable")
+    times = ordered.start_ms.to_numpy()
+    ids = ordered.sid.to_numpy()
+    new = np.r_[True, (ids[1:] != ids[:-1]) | (np.diff(times) > GATEWAY_WINDOW_MS)]
+    first = times[new]
+    last = times[np.r_[new[1:], True]] + GATEWAY_WINDOW_MS
+    result.gateway_recent_sessions_10m = (
+        np.searchsorted(np.sort(first), starts, side="left")
+        - np.searchsorted(np.sort(last), starts, side="left"))
+    order = np.argsort(ends[known], kind="stable")
+    sorted_ends, sorted_tokens = ends[known][order], tokens[known][order]
+    lo = np.searchsorted(sorted_ends, starts - GATEWAY_WINDOW_MS, side="left")
+    hi = np.searchsorted(sorted_ends, starts, side="left")
+    total = np.r_[0., np.nan_to_num(sorted_tokens, nan=0).cumsum()]
+    missing = np.r_[0, np.isnan(sorted_tokens).cumsum()]
+    result.gateway_completed_requests_10m = hi - lo
+    result.gateway_completion_10m = np.where(missing[hi] == missing[lo], total[hi] - total[lo], np.nan)
+    partial = starts - GATEWAY_WINDOW_MS < OBSERVATION_START_MS
+    result.loc[partial, ["gateway_recent_sessions_10m", "gateway_completion_10m",
+                         "gateway_completed_requests_10m"]] = np.nan
+
+    # Direct parent/child edges are resolved within the public week. Only
+    # same-account completed outcomes contribute; no final session ends used.
+    parent_keys = metadata[keys].copy()
+    parent_keys["session_id"] = metadata.parent_session_id
+    lookup = pd.MultiIndex.from_frame(metadata[keys])
+    parent = lookup.get_indexer(pd.MultiIndex.from_frame(parent_keys))
+    metadata_accounts = pd.factorize(metadata.user_id, sort=False)[0]
+    linked = (parent >= 0) & (parent != np.arange(len(parent)))
+    linked[linked] &= ((metadata_accounts[linked] >= 0) & (metadata_accounts[linked] == metadata_accounts[parent[linked]]))
+    parent[~linked] = -1
+    row_parent = parent[sid]
+    parent_history = _prefix_queries(ends, tokens, sid, starts, row_parent)[:, 0]
+    child_history = _prefix_queries(ends, tokens, row_parent, starts, sid)[:, 0]
+    linked_history = parent_history + child_history
+    unknown = np.searchsorted(np.sort(starts[~known]), starts, side="left")
+
+    def diagnostics(mask):
+        denominator = float(account[mask, 0].sum())
+        numerator = float(linked_history[mask].sum())
+        return {"rows": int(mask.sum()), "missing_end_requests": int((~known & mask).sum()),
+                "inflight_excluded_unknown_end_mean": float(unknown[mask].mean()),
+                "inflight_excluded_unknown_end_max": int(unknown[mask].max()),
+                "account_history_request_exposures": denominator,
+                "linked_parent_child_request_exposures": numerator,
+                "linked_parent_child_fraction": numerator / denominator if denominator else None}
+
+    result.index = requests.index
+    result.attrs["diagnostics"] = {
+        "definition": "direct same-account parent/child within public week; exposures sum histories over query rows",
+        "overall": diagnostics(np.ones(len(rows), dtype=bool)),
+        "weeks": {str(week): diagnostics(rows.week.eq(week).to_numpy())
+                  for week in pd.unique(rows.week)} if "week" in rows else {}}
+    return result
 
 
 def run(root=None, output=OUTPUT):
@@ -204,14 +364,17 @@ def run(root=None, output=OUTPUT):
                                for i, p in enumerate(paths)):
         raise ValueError("Features require consecutive train/validation weeks 1–13")
     started = perf_counter()
-    weekly, total_missing = [], {name: 0 for name in FEATURE_SETS["B"]}
-    for week in paths:
+    weekly, cross_rows, cross_sessions = [], [], []
+    total_missing = {name: 0 for name in FEATURE_SETS["C"]}
+    for number, week in enumerate(paths, 1):
         tick = perf_counter()
         requests = load_table(week, "requests", REQUEST_COLUMNS)
-        sessions = load_table(week, "sessions", ["session_id", "harness"])
+        sessions = load_table(week, "sessions", SESSION_COLUMNS)
         calls = load_table(week, "tool_calls", ["session_id", "step", "category", "outcome", "result_tokens"])
         loaded = perf_counter()
         features = build_features(requests, sessions, calls)
+        cross_rows.append(requests[["session_id", "step", "start_ms", "end_ms", "completion_tokens"]].assign(week=number))
+        cross_sessions.append(sessions.assign(week=number))
         built = perf_counter()
         b = features["B"]
         missing = {name: int(value) for name, value in b.isna().sum().items()}
@@ -223,15 +386,33 @@ def run(root=None, output=OUTPUT):
                        "missing_count": missing,
                        "missing_rate": {name: value / len(b) for name, value in missing.items()}})
         print(f"{week.name}: {len(b):,} rows, generation {built - loaded:.3f}s", flush=True)
+    tick = perf_counter()
+    cross = build_cross_session_features(pd.concat(cross_rows, ignore_index=True),
+                                         pd.concat(cross_sessions, ignore_index=True))
+    cross_seconds = perf_counter() - tick
+    offset = 0
+    for week in weekly:
+        missing = cross.iloc[offset:offset + week["rows"]].isna().sum()
+        for name, value in missing.items():
+            week["missing_count"][name] = int(value)
+            total_missing[name] += int(value)
+        week["missing_rate"] = {name: value / week["rows"] for name, value in week["missing_count"].items()}
+        offset += week["rows"]
     count = sum(week["rows"] for week in weekly)
     result = {"revision": REVISION, "scope": "weeks 1–13 only; no split, training or evaluation",
-              "command": f"{sys.executable} -m freeinference.features",
+              "command": 'FREEINFERENCE_DATA_DIR="$FREEINFERENCE_DATA_DIR" OPENBLAS_NUM_THREADS=1 '
+                         f"{shlex.quote(sys.executable)} -m freeinference.features",
+              "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+              "cross_session": {"window_ms": GATEWAY_WINDOW_MS,
+                                "observation_start_ms": OBSERVATION_START_MS,
+                                "generation_seconds": cross_seconds,
+                                "diagnostics": cross.attrs["diagnostics"]},
               "environment": {"python": platform.python_version(), "pandas": pd.__version__,
                               "platform": platform.platform()},
               "feature_sets": FEATURE_SETS, "lag_count": LAG_COUNT, "ewma_alpha": EWMA_ALPHA,
               "ewma_window": "up to 3 completed requests, end order, adjust=False",
               "rows": count, "elapsed_seconds": perf_counter() - started,
-              "generation_seconds": sum(week["generation_seconds"] for week in weekly),
+              "generation_seconds": sum(week["generation_seconds"] for week in weekly) + cross_seconds,
               "missing_count": total_missing,
               "missing_rate": {name: value / count for name, value in total_missing.items()},
               "weeks": weekly}

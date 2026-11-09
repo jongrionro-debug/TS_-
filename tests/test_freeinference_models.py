@@ -16,7 +16,8 @@ if HAS_DEPS:
     import pandas as pd
     from pandas.testing import assert_frame_equal
     from freeinference import loader, models, split
-    from freeinference.features import FEATURE_SETS, REQUEST_COLUMNS, build_features
+    from freeinference.features import (FEATURE_SETS, REQUEST_COLUMNS, build_cross_session_features,
+                                        build_features, run as run_features)
 
 
 @unittest.skipUnless(HAS_DEPS, "numpy, pandas, pyarrow and LightGBM are required")
@@ -47,9 +48,10 @@ class ModelTests(unittest.TestCase):
                                     "finish_reason": "stop", "role_tokens": {"user": 5},
                                     "tool_definition_names": []})
         rows = pd.DataFrame(records).reindex(columns=["week", *REQUEST_COLUMNS])
-        sessions = rows[["week", "session_id"]].drop_duplicates().assign(harness="h")
+        sessions = rows[["week", "session_id"]].drop_duplicates().assign(harness="h", user_id="private-account", parent_session_id=None)
         calls = pd.DataFrame(columns=["week", "session_id", "step", "category", "outcome", "result_tokens"])
         features = build_features(rows, sessions, calls)
+        features["C"] = pd.concat([features["B"], build_cross_session_features(rows, sessions)], axis=1)
         return rows, features
 
     def test_validation_targets_cannot_affect_selection_or_predictions_and_seed_is_fixed(self):
@@ -97,7 +99,7 @@ class ModelTests(unittest.TestCase):
                             self.assertEqual(candidate["evaluated_rounds"], evaluated)
                             self.assertIs(candidate["hit_max_rounds"], hit)
                 summary = models.round_summary(fitted.selection)
-                self.assertEqual(summary["overall"], {"candidates": 18, "hit_max_rounds": 18 if hit else 0})
+                self.assertEqual(summary["overall"], {"candidates": 24, "hit_max_rounds": 24 if hit else 0})
                 for values in summary["by_condition_quantile"].values():
                     for counts in values.values():
                         self.assertEqual(counts, {"candidates": 2, "hit_max_rounds": 2 if hit else 0})
@@ -138,7 +140,7 @@ class ModelTests(unittest.TestCase):
 
         with patch.object(lgb, "train", side_effect=train):
             first = models.QuantileModels().fit(rows, features)
-        self.assertEqual(len(calls), 3 * 3 * (len(models.GRID) + 1))
+        self.assertEqual(len(calls), len(FEATURE_SETS) * 3 * (len(models.GRID) + 1))
         for pos, (_, target, holdouts) in enumerate(calls):
             candidate = pos % (len(models.GRID) + 1)
             if candidate < len(models.GRID):
@@ -253,7 +255,7 @@ class ModelTests(unittest.TestCase):
             third = models.QuantileModels().fit(rows, features)
             for selection in third.selection.values():
                 self.assertTrue(all(s["settings"]["target_transform"] == "identity" for s in selection.values()))
-        self.assertEqual(len(evaluations), 3 * 3 * len(models.GRID) * 3)
+        self.assertEqual(len(evaluations), len(FEATURE_SETS) * 3 * len(models.GRID) * 3)
 
     def test_cli_generates_aggregate_artifacts_with_primary_ci_from_13_fixture_weeks(self):
         from datetime import timedelta
@@ -268,25 +270,44 @@ class ModelTests(unittest.TestCase):
                 weekly = rows.loc[rows.week.eq(number)].drop(columns="week")
                 weekly.to_parquet(path / "requests.parquet")
                 weekly[["session_id"]].drop_duplicates().assign(
-                    harness="h", user_id="private-account").to_parquet(path / "sessions.parquet")
+                    harness="h", user_id="private-account", parent_session_id=None).to_parquet(path / "sessions.parquet")
                 pd.DataFrame({"session_id": pd.Series(dtype="str"), "step": pd.Series(dtype="int"),
                               "category": pd.Series(dtype="str"), "outcome": pd.Series(dtype="str"),
                               "result_tokens": pd.Series(dtype="float")}).to_parquet(path / "tool_calls.parquet")
             with patch.object(models, "BOOTSTRAP_B", 20):
-                result = models.run(root, root / "out", previous_revision=None)
+                result = models.run(root, root / "out", previous_revision=None, regression_revision=None)
+            feature_report = run_features(root, root / "features.json")
+            self.assertEqual(feature_report["rows"], len(rows))
+            self.assertEqual(feature_report["feature_sets"], FEATURE_SETS)
+            self.assertEqual(len(feature_report["weeks"]), 13)
+            for name in models.C_EXTRA:
+                self.assertEqual(feature_report["missing_rate"][name], result["cross_session"]["missing_rate"][name])
+                self.assertEqual(sum(w["missing_count"][name] for w in feature_report["weeks"]),
+                                 feature_report["missing_count"][name])
+                self.assertTrue(all(name in w["missing_rate"] for w in feature_report["weeks"]))
+            self.assertEqual(feature_report["cross_session"]["diagnostics"], result["cross_session"]["diagnostics"])
+            feature_text = (root / "features.json").read_text()
+            for private in ("private-session", "private-account", str(root)):
+                self.assertNotIn(private, feature_text)
             recorded = json.loads((root / "out" / "models.json").read_text())
             self.assertEqual(recorded["primary"], result["primary"])
             self.assertEqual(recorded["environment"]["lightgbm"], lgb.__version__)
             self.assertEqual(recorded["sets"]["train_target"], {"rows": 200, "sessions": 50})
             self.assertEqual(recorded["sets"]["validation"], {"rows": 60, "sessions": 15})
             self.assertEqual(set(recorded["metrics"]["overall"]["metrics"]),
-                             {"fixed", "model", "previous_completion", "session_mean", "A", "L", "B"})
-            self.assertEqual(set(recorded["bootstrap"]), {"B_minus_L", "L_minus_A",
+                             {"fixed", "model", "previous_completion", "session_mean", "A", "L", "B", "C"})
+            self.assertEqual(set(recorded["bootstrap"]), {"B_minus_L", "L_minus_A", "C_minus_B", "C_minus_L",
                              "conditions_minus_fixed", "conditions_minus_previous_completion"})
             self.assertEqual(recorded["bootstrap"]["B_minus_L"]["reference"], "L")
             self.assertEqual(recorded["bootstrap"]["B_minus_L"]["cluster_columns"], ["week", "session_id"])
             self.assertEqual(recorded["primary"]["ci95"]["request"],
                              recorded["bootstrap"]["B_minus_L"]["groups"]["overall"]["differences"]["B"]["request"]["mean_pinball"])
+            self.assertEqual(set(recorded["supplementary"]), {"C_minus_B", "C_minus_L"})
+            self.assertEqual(set(recorded["cross_session"]["missing_rate"]), set(models.C_EXTRA))
+            regression = models.regression_previous(result, result, "fixture-41")
+            self.assertTrue(all(all(check.values()) for check in regression["conditions"].values()))
+            self.assertTrue(regression["primary_equal"])
+            self.assertTrue(regression["B_minus_L_bootstrap_equal"])
             self.assertEqual(recorded["early_stopping"], models.round_summary(result["selection"]))
             for name in ("models.json", "models.md"):
                 text = (root / "out" / name).read_text()
@@ -330,6 +351,25 @@ class ModelTests(unittest.TestCase):
             bootstrap = {"B_minus_L": {"groups": {"overall": {"differences": {"B": {
                 "request": {"mean_pinball": ci}, "session": {"mean_pinball": [-1, 1]}}}}}}}
             self.assertEqual(models.primary_result(metrics, bootstrap)["interpretation"], expected)
+
+    def test_supplementary_interpretation_does_not_change_primary(self):
+        scores = {name: {w: {"mean_pinball": score} for w in ("request", "session")}
+                  for name, score in (("L", 3.), ("B", 2.), ("C", 1.))}
+        metrics = {"overall": {"metrics": scores}}
+        for ci, expected in (([-2, -1], "validation에서 C가 B보다 개선"),
+                             ([-1, 0], "차이 미확인"), ([-1, 1], "차이 미확인"),
+                             ([.1, 1], "validation에서 C가 B보다 악화")):
+            def interval(name, value):
+                return {"groups": {"overall": {"differences": {name: {
+                    "request": {"mean_pinball": value}, "session": {"mean_pinball": [-1, 1]}}}}}}
+            bootstrap = {"B_minus_L": interval("B", [-2, -1]),
+                         "C_minus_B": interval("C", ci), "C_minus_L": interval("C", [-3, -1])}
+            primary = models.primary_result(metrics, bootstrap)
+            result = models.supplementary_results(metrics, bootstrap)
+            self.assertEqual(result["C_minus_B"]["interpretation"], expected)
+            self.assertEqual(result["C_minus_B"]["difference"], {"request": -1., "session": -1.})
+            self.assertIn("supplementary", result["C_minus_B"]["role"])
+            self.assertEqual(primary["interpretation"], "validation에서 B가 L보다 개선")
 
 
 if __name__ == "__main__":

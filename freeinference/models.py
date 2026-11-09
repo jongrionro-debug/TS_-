@@ -1,4 +1,4 @@
-"""Train-only A/L/B quantile selection, refit and aggregate validation report."""
+"""Train-only A/L/B/C quantile selection, refit and aggregate validation report."""
 import hashlib
 import json
 import platform
@@ -17,7 +17,8 @@ import pyarrow
 from .baselines import Baselines, PREDICTION_COLUMNS, QUANTILES, build_history
 from .evaluate import (BOOTSTRAP_B, BOOTSTRAP_SEED, METRICS, _set_counts,
                        evaluate_predictions, paired_bootstrap)
-from .features import FEATURE_SETS, REQUEST_COLUMNS, build_features
+from .features import (C_EXTRA, FEATURE_SETS, REQUEST_COLUMNS, SESSION_COLUMNS as FEATURE_SESSION_COLUMNS,
+                       build_cross_session_features, build_features)
 from .loader import FIRST_WEEK, REVISION, data_dir, load_table, weeks
 from .split import (FIT_WEEKS, HOLDOUT_START_MS, HOLDOUT_WEEK, SESSION_COLUMNS,
                     TRAIN_WEEKS, VALIDATION_START_MS, VALIDATION_WEEKS, split_masks)
@@ -40,6 +41,7 @@ PARAMETERS = {"objective": "quantile", "metric": "None", "seed": SEED,
               "num_threads": NUM_THREADS, "verbosity": -1}
 OUTPUT = Path(__file__).parent / "outputs" / "models"
 PREVIOUS_REVISION = "f2da61698358ac3a47171a6a8b133bd3c6f36e82"  # PR #39
+REGRESSION_REVISION = "39dedfd"  # PR #41: unchanged A/L/B 3000-round reference
 PREVIOUS_PATH = "freeinference/outputs/models/models.json"
 
 
@@ -83,7 +85,7 @@ class FeatureEncoder:
 
 def _features(features, index=None):
     if set(features) != set(FEATURE_SETS):
-        raise ValueError("Exactly A/L/B features are required")
+        raise ValueError("Exactly A/L/B/C features are required")
     for condition, columns in FEATURE_SETS.items():
         if tuple(features[condition].columns) != columns:
             raise ValueError("Input columns must exactly match FEATURE_SETS")
@@ -203,8 +205,9 @@ def comparisons(rows, predictions):
                                     B=BOOTSTRAP_B, seed=BOOTSTRAP_SEED)
             for name, reference, targets in (
                 ("B_minus_L", "L", ("B",)), ("L_minus_A", "A", ("L",)),
-                ("conditions_minus_fixed", "fixed", ("A", "L", "B")),
-                ("conditions_minus_previous_completion", "previous_completion", ("A", "L", "B")))}
+                ("C_minus_B", "B", ("C",)), ("C_minus_L", "L", ("C",)),
+                ("conditions_minus_fixed", "fixed", ("A", "L", "B", "C")),
+                ("conditions_minus_previous_completion", "previous_completion", ("A", "L", "B", "C")))}
 
 
 def primary_result(metrics, bootstrap):
@@ -218,6 +221,38 @@ def primary_result(metrics, bootstrap):
                            for w in ("request", "session")},
             "ci95": {w: intervals[w]["mean_pinball"] for w in ("request", "session")},
             "interpretation": interpretation, "final_conclusion": "reserved for approved final test issue"}
+
+
+def supplementary_results(metrics, bootstrap):
+    results = {}
+    scores = metrics["overall"]["metrics"]
+    for reference in ("B", "L"):
+        name = f"C_minus_{reference}"
+        intervals = bootstrap[name]["groups"]["overall"]["differences"]["C"]
+        ci = intervals["request"]["mean_pinball"]
+        results[name] = {
+            "role": "supplementary; primary decision remains B−L", "metric": "mean_pinball",
+            "difference": {w: scores["C"][w]["mean_pinball"] - scores[reference][w]["mean_pinball"]
+                           for w in ("request", "session")},
+            "ci95": {w: intervals[w]["mean_pinball"] for w in ("request", "session")},
+            "interpretation": (f"validation에서 C가 {reference}보다 개선" if ci[1] < 0 else
+                               "차이 미확인" if ci[0] <= 0 <= ci[1] else
+                               f"validation에서 C가 {reference}보다 악화")}
+    return results
+
+
+def regression_previous(result, previous, revision):
+    """Exact aggregate regression against #41; no trace or identifiers read."""
+    conditions = {}
+    for name in ("A", "L", "B"):
+        conditions[name] = {
+            "selection_equal": result["selection"][name] == previous["selection"][name],
+            "validation_metrics_equal": all(
+                values["metrics"][name] == previous["metrics"][group]["metrics"][name]
+                for group, values in result["metrics"].items())}
+    return {"source_revision": revision, "source_path": PREVIOUS_PATH,
+            "conditions": conditions, "primary_equal": result["primary"] == previous["primary"],
+            "B_minus_L_bootstrap_equal": result["bootstrap"]["B_minus_L"] == previous["bootstrap"]["B_minus_L"]}
 
 
 def round_summary(selection):
@@ -237,6 +272,8 @@ def compare_previous(result, previous, revision):
     """Only aggregate values from the immutable #39 artifact, never raw data."""
     selection = {}
     for condition, values in result["selection"].items():
+        if condition not in previous["selection"]:
+            continue
         selection[condition] = {}
         for label, current in values.items():
             old = previous["selection"][condition][label]
@@ -246,10 +283,12 @@ def compare_previous(result, previous, revision):
                 "holdout_pinball_change": current["holdout_pinball"] - old["holdout_pinball"]}
     comparisons = {}
     for name, bootstrap in result["bootstrap"].items():
+        if name not in previous["bootstrap"]:
+            continue
         reference = bootstrap["reference"]
         comparisons[name] = {}
         for predictor, intervals in bootstrap["groups"]["overall"]["differences"].items():
-            if predictor == reference:
+            if predictor == reference or predictor not in previous["metrics"]["overall"]["metrics"]:
                 continue
             comparisons[name][predictor] = {}
             for weighting in ("request", "session"):
@@ -277,7 +316,7 @@ def compare_previous(result, previous, revision):
 
 def _markdown(result):
     primary = result["primary"]
-    lines = ["# A/L/B LightGBM validation 비교", "",
+    lines = ["# A/L/B/C LightGBM validation 비교", "",
              f"**{primary['interpretation']}**. 최종 결론은 승인 후 test 평가에서 정한다.", "",
              f"- 주 지표: 요청 가중 mean pinball B−L = {primary['difference']['request']:.6f}, "
              f"95% CI {primary['ci95']['request']}.",
@@ -296,7 +335,7 @@ def _markdown(result):
              "- 1~9주 fit_target으로 학습, 10주 holdout_target의 원척도 해당 q pinball로 조기 종료·격자 선택. "
              "동점은 격자 순서. 선택 설정·반복 수로 1~10주 train_target 전체에 재학습. validation 선택 없음.",
              "- 범주 사전은 선택 단계 fit_target, 최종 단계 train_target에서 고정. 미관측·결측 범주는 결측, "
-             "수치 결측은 LightGBM에 전달. 입력은 FEATURE_SETS의 A/L/B 열만 사용.",
+             "수치 결측은 LightGBM에 전달. 입력은 FEATURE_SETS의 A/L/B/C 열만 사용.",
              "- log1p 예측은 expm1로 복원한 후 조기 종료·선택·평가. 출력 분위수는 행별 정렬.",
              f"- validation 정렬 전 교차 행 비율: `{json.dumps(result['crossing_rates'])}`",
              f"- bootstrap: (week, session_id) 세션 군집, B={BOOTSTRAP_B}, seed={BOOTSTRAP_SEED}, "
@@ -306,6 +345,26 @@ def _markdown(result):
              "- 요청별 값·식별자는 저장하지 않는다. 전체 설정·소스 해시·지표·CI·gain: [models.json](models.json)",
              "", "## holdout 선택", "", "| 조건 | 분위수 | 설정 | 반복 수 | 원척도 holdout pinball |",
              "|---|---|---|---:|---:|"]
+    supplemental = ["", "## C 보조 결과", "", "주 가설 판정은 B−L만 사용한다.", "",
+                    "| 비교 | 가중 | mean pinball 차이 | 95% CI | 요청 가중 해석 |",
+                    "|---|---|---:|---|---|"]
+    for name, values in result["supplementary"].items():
+        for weight in ("request", "session"):
+            supplemental.append(f"| {name} (보조) | {weight} | {values['difference'][weight]:.6f} | "
+                                f"{values['ci95'][weight]} | {values['interpretation'] if weight == 'request' else '보조 가중'} |")
+    supplemental += ["", "C 특징의 전체·주별 결측률과 부모·자식 이력 비율·종료 결측 제외 수는 JSON의 "
+                     "`cross_session` 및 [features.json](../features/features.json)에 기록한다. "
+                     "10분 창은 공개 데이터 시작 이전을 포함하면 결측이다."]
+    regression = result.get("regression_41")
+    if regression is not None:
+        supplemental += ["", "## #41 A/L/B 회귀 확인", "",
+                         f"기준 코드 `{regression['source_revision']}`의 집계 산출물과 비교했다. "
+                         f"조건별 동일 여부: `{json.dumps(regression['conditions'])}`. "
+                         f"B−L CI 동일: `{regression['B_minus_L_bootstrap_equal']}`, "
+                         f"주 판정 전체 동일: `{regression['primary_equal']}`."]
+    # Place supplementary findings before the holdout selection table.
+    table_start = lines.index("## holdout 선택") - 1
+    lines[table_start:table_start] = supplemental + [""]
     for condition, selection in result["selection"].items():
         for label, value in selection.items():
             lines.append(f"| {condition} | {label} | `{json.dumps(value['settings'])}` | "
@@ -388,19 +447,24 @@ def _markdown(result):
     return "\n".join(lines) + "\n"
 
 
-def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
+def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION,
+        regression_revision=REGRESSION_REVISION):
     started = perf_counter()
     previous = (json.loads(subprocess.check_output(
         ["git", "show", f"{previous_revision}:{PREVIOUS_PATH}"], text=True,
         cwd=Path(__file__).resolve().parent)) if previous_revision is not None else None)
+    regression = (json.loads(subprocess.check_output(
+        ["git", "show", f"{regression_revision}:{PREVIOUS_PATH}"], text=True,
+        cwd=Path(__file__).resolve().parent)) if regression_revision is not None else None)
     paths = weeks(root)
     if len(paths) != 13 or any(p.name[:10] != (FIRST_WEEK + timedelta(weeks=i)).isoformat()
                              for i, p in enumerate(paths)):
         raise ValueError("Models require consecutive train/validation weeks 1–13")
-    weekly, histories, feature_frames = [], [], []
+    weekly, histories, feature_frames, session_frames = [], [], [], []
     for number, path in enumerate(paths, 1):
         requests = load_table(path, "requests", REQUEST_COLUMNS)
-        sessions = load_table(path, "sessions", ["session_id", "harness"])
+        sessions = load_table(path, "sessions", FEATURE_SESSION_COLUMNS)
+        session_frames.append(sessions.assign(week=number))
         calls = load_table(path, "tool_calls", ["session_id", "step", "category", "outcome", "result_tokens"])
         features = build_features(requests, sessions, calls)
         feature_frames.append(features["B"])
@@ -412,9 +476,16 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
         print(f"week {number}: {len(rows):,} rows; features/history built", flush=True)
     rows = pd.concat(weekly, ignore_index=True)
     history = pd.concat(histories, ignore_index=True)
-    b = pd.concat(feature_frames, ignore_index=True)
+    cross = build_cross_session_features(rows, pd.concat(session_frames, ignore_index=True))
+    cross_summary = {"diagnostics": cross.attrs["diagnostics"],
+                     "missing_rate": {k: float(v) for k, v in cross.isna().mean().items()},
+                     "weeks_missing_rate": {
+                         str(week): {k: float(v) for k, v in cross.loc[rows.week.eq(week)].isna().mean().items()}
+                         for week in sorted(rows.week.unique())}}
+    cross.attrs.clear()
+    b = pd.concat([pd.concat(feature_frames, ignore_index=True), cross], axis=1)
     features = {name: b.loc[:, list(columns)] for name, columns in FEATURE_SETS.items()}
-    del weekly, histories, feature_frames, b, requests, calls
+    del weekly, histories, feature_frames, session_frames, cross, b, requests, calls
     loaded = perf_counter()
     masks = split_masks(rows)
     models = QuantileModels().fit(rows, features)
@@ -449,7 +520,7 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
         "sets": {name: _set_counts(rows, masks[name]) for name in masks if name != "session_week"},
         "excluded_train_targets": int((masks.train & ~masks.train_target).sum()),
         "excluded_fit_targets": int((masks.fit & ~masks.fit_target).sum()),
-        "feature_sets": FEATURE_SETS,
+        "feature_sets": FEATURE_SETS, "cross_session": cross_summary,
         "model_settings": {"grid": GRID, "parameters": PARAMETERS, "quantiles": QUANTILES,
                            "max_rounds": MAX_ROUNDS, "early_stopping_rounds": EARLY_STOPPING_ROUNDS,
                            "selection": "original-scale holdout q pinball; first grid candidate on tie",
@@ -461,6 +532,7 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
         "importance_gain": models.importance,
         "crossing_rates": crossing, "metrics": metrics, "bootstrap": bootstrap,
         "primary": primary_result(metrics, bootstrap),
+        "supplementary": supplementary_results(metrics, bootstrap),
         "limitations": ["validation only; test unread", "gateway population and period only",
                         "no account/day clustering or account-disjoint sensitivity",
                         "bootstrap does not include refitting or model-selection uncertainty"],
@@ -471,6 +543,8 @@ def run(root=None, output=OUTPUT, *, previous_revision=PREVIOUS_REVISION):
         result["limitations"].append(f"candidates hit {MAX_ROUNDS}-round cap; early stopping not confirmed for all candidates")
     if previous is not None:
         result["comparison_300_rounds"] = compare_previous(result, previous, previous_revision)
+    if regression is not None:
+        result["regression_41"] = regression_previous(result, regression, regression_revision)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     (output / "models.json").write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
