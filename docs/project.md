@@ -2,7 +2,7 @@
 
 - 과목: 시계열 데이터 분석 및 실습 (Group 5, "Forecasting LLM Token Demand with Conversation State")
 - 최종 갱신일: 2026-11-09
-- 현재 상태: **1~13주 감사·EDA·A/L/B 특징과 고정 분할·기준선 4종 validation 평가 구현.** 현재 입력 기반 연결과 엄격 완료 조건을 적용한다. [기준선 지표·세션 bootstrap CI](../freeinference/outputs/baselines/baselines.md), [특징 산출물](../freeinference/outputs/features/features.json), 연구 결정은 [ADR 0005](adr/0005-freeinference-agentic-trace.md)를 따른다. LightGBM 비교와 최종 test는 미실행이다.
+- 현재 상태: **1~13주 감사·EDA·A/L/B 특징·고정 분할·기준선 4종과 LightGBM validation 비교·B−L 세션 bootstrap CI 구현·실행 완료.** [모델 결과](../freeinference/outputs/models/models.md)의 주 지표 CI 상한 < 0으로 validation에서 B가 L보다 개선했다. 최종 test는 미실행이다. 현재 입력 기반 연결과 엄격 완료 조건을 적용한다. [기준선 지표·CI](../freeinference/outputs/baselines/baselines.md), [특징 산출물](../freeinference/outputs/features/features.json), 연구 결정은 [ADR 0005](adr/0005-freeinference-agentic-trace.md)를 따른다.
 - 이전 연구: WildChat 현재 프롬프트 응답 길이 예측(최종 test 완료)은 태그 `wildchat-final`에 보존한다. 이 문서의 수치·정의와 섞지 않는다.
 
 ## 1. 연구 질문
@@ -70,7 +70,11 @@
 
 A 입력의 결측 목록·역할은 결측으로 유지하고, 명시적 빈 tool 정의 목록은 0이다. 첫 요청이나 연결 검사를 통과하지 못한 행은 A만 유지하며 **L 추가 특징과 B 추가 특징 전체를 결측**으로 둔다(step·turn·경과 포함). 정상 연결에서 이전 요청에 tool 호출이 없으면 호출 수·범주·outcome·result_tokens는 0이다. 완전한 특징 이름 목록과 주별·전체 결측률은 [생성 산출물](../freeinference/outputs/features/features.json)의 `feature_sets`, `missing_count`, `missing_rate`에 있다. 재현은 준비된 `FREEINFERENCE_DATA_DIR`와 분석 의존성이 있는 Python에서 `python -m freeinference.features`를 실행한다. 산출물에는 집계만 기록하며 요청별 특징·정답·식별자는 내보내지 않는다. 실행은 분할·학습·평가를 하지 않는다.
 
-주 가설 검정은 **B − L** 하나로 미리 고정하고, 나머지는 보조 비교로 보고한다(다중 비교 완화).
+`freeinference.models.QuantileModels`는 `FEATURE_SETS["A"|"L"|"B"]`와 열·순서가 정확히 같은 입력만 받으며 조건·분위수마다 LightGBM 1개(총 9개)를 학습한다. LightGBM은 `4.7.0`으로 고정한다. 범주형은 `model`, `provider`, `harness`, `stream`, `step_trigger`, `waited_for`, `transition`, `previous_finish_reason`이며 선택 단계에는 `fit_target`, 최종 단계에는 `train_target`에서 본 범주 사전만 고정한다. 미관측·결측 범주는 결측으로 두고 수치 결측은 LightGBM 기본 처리에 맡긴다. 범주 사전이나 특징 열은 validation으로 확장하지 않는다.
+
+고정 격자는 `(num_leaves, min_data_in_leaf) ∈ {(15,100), (31,300)}` × `target_transform ∈ {identity, log1p}`의 4개 후보이며 `learning_rate=0.05`다. A/L/B·P10/P50/P90 모두 같은 격자를 사용한다. `objective="quantile"`, `alpha ∈ {0.1,0.5,0.9}`, `seed=20261109`, `deterministic=True`, `force_col_wise=True`, `num_threads=4`를 고정한다. 최대 300회·patience 30으로 `fit_target`만 학습하며, `holdout_target`의 **원척도 해당 q pinball** 하나로 조기 종료·설정을 선택한다. `log1p` 예측은 조기 종료·격자 비교부터 `expm1`로 복원하며, 동점이면 격자에서 먼저 나온 후보를 택한다. 선택한 설정·반복 수로 `train_target` 전체에 재학습한 뒤 validation을 예측한다. 원척도 복원 후 행별 정렬로 P10 ≤ P50 ≤ P90을 보장하고 정렬 전 교차 행 비율을 기록한다. 중요도는 조건·분위수별 gain 상위 10개 집계만 저장한다.
+
+주 가설 검정은 **B − L** 하나로 미리 고정하고, L−A와 각 조건의 fixed·previous_completion 대비 차이는 보조 비교로 보고한다(다중 비교 완화). 실행은 `python -m freeinference.models`; [집계 JSON](../freeinference/outputs/models/models.json)과 [모델 보고서](../freeinference/outputs/models/models.md)에 전체 격자·후보별 holdout 점수·선택·환경·소스 해시·시간을 기록한다. 특징 생성기·분할 상수·연구 질문·test 계약은 유지한다.
 
 ## 5. 분할과 평가
 
@@ -78,7 +82,8 @@ A 입력의 결측 목록·역할은 결측으로 유지하고, 명시적 빈 to
 - 경계 규칙: train 세션이어도 `end_ms ≥ VALIDATION_START_MS=1785024000000`(2026-07-26 00:00 UTC)이거나 종료 시각이 결측이면 `train_target`에서 제외한다. `train` 행은 그대로 보존하고 특징·기준선 이력 계산은 변경하지 않는다. test 폴더·test 시각 요청은 기존 로더에서 거부한다.
 - 하이퍼파라미터·조기 종료는 train 내부 시간 홀드아웃으로만 고른다. `FIT_WEEKS=(1,...,9)`, `HOLDOUT_WEEK=10`이며 `fit_target`은 `end_ms < HOLDOUT_START_MS=1784419200000`(2026-07-19 00:00 UTC)만 포함한다. 시각 결측도 제외한다. holdout 정답에도 validation 시작 경계를 적용한다. 기준선은 조정할 하이퍼파라미터가 없어 holdout을 쓰지 않고 경계 적용 train 전체로 맞춘다. validation은 비교 보고용, test는 최종 평가 Issue에서 승인 후 1회.
 - 지표: q별 pinball `max(q(y−p_q), (q−1)(y−p_q))`와 세 분위수 평균, P50 MAE, P10–P90 coverage(`P10 ≤ y ≤ P90`)와 평균 폭(`P90−P10`). 요청 가중은 행마다 1, 세션 가중은 **각 평가 구간 안에서** 세션별 행 수의 역수이므로 세션마다 총 가중치 1이다. 전체·첫 요청(step 0)·후속 요청·harness·model별로 같은 지표와 행 수·세션 수를 기록한다.
-- 불확실성(피드백 2): `freeinference.evaluate.paired_bootstrap`은 예측기 이름 → P10/P50/P90 DataFrame 사전과 기준 예측기 이름, `cluster_columns`를 받는다. 기본 군집은 `(week, session_id)`, `BOOTSTRAP_B=2000`, `BOOTSTRAP_SEED=20261109`로 고정한다. validation 전체의 세션을 복원 추출해 **같은 추출을 모든 예측기·구간·가중에 공유**하며 재학습하지 않는다. 세션의 모든 행은 같은 횟수만큼 포함한다. 차이(예측기−기준)의 2.5·97.5 백분위(`linear`)를 95% CI로 기록한다. 일부 구간이 빈 추출은 그 구간 CI에서 제외하고 유효 반복 수를 기록한다. 현재 산출물의 기준은 `fixed`다. B−L은 이후 주 비교이며 계정 군집·일 단위 블록 bootstrap과 계정 분리 민감도는 이후 작업이다.
+- 주 판정 지표는 validation **요청 가중 mean pinball의 B−L 차이와 세션 bootstrap 95% CI**다. CI 상한 < 0이면 "validation에서 B가 L보다 개선", 0을 포함하면 "차이 미확인", 하한 > 0이면 validation 악화로 기록한다. 세션 가중은 보조로 함께 보고한다. 최종 결론은 사용자 승인 후 test 평가 Issue에서 정한다.
+- 불확실성(피드백 2): `freeinference.evaluate.paired_bootstrap`은 예측기 이름 → P10/P50/P90 DataFrame 사전과 기준 예측기 이름, `cluster_columns`를 받는다. 기본 군집은 `(week, session_id)`, `BOOTSTRAP_B=2000`, `BOOTSTRAP_SEED=20261109`로 고정한다. validation 전체의 세션을 복원 추출해 **같은 추출을 모든 예측기·구간·가중에 공유**하며 재학습하지 않는다. 세션의 모든 행은 같은 횟수만큼 포함한다. 차이(예측기−기준)의 2.5·97.5 백분위(`linear`)를 95% CI로 기록한다. 일부 구간이 빈 추출은 그 구간 CI에서 제외하고 유효 반복 수를 기록한다. 모델 산출물은 L을 기준으로 B−L, A를 기준으로 L−A, fixed·previous_completion을 각각 기준으로 A/L/B 차이를 같은 함수·시드로 계산한다. 계정 군집·일 단위 블록 bootstrap과 계정 분리 민감도는 이후 작업이다.
 - `evaluate_predictions`와 `paired_bootstrap`은 동일 행 순서·인덱스의 정답/예측을 요구한다. 세션 가중은 군집 열을 바꿔도 유지되며, 군집 열만 바꾸면 계정·일 블록 추출을 재사용할 수 있다. 실데이터 실행은 `python -m freeinference.evaluate`; 집계 [JSON](../freeinference/outputs/baselines/baselines.json)과 [보고서](../freeinference/outputs/baselines/baselines.md)에 데이터 revision·코드 HEAD/소스 해시·명령·환경·소요 시간·경계 제외 수·지표·대체율·CI를 기록한다. 요청별 예측·정답·식별자는 내보내지 않으며 실데이터 실행은 저장소 검증 명령에 넣지 않는다.
 
 ## 6. 탐색 분석 (피드백 2·3)
@@ -95,4 +100,4 @@ A 입력의 결측 목록·역할은 결측으로 유지하고, 명시적 빈 to
 
 ## 8. 진행 상황
 
-작업은 Issue에서 관리한다([workflow.md](workflow.md)). 고정 분할·기준선 4종 validation 지표·세션 bootstrap 틀은 구현 및 실데이터 실행을 마쳤다([결과](../freeinference/outputs/baselines/baselines.md)). 다음 순서: 같은 holdout·평가 함수를 사용하는 A/L/B LightGBM validation 비교와 B−L CI → C 보조 비교 → 계정·일 블록 bootstrap 및 계정 분리 민감도 → 10분 수요 뷰 → 사용자 승인 후 최종 test 1회.
+작업은 Issue에서 관리한다([workflow.md](workflow.md)). 고정 분할·기준선 4종과 A/L/B LightGBM validation 비교·세션 bootstrap CI를 구현하고 1~13주 실데이터 실행을 마쳤다([모델 결과](../freeinference/outputs/models/models.md), [기준선 결과](../freeinference/outputs/baselines/baselines.md)). 주 판정은 validation에서 B가 L보다 개선이다. 소규모 격자·최대 300회에 한정한 비교이며 학습·선택 불확실성, 계정·일 군집과 계정 분리 민감도는 미검증이다. 최종 결론은 test 평가까지 유보한다. 다음 순서: C 보조 비교 → 계정·일 블록 bootstrap 및 계정 분리 민감도 → 10분 수요 뷰 → 사용자 승인 후 최종 test 1회.
