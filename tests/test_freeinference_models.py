@@ -1,5 +1,6 @@
 """Synthetic model contracts; no trace access or real-data evaluation."""
 import contextlib
+import copy
 import importlib.util
 import io
 import json
@@ -69,6 +70,37 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(models.PARAMETERS["seed"], models.SEED)
         self.assertTrue(models.PARAMETERS["deterministic"])
         self.assertEqual(models.PARAMETERS["num_threads"], models.NUM_THREADS)
+
+    def test_round_cap_uses_actual_evaluations_including_patience_after_best(self):
+        rows, features = self.fixture()
+        original_train = lgb.train
+        for scores, best, evaluated, hit in (
+                ([6, 5, 4, 3, 2, 1], 6, 6, True),
+                ([1, 1, 1, 1, 1, 1], 1, 3, False),
+                ([6, 5, 4, 3, 2, 3], 5, 6, True)):
+            with self.subTest(scores=scores):
+                def train(params, dataset, **kwargs):
+                    if "feval" in kwargs:
+                        values = iter(scores)
+                        kwargs["feval"] = lambda prediction, valid: ("original_pinball", next(values), False)
+                    return original_train(params, dataset, **kwargs)
+
+                with patch.object(models, "MAX_ROUNDS", 6), \
+                        patch.object(models, "EARLY_STOPPING_ROUNDS", 2), \
+                        patch.object(lgb, "train", side_effect=train):
+                    fitted = models.QuantileModels().fit(rows, features)
+                for selection in fitted.selection.values():
+                    for selected in selection.values():
+                        for candidate in selected["candidates"]:
+                            self.assertEqual(candidate["best_iteration"], best)
+                            self.assertEqual(candidate["iterations"], best)
+                            self.assertEqual(candidate["evaluated_rounds"], evaluated)
+                            self.assertIs(candidate["hit_max_rounds"], hit)
+                summary = models.round_summary(fitted.selection)
+                self.assertEqual(summary["overall"], {"candidates": 18, "hit_max_rounds": 18 if hit else 0})
+                for values in summary["by_condition_quantile"].values():
+                    for counts in values.values():
+                        self.assertEqual(counts, {"candidates": 2, "hit_max_rounds": 2 if hit else 0})
 
     def test_training_and_selection_receive_exact_target_masks(self):
         rows, features = self.fixture()
@@ -241,7 +273,7 @@ class ModelTests(unittest.TestCase):
                               "category": pd.Series(dtype="str"), "outcome": pd.Series(dtype="str"),
                               "result_tokens": pd.Series(dtype="float")}).to_parquet(path / "tool_calls.parquet")
             with patch.object(models, "BOOTSTRAP_B", 20):
-                result = models.run(root, root / "out")
+                result = models.run(root, root / "out", previous_revision=None)
             recorded = json.loads((root / "out" / "models.json").read_text())
             self.assertEqual(recorded["primary"], result["primary"])
             self.assertEqual(recorded["environment"]["lightgbm"], lgb.__version__)
@@ -255,10 +287,34 @@ class ModelTests(unittest.TestCase):
             self.assertEqual(recorded["bootstrap"]["B_minus_L"]["cluster_columns"], ["week", "session_id"])
             self.assertEqual(recorded["primary"]["ci95"]["request"],
                              recorded["bootstrap"]["B_minus_L"]["groups"]["overall"]["differences"]["B"]["request"]["mean_pinball"])
+            self.assertEqual(recorded["early_stopping"], models.round_summary(result["selection"]))
             for name in ("models.json", "models.md"):
                 text = (root / "out" / name).read_text()
                 self.assertNotIn("private-session", text)
                 self.assertNotIn("private-account", text)
+                self.assertNotIn(str(root), text)
+            previous = copy.deepcopy(result)
+            previous["model_settings"]["max_rounds"] = 300
+            previous["selection"]["B"]["P50"]["iterations"] = 300
+            previous["selection"]["B"]["P50"]["holdout_pinball"] += 2
+            previous["metrics"]["overall"]["metrics"]["B"]["request"]["mean_pinball"] += 4
+            old_ci = [-5., -1.]
+            previous["bootstrap"]["B_minus_L"]["groups"]["overall"]["differences"]["B"]["request"]["mean_pinball"] = old_ci
+            comparison = models.compare_previous(result, previous, "synthetic-reference")
+            self.assertEqual(comparison["best_iteration_at_max"], 0)
+            self.assertEqual(comparison["selection"]["B"]["P50"]["holdout_pinball_change"], -2)
+            primary = comparison["overall_mean_pinball"]["B_minus_L"]["B"]["request"]
+            self.assertAlmostEqual(primary["current_difference"], result["primary"]["difference"]["request"])
+            self.assertAlmostEqual(primary["change"], -4)
+            self.assertEqual(primary["previous_ci95"], old_ci)
+            self.assertEqual(primary["current_ci95"], result["primary"]["ci95"]["request"])
+            self.assertEqual(set(comparison["overall_mean_pinball"]), set(result["bootstrap"]))
+            result["comparison_300_rounds"] = comparison
+            markdown = models._markdown(result)
+            self.assertIn("synthetic-reference", markdown)
+            self.assertIn("L_minus_A", markdown)
+            result["early_stopping"]["overall"]["hit_max_rounds"] = 1
+            self.assertIn("한계: 20회에서도", models._markdown(result))
             # Refuse all test directories before writing anything.
             (root / "release" / "2026-08-16_2026-08-22").mkdir()
             with self.assertRaisesRegex(ValueError, "Held-out"):
