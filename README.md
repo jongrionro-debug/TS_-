@@ -53,6 +53,10 @@ FREEINFERENCE_DATA_DIR=~/data/freeinference/bb26cf7 OPENBLAS_NUM_THREADS=1 ~/.ve
 
 같은 1~13주 데이터와 분석 환경에서 `OPENBLAS_NUM_THREADS=1 python -m freeinference.demand`를 실행한다. `FREEINFERENCE_DATA_DIR`은 준비된 데이터 위치를 가리킨다. [수요 뷰](freeinference/outputs/demand/demand.md)는 validation 요청 시작 기준 현재 추정과 일 블록 bootstrap을 기록한다.
 
+## 최종 test 1회 평가 재현
+
+최종 test(14~16주)는 #48에서 사용자 승인 후 1회 실행했다. 같은 revision의 1~13주와 14~16주 `manifest.json`·`processed/`를 별도 폴더에 두고, Hugging Face LFS sha256으로 만든 `expected_sha256.json`을 함께 둔다. `FREEINFERENCE_FINAL_DATA_DIR`이 그 폴더를 가리키게 하고 `OPENBLAS_NUM_THREADS=1 python -m freeinference.final`을 실행한다. [최종 평가](freeinference/outputs/final/final.md)와 [집계 JSON](freeinference/outputs/final/final.json)이 이미 있으면 실행을 거부한다. test 재평가는 하지 않는다.
+
 ## 검증
 
 ```sh
