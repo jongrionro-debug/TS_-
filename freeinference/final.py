@@ -130,9 +130,14 @@ def final_masks(rows):
     assigned = (first - int(datetime.combine(FIRST_WEEK, datetime.min.time(), timezone.utc).timestamp() * 1000)) // WEEK_MS + 1
     if ((assigned < 1) | (assigned > 16) | (rows.start_ms >= TEST_START_MS + 3 * WEEK_MS)).any():
         raise ValueError('Request outside release period')
-    if ((rows.week >= 14) & (assigned <= 13)).any():
-        raise ValueError('Test-folder session starts before test period')
-    result['test'] = assigned.between(14, 16)
+    # Test-folder sessions whose first request precedes the test start belong to
+    # week 13 by the first-start rule, but were not in the validation evaluation.
+    # They are excluded from both evaluations (history/C features still see them).
+    boundary = (rows.week >= 14) & (assigned <= 13)
+    if (boundary & assigned.lt(13)).any():
+        raise ValueError('Test-folder session starts before week 13')
+    result['excluded_boundary'] = boundary
+    result['test'] = assigned.between(14, 16) & ~boundary
     return result
 
 
@@ -187,17 +192,28 @@ def run(root=None, output=OUTPUT):
     cross.attrs.clear()
     b = pd.concat([pd.concat(feature_frames, ignore_index=True), cross], axis=1)
     features = {name: b.loc[:, list(columns)] for name, columns in FEATURE_SETS.items()}
+    # Validation reproduction uses the information set of the original weeks 1–13
+    # run: test-folder requests just before the test start must not enter
+    # validation-row C features. Training rows are identical under both builds.
+    earlier = rows.week.le(13)
+    cross_earlier = build_cross_session_features(rows.loc[earlier], sessions.loc[sessions.week.le(13)])
+    cross_earlier.attrs.clear()
+    b_earlier = pd.concat([b.loc[earlier, [c for c in b.columns if c not in cross.columns]],
+                           cross_earlier.set_axis(rows.index[earlier])], axis=1)[b.columns]
+    validation_features = {name: b_earlier.loc[:, list(columns)] for name, columns in FEATURE_SETS.items()}
     masks = final_masks(rows)
+    train_rows = masks.train_target[earlier]
+    pd.testing.assert_frame_equal(b.loc[earlier].loc[train_rows], b_earlier.loc[train_rows])
     validate_test_rows(rows, masks.test)
     reference = json.loads(REFERENCE.read_text(encoding='utf-8'))
     model = fit_fixed(rows, features, masks.train_target, REFERENCE)
     baselines = Baselines().fit(rows, history, masks.train_target)
-    def predict(mask):
+    def predict(mask, source=features):
         frame = rows.loc[mask].copy()
-        model_predictions, _ = model.predict({name: values.loc[mask] for name, values in features.items()})
+        model_predictions, _ = model.predict({name: values.loc[mask[values.index]] for name, values in source.items()})
         base, _ = baselines.predict(frame, history.loc[mask])
         return frame, {**base, **model_predictions}
-    validation, vp = predict(masks.validation)
+    validation, vp = predict(masks.validation, validation_features)
     validation_metrics = evaluate_predictions(validation, vp)
     # Selection comes from the same reference; reproduction is checked by metrics.
     if validation_metrics != reference['metrics']:
@@ -233,6 +249,8 @@ def run(root=None, output=OUTPUT):
                                         'bootstrap': validation_demand['bootstrap']},
                              'reproduced': True},
               'test': {'metrics': metrics, 'bootstrap': bootstrap, 'block_bootstrap': blocks,
+                       'excluded_boundary': {'sessions': int(rows.loc[masks.excluded_boundary, list(SESSION_COLUMNS)].drop_duplicates().shape[0]),
+                                             'rows': int(masks.excluded_boundary.sum())},
                        'primary': {'difference': scores['B']['request']['mean_pinball'] - scores['L']['request']['mean_pinball'],
                                    'ci95': ci, 'conclusion': conclusion}, 'demand': demand_result}}
     result_json = json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n'

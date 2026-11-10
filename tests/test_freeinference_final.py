@@ -256,9 +256,20 @@ class FinalBoundaryTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 final.run(root=tmp, output=output)
 
-    def test_test_folder_session_before_boundary_is_rejected(self):
+    def test_test_folder_session_before_boundary_is_excluded(self):
+        rows = pd.DataFrame({'week': [14, 14, 14], 'session_id': ['s', 's', 't'],
+                             'start_ms': [final.TEST_START_MS - 1, final.TEST_START_MS + 5,
+                                          final.TEST_START_MS + 10],
+                             'end_ms': [final.TEST_START_MS + 1, final.TEST_START_MS + 6,
+                                        final.TEST_START_MS + 11]})
+        masks = final.final_masks(rows)
+        self.assertEqual(masks.excluded_boundary.tolist(), [True, True, False])
+        self.assertEqual(masks.test.tolist(), [False, False, True])
+        self.assertFalse(masks.loc[:1, ['train_target', 'validation']].any().any())
+
+    def test_test_folder_session_before_week_13_is_rejected(self):
         rows = pd.DataFrame({'week': [14], 'session_id': ['s'],
-                             'start_ms': [final.TEST_START_MS - 1],
+                             'start_ms': [final.TEST_START_MS - 2 * final.WEEK_MS],
                              'end_ms': [final.TEST_START_MS + 1]})
         with self.assertRaises(ValueError):
             final.final_masks(rows)
